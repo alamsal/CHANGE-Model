@@ -14,11 +14,14 @@
 #include "vegetation.h"
 #include "fires.h"
 #include "celllist.h"
+#include <iostream>
+using namespace std;
 
 // POINTERS TO MAIN LANDSCAPE ARRAYS
 //---------------------------------------------------------------------------
 short int *stategrid;	// successional stage grid
 char *comgrid;			// community type grid
+char *lccgrid;			// lcc type grid
 short int *timeinstage;	// time in current successional stage grid
 short int *dem;			// elevation grid
 short int *age;		    // patch age grid
@@ -146,6 +149,10 @@ struct mortality hs_cmort;  // post hs-fire chronic mortality (by time since fir
 struct mortality ms_cmort;  // post ms-fire chronic mortality (by time since fire)
 struct mortality decayrate; // dead wood decay (by time since fire)
 
+//Land cover parameters
+int numlcc;					//Number of lcc types
+int lcccode[40];			//LCC code works upto 40 different LCC types.
+
 // Summary arrays
 double sum_deadwood[100];   // dead wood loading summary array
 double sum_livebio[100];    // live wood loading summary array
@@ -169,6 +176,8 @@ int main( int argc, char *argv[] ) {
     char outfilename2[80];  // output file name (landscape summary)
 	char outfilename3[80];  // output file name (treatment summary)
     char harvfilename[80];	// input file name (treatment priority)
+	char lccfilename[80];	// input file name (land cover class)
+
     char yearstr[10];       // current year
 
     int init_state[40];		// default initial state for each community type
@@ -213,7 +222,8 @@ int main( int argc, char *argv[] ) {
 	int initindex;			// initial treatment unit
 	int unitcounter[5];		// treatment unit counter
 	int unitcnt;			// counts number of units treated
-	
+	int lcccnt;				// counts number of lcc types
+
 	// 9-21-2012: Code updated to allow up to 40 fire regimes
     double fsize;           // fire size
     double nfr[40][10];         // natural fire rotation
@@ -244,6 +254,7 @@ int main( int argc, char *argv[] ) {
     struct image_header land_head;      // ERDAS file head for topo grid
     struct image_header dem_head;		// ERDAS file header for dem grid
     struct image_header com_head;       // ERDAS file head for age grid
+	struct image_header lcc_head;		// ERDAS file head for lcc grid
     struct image_header state_head;		// ERDAS file header for successional stage grid
     struct image_header bioage_head;    // ERDAS file head for bioage grid
     struct image_header dead_head;      // ERDAS file head for dead grid
@@ -265,6 +276,8 @@ int main( int argc, char *argv[] ) {
     strcat(firefilename, ".fre");
     strcpy(harvfilename, runname);
     strcat(harvfilename, ".hrv");
+	strcpy(lccfilename, runname);
+    strcat(lccfilename, ".lcc");
 
     // Open input files and read scenario parameters
 	ifstream infile;
@@ -276,6 +289,7 @@ int main( int argc, char *argv[] ) {
     ifstream landfile;
     ifstream infirefile;
     ifstream inharvfile;
+	ifstream inlccfile;
 
 	// Read main input file
 	infile >> cellsize; infile.ignore(100, '\n');
@@ -392,7 +406,7 @@ int main( int argc, char *argv[] ) {
 
     // Read landtype input file
 	if( simfire_flag == 1 ) {
-        landfile >> numland; landfile.ignore(100, '\n');
+        landfile >> numland; landfile.ignore(100,'\n');
 		for(landcnt = 0; landcnt < numland; landcnt ++) {
             landfile >> landcode[landcnt]; landfile.ignore(100, '\n');
             landfile >> landfiremod[landcnt]; landfile.ignore(100, '\n');
@@ -419,6 +433,16 @@ int main( int argc, char *argv[] ) {
 			}
 		}
     }
+	
+	// Read lcc inputfile
+	inlccfile.open(lccfilename);
+	inlccfile>>numlcc; inlccfile.ignore(100,'\n');
+	for(lcccnt=0;lcccnt<numlcc;lcccnt++)
+	{
+		inlccfile>>lcccode[lcccnt]; inlccfile.ignore(100,'\n');
+		//std::cout<<lcccode[lcccnt]; 
+
+	}
 
     // Only read wood biomass intput file if we're simulating biomass
 	biosum = 0;
@@ -530,6 +554,7 @@ int main( int argc, char *argv[] ) {
     dem = new short int[size];
     stategrid = new short int[size];
     comgrid = new char[size];
+	lccgrid= new char[size];
     timeinstage = new short int[size];
     age = new short int[size];
     tsfire = new short int[size];
@@ -584,6 +609,8 @@ int main( int argc, char *argv[] ) {
 
         land_head = read_grid("landtype", landgrid);
 		com_head = read_grid("community", comgrid); 
+		lcc_head= read_grid("lcc",lccgrid);
+		
     // or generate homogeneous grids
 	// not sure if this still works - do I need to add a generator for the elevation grid?
 	} else {
@@ -616,18 +643,39 @@ int main( int argc, char *argv[] ) {
         zsize[zonecnt] = 0;
     }
 
+	//Integrating buffer with LCC type////////////////////////////////////////////////////////////////////////
+	for(index=0;index<size;index++)
+	{
+		//printf("%d",buffer[index]);
+		//printf("%d",lccgrid[index]);
+		if(buffer[index]>0)
+		{
+			if(lccgrid[index]>0)
+			{
+				if(buffer[index]==2 ||lccgrid[index]==2)
+				{
+					buffer[index]=2;
+				}
+			}
+		}
+		
+	}
+
+
     // compute the size of the active landscape, fire regime zones, and summary zones
     for(index=0; index<size; index++) {
+		
         if(buffer[index] > 0)  {
             landsize ++;
             if( simfire_flag == 1) {
-                if( regime[index] > 0 ) {
-                    rsize[regime[index] - 1]++;
+                if( buffer[index] > 0 ) {
+                    rsize[buffer[index] - 1]++;
                 }
             }
             if( read_map > 0 && runtype > 0 ) {
 				// 9/24/2012 - Added comgrid condition to handle problem w/ Erik and Rob's input files
-                if( buffer[index] == 1 && comgrid[index] > 0 ) {
+				if( (buffer[index] == 1)&& (comgrid[index] > 0)) {
+					
                     zsize[comgrid[index] - 1] += 1;
                 }
             } else {

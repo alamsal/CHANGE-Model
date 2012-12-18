@@ -81,6 +81,7 @@
     <ClCompile Include="..\..\Code\fires.cpp" />
     <ClCompile Include="..\..\Code\lads.cpp" />
     <ClCompile Include="..\..\Code\ladsio.cpp" />
+    <ClCompile Include="..\..\Code\lcc.cpp" />
     <ClCompile Include="..\..\Code\randnum.cpp" />
     <ClCompile Include="..\..\Code\stdafx.cpp" />
     <ClCompile Include="..\..\Code\vegetation.cpp" />
@@ -91,6 +92,7 @@
     <ClInclude Include="..\..\Code\fires.h" />
     <ClInclude Include="..\..\Code\lads.h" />
     <ClInclude Include="..\..\Code\ladsio.h" />
+    <ClInclude Include="..\..\Code\lcc.h" />
     <ClInclude Include="..\..\Code\randnum.h" />
     <ClInclude Include="..\..\Code\stdafx.h" />
     <ClInclude Include="..\..\Code\vegetation.h" />
