@@ -169,51 +169,51 @@ double totburncount[40];	// total number of fires summary array
 
 int main( int argc, char *argv[] ) {
 
-    char runname[80];       // run name
-    char infilename[80];    // main input file name
-    char landfilename[80];  // landtype input file name
-    char comfilename[80];	// community type input file name
-    char firefilename[80];  // fire regime input file name
-    char outfilename[80];   // output file name (fire summary)
-    char outfilename2[80];  // output file name (landscape summary)
+	char runname[80];       // run name
+	char infilename[80];    // main input file name
+	char landfilename[80];  // landtype input file name
+	char comfilename[80];	// community type input file name
+	char firefilename[80];  // fire regime input file name
+	char outfilename[80];   // output file name (fire summary)
+	char outfilename2[80];  // output file name (landscape summary)
 	char outfilename3[80];  // output file name (treatment summary)
-    char harvfilename[80];	// input file name (treatment priority)
+	char harvfilename[80];	// input file name (treatment priority)
 	char lccfilename[80];	// input file name (land cover class)
 
-    char yearstr[10];       // current year
+	char yearstr[10];       // current year
 
-    int init_state[40];		// default initial state for each community type
+	int init_state[40];		// default initial state for each community type
 
-    int burnin;      	    // number of years burn-in time
-    int maxyear;    	    // max year in the simulation
-    int step;        	    // time step between summaries
-    int runtype;            // type of output from run
-    int landfiresum;        // input flag for landscape fire summary
-    int landstrusum;        // input flag for landscape structure summary
-    int snapsum;            // input flag for landscape snapshot output
-    int regcnt;             // fire regime counter
+	int burnin;      	    // number of years burn-in time
+	int maxyear;    	    // max year in the simulation
+	int step;        	    // time step between summaries
+	int runtype;            // type of output from run
+	int landfiresum;        // input flag for landscape fire summary
+	int landstrusum;        // input flag for landscape structure summary
+	int snapsum;            // input flag for landscape snapshot output
+	int regcnt;             // fire regime counter
 	int sevcnt;				// severity class counter
-    int zonecnt;            // summary zone counter
-    int statecnt;			// summary state counter
-    int landcnt;			// landtype counter
+	int zonecnt;            // summary zone counter
+	int statecnt;			// summary state counter
+	int landcnt;			// landtype counter
 	int comcnt;				// community counter
-    int classcnt;           // summary zone counter
+	int classcnt;           // summary zone counter
 	int treatcnt;			// treatment counter
-    int biosum;             // biomass loading flag
-    int year;               // simulation year
-    int fperim;             // fire perimeter
-    int nfires;			    // number of fires in a given year
+	int biosum;             // biomass loading flag
+	int year;               // simulation year
+	int fperim;             // fire perimeter
+	int nfires;			    // number of fires in a given year
 	double nfires_f;		// number of fires in a given year, generated from normal dist
-    int fire;			    // fire loop counter
-    int next_sum;		    // next summary year
-    int index;              // cell index - unique value for each cell
-    int is_bdin;            // flag indicating when landscape is "burned in"
-    int islands;            // tallys number of interior fire cells
-    int shapetype;          // flag for normal vs. lognormal fire size dist
-    int endy;               // end year for the current parameter set
-    int regnum;             // number of disturbance regimes
-    int simfire_flag;		// flag - indicates whether fires will be simulated
-    int simharv_flag;		// flag - indicates whether management will be simulated
+	int fire;			    // fire loop counter
+	int next_sum;		    // next summary year
+	int index;              // cell index - unique value for each cell
+	int is_bdin;            // flag indicating when landscape is "burned in"
+	int islands;            // tallys number of interior fire cells
+	int shapetype;          // flag for normal vs. lognormal fire size dist
+	int endy;               // end year for the current parameter set
+	int regnum;             // number of disturbance regimes
+	int simfire_flag;		// flag - indicates whether fires will be simulated
+	int simharv_flag;		// flag - indicates whether management will be simulated
 	int distnum;			// number of non-spatial disturbance types
 	int mgmtnum;			// number of treatment types
 	int munitnum[5];		// number of units listed for each treatment type
@@ -227,21 +227,21 @@ int main( int argc, char *argv[] ) {
 	int lcccnt;				// counts number of lcc types
 
 	// 9-21-2012: Code updated to allow up to 40 fire regimes
-    double fsize;           // fire size
-    double nfr[40][10];         // natural fire rotation
-    double mff[40][10];			// mean number of fires/year
-    double mfsize[40][10];      // mean fire size (in cells)
-    double sdfsize[40][10];     // standard devlation of fire size (in cells)
-    double mfsizeha[40][10];    // mean fire size (in ha)
-    double sdfsizeha[40][10];   // standard devlation of fire size (in ha)
+	double fsize;           // fire size
+	double nfr[40][10];         // natural fire rotation
+	double mff[40][10];			// mean number of fires/year
+	double mfsize[40][10];      // mean fire size (in cells)
+	double sdfsize[40][10];     // standard devlation of fire size (in cells)
+	double mfsizeha[40][10];    // mean fire size (in ha)
+	double sdfsizeha[40][10];   // standard devlation of fire size (in ha)
 	double sevlow[40][10];		// lower severity cutoff - stand replacement/non stand replacement
 	double sevhigh[40][10];		// upper severity cutoff - stand replacement/non stand replacement
 	double sev2low[40][10];		// lower severity cutoff - mixed/non lethal
 	double sev2high[40][10];	// upper severity cutoff - mixed/non lethal
-    double mlsize[40][10];      // mean fire size (natural log cells)
-    double stdlsize[40][10];    // standard devlation of fire size (natural log cells)
-    double rsize[40];       // size of each disturbance regime
-    double curfiresev;      // severity of current fire (probability of stand-replacement fire)
+	double mlsize[40][10];      // mean fire size (natural log cells)
+	double stdlsize[40][10];    // standard devlation of fire size (natural log cells)
+	double rsize[40];       // size of each disturbance regime
+	double curfiresev;      // severity of current fire (probability of stand-replacement fire)
 	double curfiresev2;		// severity of current fire (probability of mixed fire if non stand replacement)
 	double curmixedfire;	// severity of current fire (probability of mixed severity)
 	double curlowfire;		// severity of current fire (probability of non lethal)
@@ -251,16 +251,16 @@ int main( int argc, char *argv[] ) {
 	double totprob;			// total of non-spatial disturbance probabilities
 	double cumprob;			// cumulative non-spatial disturbance probability
 
-    struct image_header buffer_head;    // ERDAS file header for buffer grid
-    struct image_header regime_head;    // ERDAS file header for regime grid
-    struct image_header land_head;      // ERDAS file head for topo grid
-    struct image_header dem_head;		// ERDAS file header for dem grid
-    struct image_header com_head;       // ERDAS file head for age grid
+	struct image_header buffer_head;    // ERDAS file header for buffer grid
+	struct image_header regime_head;    // ERDAS file header for regime grid
+	struct image_header land_head;      // ERDAS file head for topo grid
+	struct image_header dem_head;		// ERDAS file header for dem grid
+	struct image_header com_head;       // ERDAS file head for age grid
 	struct image_header lcc_head;		// ERDAS file head for lcc grid
-    struct image_header state_head;		// ERDAS file header for successional stage grid
-    struct image_header bioage_head;    // ERDAS file head for bioage grid
-    struct image_header dead_head;      // ERDAS file head for dead grid
-    struct image_header manage_head;	// ERDAS file header for management unit grid
+	struct image_header state_head;		// ERDAS file header for successional stage grid
+	struct image_header bioage_head;    // ERDAS file head for bioage grid
+	struct image_header dead_head;      // ERDAS file head for dead grid
+	struct image_header manage_head;	// ERDAS file header for management unit grid
 	struct image_header age_head;		// ERDAS file header for forest age grid
 	struct image_header tsfire_head;	// ERDAS file header for time since fire grid
 
@@ -270,48 +270,48 @@ int main( int argc, char *argv[] ) {
 	strcpy(runname, argv[1]);
 	strcpy(infilename, argv[1]);
 	strcat(infilename, ".in");
-    strcpy(comfilename, runname);
-    strcat(comfilename, ".ctp");
-    strcpy(landfilename, runname);
-    strcat(landfilename, ".lnd");
-    strcpy(firefilename, runname);
-    strcat(firefilename, ".fre");
-    strcpy(harvfilename, runname);
-    strcat(harvfilename, ".hrv");
+	strcpy(comfilename, runname);
+	strcat(comfilename, ".ctp");
+	strcpy(landfilename, runname);
+	strcat(landfilename, ".lnd");
+	strcpy(firefilename, runname);
+	strcat(firefilename, ".fre");
+	strcpy(harvfilename, runname);
+	strcat(harvfilename, ".hrv");
 	strcpy(lccfilename, runname);
 
 	strcat(lccfilename, ".lcc");
 
-    // Open input files and read scenario parameters
+	// Open input files and read scenario parameters
 	ifstream infile;
-    infile.open(infilename);
+	infile.open(infilename);
 
-    ifstream comfile;
-    comfile.open(comfilename);
+	ifstream comfile;
+	comfile.open(comfilename);
 
-    ifstream landfile;
-    ifstream infirefile;
-    ifstream inharvfile;
+	ifstream landfile;
+	ifstream infirefile;
+	ifstream inharvfile;
 	ifstream inlccfile;
 
 	// Read main input file
 	infile >> cellsize; infile.ignore(100, '\n');
-    infile >> read_map; infile.ignore(100, '\n');
-    infile >> maxrow; infile.ignore(100, '\n');
-    infile >> maxcol; infile.ignore(100, '\n');
-    infile >> simfire_flag; infile.ignore(100, '\n');
-    infile >> simharv_flag; infile.ignore(100, '\n');
-    infile >> burnin; infile.ignore(100, '\n');
-    infile >> maxyear; infile.ignore(100, '\n');
-    infile >> runstep; infile.ignore(100, '\n');
-    infile >> step; infile.ignore(100, '\n');
-    infile >> runtype; infile.ignore(100, '\n');
-    infile >> sumtype; infile.ignore(100, '\n');
-    infile >> tsumtype; infile.ignore(100, '\n'); 
-    infile >> snapsum; infile.ignore(100, '\n');
-    infile >> landfiresum; infile.ignore(100, '\n');
-    infile >> landstrusum; infile.ignore(100, '\n');
-    infile >> biom_flag; infile.ignore(100, '\n');
+	infile >> read_map; infile.ignore(100, '\n');
+	infile >> maxrow; infile.ignore(100, '\n');
+	infile >> maxcol; infile.ignore(100, '\n');
+	infile >> simfire_flag; infile.ignore(100, '\n');
+	infile >> simharv_flag; infile.ignore(100, '\n');
+	infile >> burnin; infile.ignore(100, '\n');
+	infile >> maxyear; infile.ignore(100, '\n');
+	infile >> runstep; infile.ignore(100, '\n');
+	infile >> step; infile.ignore(100, '\n');
+	infile >> runtype; infile.ignore(100, '\n');
+	infile >> sumtype; infile.ignore(100, '\n');
+	infile >> tsumtype; infile.ignore(100, '\n'); 
+	infile >> snapsum; infile.ignore(100, '\n');
+	infile >> landfiresum; infile.ignore(100, '\n');
+	infile >> landstrusum; infile.ignore(100, '\n');
+	infile >> biom_flag; infile.ignore(100, '\n');
 	infile >> distnum; infile.ignore(100, '\n');
 	infile >> mgmtnum; infile.ignore(100, '\n');
 
@@ -325,15 +325,15 @@ int main( int argc, char *argv[] ) {
 		comfile >> comnumstate[comcnt]; comfile.ignore(100, '\n');
 		comfile >> init_state[comcnt]; comfile.ignore(100, '\n');
 		for(statecnt = 0; statecnt < comnumstate[comcnt]; statecnt ++) {
-            numstate ++;
+			numstate ++;
 			comfile >> statecode[comcnt][statecnt]; comfile.ignore(100, '\n');
 			if(statecode[comcnt][statecnt] > largestnumstate) {
 				largestnumstate = statecode[comcnt][statecnt];
 			}
-            comfile >> stateout[comcnt][statecnt]; comfile.ignore(100, '\n');
+			comfile >> stateout[comcnt][statecnt]; comfile.ignore(100, '\n');
 			comfile >> statefiremod[comcnt][statecnt]; comfile.ignore(100, '\n');
 			comfile >> statefireinit[comcnt][statecnt]; comfile.ignore(100, '\n');
-            comfile >> statesev[comcnt][statecnt]; comfile.ignore(100, '\n');
+			comfile >> statesev[comcnt][statecnt]; comfile.ignore(100, '\n');
 			comfile >> statesev2[comcnt][statecnt]; comfile.ignore(100, '\n');
 			comfile >> initage[comcnt][statecnt]; comfile.ignore(100, '\n');
 			comfile >> suclag[comcnt][statecnt]; comfile.ignore(100, '\n');
@@ -357,8 +357,8 @@ int main( int argc, char *argv[] ) {
 				comfile >> disttrans[comcnt][statecnt][classcnt]; 
 				comfile >> distreset[comcnt][statecnt][classcnt];comfile.ignore(100, '\n');
 			}
-        }
-    }
+		}
+	}
 
 	for(comcnt = 0; comcnt < numcom; comcnt++) {
 		for(statecnt = 0; statecnt < comnumstate[comcnt]; statecnt ++) {
@@ -380,50 +380,50 @@ int main( int argc, char *argv[] ) {
 	// Only read fire regime and landtype intput files if we're simulating fire 
 	if(simfire_flag == 1) {
 
-        landfile.open(landfilename);
-        infirefile.open(firefilename);
-    }
+		landfile.open(landfilename);
+		infirefile.open(firefilename);
+	}
 
-    // Read fire regime input file
+	// Read fire regime input file
 	if( simfire_flag == 1 ) {
-        infirefile >> regnum; infirefile.ignore(100, '\n');
-        infirefile >> shapetype; infirefile.ignore(100, '\n');
-        infirefile >> w_dir;infirefile.ignore(100, '\n');
-        infirefile >> w_var; infirefile.ignore(100, '\n');
-        infirefile >> w_speed;infirefile.ignore(100, '\n');
+		infirefile >> regnum; infirefile.ignore(100, '\n');
+		infirefile >> shapetype; infirefile.ignore(100, '\n');
+		infirefile >> w_dir;infirefile.ignore(100, '\n');
+		infirefile >> w_var; infirefile.ignore(100, '\n');
+		infirefile >> w_speed;infirefile.ignore(100, '\n');
 		infirefile >> w_shift;infirefile.ignore(100, '\n');
-        infirefile >> fire_cal; infirefile.ignore(100, '\n');
-        infirefile >> fire_cal2; infirefile.ignore(100, '\n');
+		infirefile >> fire_cal; infirefile.ignore(100, '\n');
+		infirefile >> fire_cal2; infirefile.ignore(100, '\n');
 		infirefile >> fire_pat; infirefile.ignore(100, '\n');
 		infirefile >> torus; infirefile.ignore(100, '\n');
 		infirefile >> mintsfire; infirefile.ignore(100, '\n');
-        infirefile >> nslopeclass; infirefile.ignore(100, '\n');
-        for(classcnt = 0; classcnt < nslopeclass; classcnt ++) {
-            infirefile >> lowerslope[classcnt];
-            infirefile >> upperslope[classcnt];
-            infirefile >> slopefact[classcnt];
-            infirefile.ignore(100, '\n');
-        }
+		infirefile >> nslopeclass; infirefile.ignore(100, '\n');
+		for(classcnt = 0; classcnt < nslopeclass; classcnt ++) {
+			infirefile >> lowerslope[classcnt];
+			infirefile >> upperslope[classcnt];
+			infirefile >> slopefact[classcnt];
+			infirefile.ignore(100, '\n');
+		}
 
-    }
+	}
 
-    // Read landtype input file
+	// Read landtype input file
 	if( simfire_flag == 1 ) {
-        landfile >> numland; landfile.ignore(100,'\n');
+		landfile >> numland; landfile.ignore(100,'\n');
 		for(landcnt = 0; landcnt < numland; landcnt ++) {
-            landfile >> landcode[landcnt]; landfile.ignore(100, '\n');
-            landfile >> landfiremod[landcnt]; landfile.ignore(100, '\n');
+			landfile >> landcode[landcnt]; landfile.ignore(100, '\n');
+			landfile >> landfiremod[landcnt]; landfile.ignore(100, '\n');
 			landfile >> landfireinit[landcnt]; landfile.ignore(100, '\n');
-            landfile >> landsevmod[landcnt]; landfile.ignore(100, '\n');
+			landfile >> landsevmod[landcnt]; landfile.ignore(100, '\n');
 			landfile >> landsevmod2[landcnt]; landfile.ignore(100, '\n');
 		}
 	}
 
 
-    // Only read harvest input file if we're simulating management
+	// Only read harvest input file if we're simulating management
 	if(simharv_flag == 1) {
-        inharvfile.open(harvfilename);
-    }
+		inharvfile.open(harvfilename);
+	}
 
 	// Read harvest intput file 
 	if( simharv_flag == 1 ) {
@@ -435,8 +435,8 @@ int main( int argc, char *argv[] ) {
 				inharvfile >> treatorder[unitcnt][treatcnt]; inharvfile.ignore(100, '\n');
 			}
 		}
-    }
-	
+	}
+
 	// Read lcc inputfile
 	inlccfile.open(lccfilename);
 	inlccfile>>numlcc; inlccfile.ignore(100,'\n');
@@ -447,204 +447,204 @@ int main( int argc, char *argv[] ) {
 
 	}
 
-    // Only read wood biomass intput file if we're simulating biomass
+	// Only read wood biomass intput file if we're simulating biomass
 	biosum = 0;
-		if(biom_flag == 1) {
-        ifstream infile3;
-        infile3.open("biomass.in");
+	if(biom_flag == 1) {
+		ifstream infile3;
+		infile3.open("biomass.in");
 
-        infile3 >> biosum; infile3.ignore(100, '\n');
-        for(regcnt = 0; regcnt < regnum; regcnt ++) {
-            infile3 >> cr_p1[regcnt];
-        }
-        infile3.ignore(100, '\n');
-        for(regcnt = 0; regcnt < regnum; regcnt ++) {
-            infile3 >> cr_p2[regcnt];
-        }
-        infile3.ignore(100, '\n');
-        for(regcnt = 0; regcnt < regnum; regcnt ++) {
-            infile3 >> cr_p3a[regcnt];
-        }
-        infile3.ignore(100, '\n');
-        for(regcnt = 0; regcnt < regnum; regcnt ++) {
-            infile3 >> cr_p3b[regcnt];
-        }
-        infile3.ignore(100, '\n');
-        for(regcnt = 0; regcnt < regnum; regcnt ++) {
-            infile3 >> hs_mort[regcnt];
-        }
-        infile3.ignore(100, '\n');
-        for(regcnt = 0; regcnt < regnum; regcnt ++) {
-            infile3 >> ms_mort[regcnt];
-        }
-        infile3.ignore(100, '\n');
-        for(regcnt = 0; regcnt < regnum; regcnt ++) {
-            infile3 >> hs_consume[regcnt];
-        }
-        infile3.ignore(100, '\n');
-        for(regcnt = 0; regcnt < regnum; regcnt ++) {
-            infile3 >> ms_consume[regcnt];
-        }
-        infile3.ignore(100, '\n');
-        infile3 >> decayrate.nclass; infile3.ignore(100, '\n');
-        for(classcnt = 0; classcnt < decayrate.nclass; classcnt ++) {
-            infile3 >> decayrate.lowerbnd[classcnt];
-            infile3 >> decayrate.upperbnd[classcnt];
-            for(regcnt = 0; regcnt < regnum; regcnt ++) {
-                infile3 >> decayrate.mort[classcnt][regcnt];
-            }
-            infile3.ignore(100, '\n');
-        }
-        infile3 >> hs_cmort.nclass; infile3.ignore(100, '\n');
-        for(classcnt = 0; classcnt < hs_cmort.nclass; classcnt ++) {
-            infile3 >> hs_cmort.lowerbnd[classcnt];
-            infile3 >> hs_cmort.upperbnd[classcnt];
-            for(regcnt = 0; regcnt < regnum; regcnt ++) {
-                infile3 >> hs_cmort.mort[classcnt][regcnt];
-            }
-            infile3.ignore(100, '\n');
-        }
-        infile3 >> ms_cmort.nclass; infile3.ignore(100, '\n');
-        for(classcnt = 0; classcnt < ms_cmort.nclass; classcnt ++) {
-            infile3 >> ms_cmort.lowerbnd[classcnt];
-            infile3 >> ms_cmort.upperbnd[classcnt];
-            for(regcnt = 0; regcnt < regnum; regcnt ++) {
-                infile3 >> ms_cmort.mort[classcnt][regcnt];
-            }
-            infile3.ignore(100, '\n');
-        }
+		infile3 >> biosum; infile3.ignore(100, '\n');
+		for(regcnt = 0; regcnt < regnum; regcnt ++) {
+			infile3 >> cr_p1[regcnt];
+		}
+		infile3.ignore(100, '\n');
+		for(regcnt = 0; regcnt < regnum; regcnt ++) {
+			infile3 >> cr_p2[regcnt];
+		}
+		infile3.ignore(100, '\n');
+		for(regcnt = 0; regcnt < regnum; regcnt ++) {
+			infile3 >> cr_p3a[regcnt];
+		}
+		infile3.ignore(100, '\n');
+		for(regcnt = 0; regcnt < regnum; regcnt ++) {
+			infile3 >> cr_p3b[regcnt];
+		}
+		infile3.ignore(100, '\n');
+		for(regcnt = 0; regcnt < regnum; regcnt ++) {
+			infile3 >> hs_mort[regcnt];
+		}
+		infile3.ignore(100, '\n');
+		for(regcnt = 0; regcnt < regnum; regcnt ++) {
+			infile3 >> ms_mort[regcnt];
+		}
+		infile3.ignore(100, '\n');
+		for(regcnt = 0; regcnt < regnum; regcnt ++) {
+			infile3 >> hs_consume[regcnt];
+		}
+		infile3.ignore(100, '\n');
+		for(regcnt = 0; regcnt < regnum; regcnt ++) {
+			infile3 >> ms_consume[regcnt];
+		}
+		infile3.ignore(100, '\n');
+		infile3 >> decayrate.nclass; infile3.ignore(100, '\n');
+		for(classcnt = 0; classcnt < decayrate.nclass; classcnt ++) {
+			infile3 >> decayrate.lowerbnd[classcnt];
+			infile3 >> decayrate.upperbnd[classcnt];
+			for(regcnt = 0; regcnt < regnum; regcnt ++) {
+				infile3 >> decayrate.mort[classcnt][regcnt];
+			}
+			infile3.ignore(100, '\n');
+		}
+		infile3 >> hs_cmort.nclass; infile3.ignore(100, '\n');
+		for(classcnt = 0; classcnt < hs_cmort.nclass; classcnt ++) {
+			infile3 >> hs_cmort.lowerbnd[classcnt];
+			infile3 >> hs_cmort.upperbnd[classcnt];
+			for(regcnt = 0; regcnt < regnum; regcnt ++) {
+				infile3 >> hs_cmort.mort[classcnt][regcnt];
+			}
+			infile3.ignore(100, '\n');
+		}
+		infile3 >> ms_cmort.nclass; infile3.ignore(100, '\n');
+		for(classcnt = 0; classcnt < ms_cmort.nclass; classcnt ++) {
+			infile3 >> ms_cmort.lowerbnd[classcnt];
+			infile3 >> ms_cmort.upperbnd[classcnt];
+			for(regcnt = 0; regcnt < regnum; regcnt ++) {
+				infile3 >> ms_cmort.mort[classcnt][regcnt];
+			}
+			infile3.ignore(100, '\n');
+		}
 
-    }
+	}
 
 	// Basic raster computations - cell size and number of cells
 	cell_ha = pow((double)cellsize, 2) / 10000;
-    size = maxrow * maxcol;
+	size = maxrow * maxcol;
 
 
-    // Setup outputfiles
+	// Setup outputfiles
 	strcpy(outfilename, argv[1]);
-    strcpy(outfilename2, argv[1]);
+	strcpy(outfilename2, argv[1]);
 	strcpy(outfilename3, argv[1]);
-    // Fire summary output file
-    ofstream outfire;
-    if(simfire_flag == 1) {
-        if(sumtype == 2 || sumtype == 4) {
-            outfire.open("firesum.fir", ios::app);
-        } else if(sumtype == 1 || sumtype == 3) {
-            outfire.open(strcat(outfilename, ".fir"));
-        }
-    }
+	// Fire summary output file
+	ofstream outfire;
+	if(simfire_flag == 1) {
+		if(sumtype == 2 || sumtype == 4) {
+			outfire.open("firesum.fir", ios::app);
+		} else if(sumtype == 1 || sumtype == 3) {
+			outfire.open(strcat(outfilename, ".fir"));
+		}
+	}
 
-    // Vegetation summary output file
+	// Vegetation summary output file
 	ofstream outsum;
-    if(runtype == 1) {
-        outsum.open(strcat(outfilename2, ".sum"));
-    } else {
-        outsum.open("ladsout.sum", ios::app);
-    }
+	if(runtype == 1) {
+		outsum.open(strcat(outfilename2, ".sum"));
+	} else {
+		outsum.open("ladsout.sum", ios::app);
+	}
 
 	// Treatment summary output file
 	ofstream outtreat;
 	if(simharv_flag == 1) {
-        if(tsumtype == 2 || tsumtype == 4) {
-            outtreat.open("treatsum.trt", ios::app);
-        } else if(tsumtype == 1 || tsumtype == 3) {
-            outtreat.open(strcat(outfilename3, ".trt"));
-        }
+		if(tsumtype == 2 || tsumtype == 4) {
+			outtreat.open("treatsum.trt", ios::app);
+		} else if(tsumtype == 1 || tsumtype == 3) {
+			outtreat.open(strcat(outfilename3, ".trt"));
+		}
 	}
 
-    // Allocate memory for arrays
-    dem = new short int[size];
-    stategrid = new short int[size];
-    comgrid = new char[size];
+	// Allocate memory for arrays
+	dem = new short int[size];
+	stategrid = new short int[size];
+	comgrid = new char[size];
 	lccgrid= new char[size];
-    timeinstage = new short int[size];
-    age = new short int[size];
-    tsfire = new short int[size];
-    regime = new char[size];
-    management = new short int[size];
-    buffer = new char[size];
-    fgrid1 = new char[size];
-    landgrid = new char[size];
-    fgrid2 = new char[size];
-    fsusc = new float[size];
-    temp = new unsigned char[size];
-    temp2 = new unsigned char[size];
- 	fint = new float[size];
+	timeinstage = new short int[size];
+	age = new short int[size];
+	tsfire = new short int[size];
+	regime = new char[size];
+	management = new short int[size];
+	buffer = new char[size];
+	fgrid1 = new char[size];
+	landgrid = new char[size];
+	fgrid2 = new char[size];
+	fsusc = new float[size];
+	temp = new unsigned char[size];
+	temp2 = new unsigned char[size];
+	fint = new float[size];
 
-    if(landfiresum == 1) {
-        fsum1 = new unsigned long int[size];
-        fsum2 = new unsigned long int[size];
+	if(landfiresum == 1) {
+		fsum1 = new unsigned long int[size];
+		fsum2 = new unsigned long int[size];
 		fsum3 = new unsigned long int[size];
-    }
+	}
 
-    if(sumtype > 0) {
+	if(sumtype > 0) {
 		firespreadgrid = new char[size];
- 		processed = new unsigned short int[size];
-        patchx = new unsigned short int[size];
-        patchy = new unsigned short int[size];
-    }
+		processed = new unsigned short int[size];
+		patchx = new unsigned short int[size];
+		patchy = new unsigned short int[size];
+	}
 
-    if(landstrusum == 1) {
-        strucsum = new unsigned long int[size * largestnumstate];
-    }
+	if(landstrusum == 1) {
+		strucsum = new unsigned long int[size * largestnumstate];
+	}
 
-    if(biom_flag > 0) {
-        bioagegrid = new short int[size];
-        deadgrid = new double[size];
-    }
+	if(biom_flag > 0) {
+		bioagegrid = new short int[size];
+		deadgrid = new double[size];
+	}
 
-    if(runtype > 0) {
-        zonesumgrid = new char[size];
-    }
+	if(runtype > 0) {
+		zonesumgrid = new char[size];
+	}
 
-    // setup state variable grids
+	// setup state variable grids
 	// either read from input files
-    if( read_map > 0 ) {
-        buffer_head = read_grid("buffer", buffer);
-        if( simfire_flag == 1 ) {
-            regime_head = read_grid("regime", regime);
-            dem_head = read_16bit_grid("elevation", dem);
-        }
-        if( simharv_flag == 1 ) {
-            manage_head = read_16bit_grid("management", management);
-        }
+	if( read_map > 0 ) {
+		buffer_head = read_grid("buffer", buffer);
+		if( simfire_flag == 1 ) {
+			regime_head = read_grid("regime", regime);
+			dem_head = read_16bit_grid("elevation", dem);
+		}
+		if( simharv_flag == 1 ) {
+			manage_head = read_16bit_grid("management", management);
+		}
 
-        land_head = read_grid("landtype", landgrid);
+		land_head = read_grid("landtype", landgrid);
 		com_head = read_grid("community", comgrid); 
 		lcc_head= read_grid("lcc",lccgrid);
-		
-    // or generate homogeneous grids
-	// not sure if this still works - do I need to add a generator for the elevation grid?
+
+		// or generate homogeneous grids
+		// not sure if this still works - do I need to add a generator for the elevation grid?
 	} else {
-        buffer_head = gen_grid(maxrow, maxcol, 1, buffer);
-        if (simfire_flag == 1) {
-            regime_head = gen_grid(maxrow, maxcol, 1, regime);
-        }
-        land_head = gen_grid(maxrow, maxcol, 1, landgrid);
+		buffer_head = gen_grid(maxrow, maxcol, 1, buffer);
+		if (simfire_flag == 1) {
+			regime_head = gen_grid(maxrow, maxcol, 1, regime);
+		}
+		land_head = gen_grid(maxrow, maxcol, 1, landgrid);
 		com_head = gen_grid(maxrow, maxcol, 1, comgrid);
-    }
+	}
 
-    // set size counters to zero
-    landsize=0;
+	// set size counters to zero
+	landsize=0;
 
-    if( simfire_flag == 1) {
-        for(regcnt = 0; regcnt < regnum; regcnt ++) {
-            rsize[regcnt] = 0;
-        }
-}
-    
-    if( simharv_flag == 1) {
+	if( simfire_flag == 1) {
+		for(regcnt = 0; regcnt < regnum; regcnt ++) {
+			rsize[regcnt] = 0;
+		}
+	}
+
+	if( simharv_flag == 1) {
 		for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
 			unitcounter[treatcnt] = 0;
 		}
 
-    }
-    
-    // Note that zsize contains the sizes of the communities - since these are the summary zones
+	}
+
+	// Note that zsize contains the sizes of the communities - since these are the summary zones
 	for(zonecnt = 0; zonecnt < numcom; zonecnt ++) {
-        zsize[zonecnt] = 0;
-    }
+		zsize[zonecnt] = 0;
+	}
 
 	//Integrating buffer with LCC type added by Ashis 12/18/2012
 	for(index=0;index<size;index++)
@@ -653,45 +653,45 @@ int main( int argc, char *argv[] ) {
 		//printf("%d",lccgrid[index]);
 		if(buffer[index]>0 && lccgrid[index]>0)
 		{
-				if(buffer[index]==2 ||lccgrid[index]==2)
-				{
-					buffer[index]=2;
-				}
-				
-				if(buffer[index]==1 && lccgrid[index]==1)
-				{
-					buffer[index]=1;
-				}						
+			if(buffer[index]==2 ||lccgrid[index]==2)
+			{
+				buffer[index]=2;
+			}
+
+			if(buffer[index]==1 && lccgrid[index]==1)
+			{
+				buffer[index]=1;
+			}						
 		}
 		else
 		{
 			buffer[index]=0;
 		}
-		
+
 	}
 
 
-    // compute the size of the active landscape, fire regime zones, and summary zones
-    for(index=0; index<size; index++) {
-        if(buffer[index] > 0)  {
-            landsize ++;
-            if( simfire_flag == 1) {
-                if( regime[index] > 0 ) {
-                    rsize[regime[index] - 1]++;
-                }
-            }
-            if( read_map > 0 && runtype > 0 ) {
+	// compute the size of the active landscape, fire regime zones, and summary zones
+	for(index=0; index<size; index++) {
+		if(buffer[index] > 0)  {
+			landsize ++;
+			if( simfire_flag == 1) {
+				if( regime[index] > 0 ) {
+					rsize[regime[index] - 1]++;
+				}
+			}
+			if( read_map > 0 && runtype > 0 ) {
 				// 9/24/2012 - Added comgrid condition to handle problem w/ Erik and Rob's input files
-                if( buffer[index] == 1 && comgrid[index] > 0 ) {
-                    zsize[comgrid[index] - 1] += 1;
-                }
-            } else {
-                if( buffer[index] == 1 ) {
-                    zsize[0] += 1;
-                }
-            }
-        }
-    }
+				if( buffer[index] == 1 && comgrid[index] > 0 ) {
+					zsize[comgrid[index] - 1] += 1;
+				}
+			} else {
+				if( buffer[index] == 1 ) {
+					zsize[0] += 1;
+				}
+			}
+		}
+	}
 
 	// initialize random number generator
 	sgenrand(time((unsigned long)(time_t)0));
@@ -701,7 +701,7 @@ int main( int argc, char *argv[] ) {
 		state_head = read_veg_grid("initstate", stategrid);
 		age_head = read_veg2_grid("initage", age, runstep);
 		tsfire_head = read_veg2_grid("inittsfire", tsfire, runstep);
-        if(biom_flag > 0) {
+		if(biom_flag > 0) {
 			bioage_head = read_veg2_grid("initbioage", bioagegrid, runstep);
 			dead_head = read_veg3_grid("initdead", deadgrid, runstep);
 		}
@@ -721,38 +721,38 @@ int main( int argc, char *argv[] ) {
 			timeinstage[index] = age[index] - initage[comgrid[index] - 1][stategrid[index] - 1];
 		}
 
-    // otherwise use default initial stage for each community type
+		// otherwise use default initial stage for each community type
 	} else {
-        for(index=0; index<size; index++) {
-            if(buffer[index] > 0) {
-                stategrid[index] = (short int)init_state[comgrid[index] - 1];
-                timeinstage[index] = 0;
-                age[index] = initage[comgrid[index] - 1][stategrid[index] - 1];
-                tsfire[index] = 0;
-                if(biom_flag > 0) {
-                    bioagegrid[index] = age[index];
-                    deadgrid[index] = 0;
-                }
-            }
-        }
-    }
+		for(index=0; index<size; index++) {
+			if(buffer[index] > 0) {
+				stategrid[index] = (short int)init_state[comgrid[index] - 1];
+				timeinstage[index] = 0;
+				age[index] = initage[comgrid[index] - 1][stategrid[index] - 1];
+				tsfire[index] = 0;
+				if(biom_flag > 0) {
+					bioagegrid[index] = age[index];
+					deadgrid[index] = 0;
+				}
+			}
+		}
+	}
 
-    // initialize summary grids
+	// initialize summary grids
 	for(index=0; index<size; index++) {
-        if(buffer[index] > 0) {
-            temp[index] = get_struc(index);
-            if(landfiresum == 1) {
-                fsum1[index] = 0;
-                fsum2[index] = 0;
+		if(buffer[index] > 0) {
+			temp[index] = get_struc(index);
+			if(landfiresum == 1) {
+				fsum1[index] = 0;
+				fsum2[index] = 0;
 				fsum3[index] = 0;
-            }
-            if(landstrusum == 1) {
-                for(regcnt=0; regcnt < largestnumstate; regcnt++) {
-                    strucsum[index + regcnt * size] = 0;
-                }
-            }
-        }
-    }
+			}
+			if(landstrusum == 1) {
+				for(regcnt=0; regcnt < largestnumstate; regcnt++) {
+					strucsum[index + regcnt * size] = 0;
+				}
+			}
+		}
+	}
 
 	// initialize summary arrays
 	for(regcnt = 0; regcnt < regnum; regcnt ++) {
@@ -762,20 +762,20 @@ int main( int argc, char *argv[] ) {
 		hiburnarea[regcnt] = 0;
 		totburncount[regcnt] = 0;
 	}
-	
+
 	is_bdin = 0;
 	next_sum = step;
-    endy = 0;
+	endy = 0;
 
-    // process the simulation step by step
-    for(year=runstep; year<=maxyear || is_bdin ==0;year+=runstep){
+	// process the simulation step by step
+	for(year=runstep; year<=maxyear || is_bdin ==0;year+=runstep){
 
-        // If the end year for the current parameter set if reached,
-        // then read in the next parameter set
-        if( simfire_flag == 1 ) {
-            if((is_bdin == 0 && year == runstep) || (is_bdin == 1 && year > endy )) {
-            // Read parameters for the specified number of fire regimes
-                for(regcnt = 0; regcnt < regnum; regcnt ++) {
+		// If the end year for the current parameter set if reached,
+		// then read in the next parameter set
+		if( simfire_flag == 1 ) {
+			if((is_bdin == 0 && year == runstep) || (is_bdin == 1 && year > endy )) {
+				// Read parameters for the specified number of fire regimes
+				for(regcnt = 0; regcnt < regnum; regcnt ++) {
 					infirefile >> endy;
 					for(sevcnt = 0; sevcnt < 2; sevcnt ++) {
 						infirefile >> nfr[regcnt][sevcnt];
@@ -797,15 +797,15 @@ int main( int argc, char *argv[] ) {
 						}
 					}
 					infirefile.ignore(100, '\n');
-                }
-            }
-        }
+				}
+			}
+		}
 
-        // Test to see if the burn-in period is finished
-        if(year > burnin && is_bdin == 0) {
-            is_bdin = 1;
-            year = runstep;
-	        next_sum = step;
+		// Test to see if the burn-in period is finished
+		if(year > burnin && is_bdin == 0) {
+			is_bdin = 1;
+			year = runstep;
+			next_sum = step;
 			for(regcnt = 0; regcnt < regnum; regcnt ++) {
 				totburnarea[regcnt] = 0;
 				totburncount[regcnt] = 0;
@@ -813,8 +813,8 @@ int main( int argc, char *argv[] ) {
 				miburnarea[regcnt] = 0;
 				hiburnarea[regcnt] = 0;
 			}
-        }
-		
+		}
+
 		// Set up fire spread summary grid
 		if(sumtype > 0) {
 			for(index=0; index<size; index++) {
@@ -822,15 +822,15 @@ int main( int argc, char *argv[] ) {
 			}
 		}
 
-        // Increment the age of every cell
-        grow_veg();
+		// Increment the age of every cell
+		grow_veg();
 
 		// Non-spatial disturbances
 		nsdisturb_veg(distnum);
 
-        // Forest management disturbances
+		// Forest management disturbances
 		if( simharv_flag == 1 ) {
-            
+
 			for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
 				// Cycle through the management loop
 				cumtreat[treatcnt] = 0;
@@ -871,13 +871,13 @@ int main( int argc, char *argv[] ) {
 					}
 				}
 			}
-        }
+		}
 
-        // Fire disturbances
+		// Fire disturbances
 		if( simfire_flag == 1) {
 
-            // Cycle through the fire loop
-            for(regcnt = 0; regcnt < regnum; regcnt ++) {
+			// Cycle through the fire loop
+			for(regcnt = 0; regcnt < regnum; regcnt ++) {
 				for(sevcnt = 0; sevcnt < 2; sevcnt ++ ) {
 					if( mff[regcnt][sevcnt] < 30) {
 						nfires = poisson_rv( mff[regcnt][sevcnt]);
@@ -911,55 +911,55 @@ int main( int argc, char *argv[] ) {
 						// If past burn-in period, write fire information to file
 						if(is_bdin == 1) {
 
-						// Output for individual-fire summary types
-						if(sumtype == 3) {
-							islands = fill_islands();
-							fperim = get_perim();
-							felong = get_elongation();
-							itoa(year, yearstr, 10);
-							outfire << yearstr << " " << fsize << " " << burned << " " << fperim << " "
-								<< islands << " " << felong << " " << (regcnt + 1) << endl;
-						} else if(sumtype == 4) {
-							islands = fill_islands();
-							fperim = get_perim();
-							felong = get_elongation();
-							itoa(year, yearstr, 10);
-							outfire << runname << " " << yearstr << " " << fsize << " " << burned << " "
-								<< fperim << " " << islands << " " << felong << " " << (regcnt + 1) << endl;
-						}
+							// Output for individual-fire summary types
+							if(sumtype == 3) {
+								islands = fill_islands();
+								fperim = get_perim();
+								felong = get_elongation();
+								itoa(year, yearstr, 10);
+								outfire << yearstr << " " << fsize << " " << burned << " " << fperim << " "
+									<< islands << " " << felong << " " << (regcnt + 1) << endl;
+							} else if(sumtype == 4) {
+								islands = fill_islands();
+								fperim = get_perim();
+								felong = get_elongation();
+								itoa(year, yearstr, 10);
+								outfire << runname << " " << yearstr << " " << fsize << " " << burned << " "
+									<< fperim << " " << islands << " " << felong << " " << (regcnt + 1) << endl;
+							}
 						}
 					}
 				}
 
-            } // end fires loop
-        } // end if fireflag == 1
+			} // end fires loop
+		} // end if fireflag == 1
 
-        // If landscape structure summary is selected, increment structure
-        // summary grids
-        if(is_bdin == 1 && landstrusum == 1) {
-            for( index = 0; index < size; index++ ) {
-                if(buffer[index] == 1) {
-                    strucsum[index + (stategrid[index] - 1) * size] ++;
-                }
-            }
-        }
+		// If landscape structure summary is selected, increment structure
+		// summary grids
+		if(is_bdin == 1 && landstrusum == 1) {
+			for( index = 0; index < size; index++ ) {
+				if(buffer[index] == 1) {
+					strucsum[index + (stategrid[index] - 1) * size] ++;
+				}
+			}
+		}
 
-        // If the current year is a summary year, write output grids
-        if( year == next_sum && is_bdin == 1 ) {
+		// If the current year is a summary year, write output grids
+		if( year == next_sum && is_bdin == 1 ) {
 
-            // Output the landscape "snapshot"
-            if(snapsum >= 1) {
-                gen_snapshot(runname, year, buffer_head, snapsum, 0);
-            }
-            // or output age summaries
+			// Output the landscape "snapshot"
+			if(snapsum >= 1) {
+				gen_snapshot(runname, year, buffer_head, snapsum, 0);
+			}
+			// or output age summaries
 			if(snapsum == 2) {
-                gen_agesum(runname, year, buffer_head, runstep);
-            }
+				gen_agesum(runname, year, buffer_head, runstep);
+			}
 
-            // Output wood biomass summaries
+			// Output wood biomass summaries
 			if(biosum > 0 && biom_flag > 0) {
-                gen_biosum(runname, year, buffer_head);
-            }
+				gen_biosum(runname, year, buffer_head);
+			}
 
 			// Output fire summaries
 			// To a separate file for each model run
@@ -980,7 +980,7 @@ int main( int argc, char *argv[] ) {
 					hiburnarea[regcnt] = 0;
 				}
 				outfire << endl;
-			// or all runs appended to a single file
+				// or all runs appended to a single file
 			} else if (simfire_flag == 1 && sumtype == 2) {
 				itoa(year, yearstr, 10);
 				outfire << runname << " " << yearstr;
@@ -1009,7 +1009,7 @@ int main( int argc, char *argv[] ) {
 					outtreat << cumtreat[treatcnt] << " ";
 				}
 				outtreat << endl;
-			// or all runs appended to a single file
+				// or all runs appended to a single file
 			} else if (simharv_flag == 1 && tsumtype == 2) {
 				itoa(year, yearstr, 10);
 				outtreat << runname << " " << yearstr << " ";
@@ -1027,70 +1027,70 @@ int main( int argc, char *argv[] ) {
 				// Compute the successional stage summaries for each community type
 				landscape_sum(comnumstate, numcom );
 
-                // Output the runname if we're appending to a single file
+				// Output the runname if we're appending to a single file
 				if(runtype == 2) {
 					outsum  << runname << " ";
-                }
+				}
 
-                outsum << year << " ";
+				outsum << year << " ";
 
-                // Write the % area of each structure (and possbility biomass summaries) for each zone
+				// Write the % area of each structure (and possbility biomass summaries) for each zone
 				for(zonecnt = 0; zonecnt < numcom; zonecnt ++) {
-                    for(classcnt = 1; classcnt <= comnumstate[zonecnt]; classcnt ++) {
-                        outsum << sum_array[classcnt][zonecnt] << " ";
-                    }
-                    if(biom_flag > 0) {
-                        outsum << sum_livebio[zonecnt] << " " << sum_deadwood[zonecnt] << " ";
-                    }
-                }
+					for(classcnt = 1; classcnt <= comnumstate[zonecnt]; classcnt ++) {
+						outsum << sum_array[classcnt][zonecnt] << " ";
+					}
+					if(biom_flag > 0) {
+						outsum << sum_livebio[zonecnt] << " " << sum_deadwood[zonecnt] << " ";
+					}
+				}
 
-                outsum << endl;
+				outsum << endl;
 
-            }
+			}
 
-      	    next_sum += step;	// Set the next summary year
+			next_sum += step;	// Set the next summary year
 
-        } // end summary year if statement
+		} // end summary year if statement
 
 
-    }  // end year loop
+	}  // end year loop
 
 	// Do I need to worry about explicitly closing any other files?
 	outfire.close();
-    outsum.close();
+	outsum.close();
 
-    // Write fire frequency summary grid
-    if(landfiresum == 1) {
-        gen_firesum(runname, maxyear, buffer_head, runstep);
-        gen_sevsum(runname, maxyear, buffer_head);
-    }
+	// Write fire frequency summary grid
+	if(landfiresum == 1) {
+		gen_firesum(runname, maxyear, buffer_head, runstep);
+		gen_sevsum(runname, maxyear, buffer_head);
+	}
 
-    // Write the structure summary grid
+	// Write the structure summary grid
 	if(landstrusum == 1) {
-        gen_strucsum(runname, largestnumstate, maxyear, buffer_head);
-    }
+		gen_strucsum(runname, largestnumstate, maxyear, buffer_head);
+	}
 
-    // Free memory (am I missing any arrays here?)
-    delete(age);
-    delete(tsfire);
-    delete(regime);
-    delete(buffer);
-    delete(comgrid);
-    delete(fgrid1);
-    delete(fgrid2);
-    delete(fsusc);
+	// Free memory (am I missing any arrays here?)
+	delete(age);
+	delete(tsfire);
+	delete(regime);
+	delete(buffer);
+	delete(comgrid);
+	delete(fgrid1);
+	delete(fgrid2);
+	delete(fsusc);
 	delete(fint);
-    delete(temp);
-    delete(temp2);
-    delete(fsum1);
-    delete(processed);
-    delete(patchx);
-    delete(patchy);
-    delete(strucsum);
+	delete(temp);
+	delete(temp2);
+	delete(fsum1);
+	delete(processed);
+	delete(patchx);
+	delete(patchy);
+	delete(strucsum);
 	delete(lccgrid);
 	cin.get();
 
-    return 0;
+	return 0;
 }
 
 
