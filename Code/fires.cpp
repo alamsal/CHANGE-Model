@@ -72,6 +72,7 @@ int firespread( int firereg, int fsize ) {
 		index = row * maxcol + col;
         if( (int)regime[index] == firereg + 1 ) {
 		    f_susc = fsusc[index];
+			//printf("%d\t%d\n",u0_1(),f_susc);
 		    if( u0_1() < f_susc )
                 break;
         }

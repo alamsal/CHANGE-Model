@@ -8,6 +8,6 @@
 
 #ifndef lccH
 #define lccH
-
+extern char *lccgrid;           // fire buffer zone grid
 
 #endif
