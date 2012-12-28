@@ -647,29 +647,7 @@ int main( int argc, char *argv[] ) {
 	}
 
 	//Integrating buffer with LCC type added by Ashis 12/18/2012
-	for(index=0;index<size;index++)
-	{
-		//printf("%d",buffer[index]);
-		//printf("%d",lccgrid[index]);
-		if(buffer[index]>0 && lccgrid[index]>0)
-		{
-			if(buffer[index]==2 ||lccgrid[index]==2)
-			{
-				buffer[index]=2;
-			}
-
-			if(buffer[index]==1 && lccgrid[index]==1)
-			{
-				buffer[index]=1;
-			}						
-		}
-		else
-		{
-			buffer[index]=0;
-		}
-
-	}
-
+	merg_lccBuffer(buffer,lccgrid);
 
 	// compute the size of the active landscape, fire regime zones, and summary zones
 	for(index=0; index<size; index++) {
@@ -775,6 +753,7 @@ int main( int argc, char *argv[] ) {
 		if( simfire_flag == 1 ) {
 			if((is_bdin == 0 && year == runstep) || (is_bdin == 1 && year > endy )) {
 				// Read parameters for the specified number of fire regimes
+				// Added by Ashis: Loop to read parameter fire in the fire regime input file .
 				for(regcnt = 0; regcnt < regnum; regcnt ++) {
 					infirefile >> endy;
 					for(sevcnt = 0; sevcnt < 2; sevcnt ++) {
@@ -802,6 +781,7 @@ int main( int argc, char *argv[] ) {
 		}
 
 		// Test to see if the burn-in period is finished
+		//Added By Ashis: Burn in period is optional for new the model, Mike used it to model historical landscapes before European came to US.
 		if(year > burnin && is_bdin == 0) {
 			is_bdin = 1;
 			year = runstep;
@@ -822,10 +802,10 @@ int main( int argc, char *argv[] ) {
 			}
 		}
 
-		// Increment the age of every cell
+		// Increment the age of every cell based on fire rotation, fire severity etc.
 		grow_veg();
 
-		// Non-spatial disturbances
+		// Non-spatial disturbances 
 		nsdisturb_veg(distnum);
 
 		// Forest management disturbances

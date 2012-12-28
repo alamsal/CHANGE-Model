@@ -60,7 +60,7 @@ void gen_strucsum( char *runname, int nclass, int nsum, struct image_header out_
 void gen_firesum( char *filename, int nsum, struct image_header out_head, int timestep );
 void gen_sevsum(char *filename, int nsum, struct image_header out_head);
 void gen_snapshot( char *runname, int year, struct image_header out_head,
-    int snapsum, int transsum );
+int snapsum, int transsum );
 void gen_agesum( char *runname, int year, struct image_header out_head, int timestep );
 void gen_biosum( char *runname, int year, struct image_header out_head );
 void write_grid( char *outfilename, unsigned char *gridname, struct image_header imagehd );

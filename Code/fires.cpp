@@ -72,7 +72,7 @@ int firespread( int firereg, int fsize ) {
 		index = row * maxcol + col;
         if( (int)regime[index] == firereg + 1 ) {
 		    f_susc = fsusc[index];
-			//printf("%d\t%d\n",u0_1(),f_susc);
+			printf("%d\t%d\n",u0_1(),f_susc);
 		    if( u0_1() < f_susc )
                 break;
         }
@@ -154,7 +154,7 @@ int firespread( int firereg, int fsize ) {
 			                index2 = row2 * maxcol + col2;
 							if(fgrid2[index2] != 0 )
 								goodcell = 0;
-							if(regime[index2] <= 0)
+							if(buffer[index2] <= 0) // Comment Need special care for Buffer and Regime to create good cell.- if(regime[index2] <= 0)
 								goodcell = 0;
 							if(tsfire[index2] < mintsfire)
 								goodcell = 0;

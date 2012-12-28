@@ -10,7 +10,7 @@
 #include "ladsio.h"
 #include "lads.h"
 #include "biomass.h"
-
+#include "lcc.h"
 //----------------------------------------------------------------------------
 // read_veg3_grid - reads in initial dead biomass grid
 //----------------------------------------------------------------------------
@@ -420,6 +420,11 @@ void gen_snapshot( char *runname, int year, struct image_header out_head,
 
         }
     }
+	
+	//Added by Ashis 12/28/2012
+	// write lcc info into temp grid
+
+	merg_lccSnapshot();
 
     // write grids to output files
     if (snapsum > 0) {
