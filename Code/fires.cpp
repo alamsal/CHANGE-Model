@@ -57,9 +57,12 @@ int firespread( int firereg, int fsize ) {
 	fire_cal_odds = fire_cal / (1 - fire_cal);
 	
 	// Initialize the fire grids
-    for(index=0;index<size;index++) {
-        if(regime[index] > 0) {
+    for(index=0;index<size;index++)
+	{
+        if(regime[index] > 0)  //Edited by Ashis:1/4/2013 : if(regime[index] > 0)
+		{		
 			fsusc[index] = statefireinit[comgrid[index] - 1][stategrid[index] - 1] * landfireinit[landgrid[index] - 1];
+			//printf("%d \t %d \n",statefireinit[comgrid[index] - 1][stategrid[index] - 1],landfireinit[landgrid[index] - 1]);
         }
         fgrid1[index] = 0;
         fgrid2[index] = 0;
@@ -70,11 +73,16 @@ int firespread( int firereg, int fsize ) {
 	    row = rand_int(maxrow) - 1;
 		col = rand_int(maxcol) - 1;
 		index = row * maxcol + col;
-        if( (int)regime[index] == firereg + 1 ) {
-		    f_susc = fsusc[index];
-			printf("%d\t%d\n",u0_1(),f_susc);
-		    if( u0_1() < f_susc )
-                break;
+        if((int)regime[index] == (firereg + 1) ) {  //Edited by Ashis:1/4/2013 : f( ((int)regime[index] == firereg + 1)
+		    
+			f_susc = fsusc[index];
+			
+			//printf("Fire suc...%f\t\t%f\n",f_susc,u0_1());
+		    
+			if(u0_1() < f_susc )
+			{
+				break;
+			}
         }
     }
 
@@ -119,7 +127,7 @@ int firespread( int firereg, int fsize ) {
 
             totprob = 0;
             cellcnt = 0;
-
+			//printf("Go once through the list of burning cells\n");
             // Loop through neighboring cells
             row = nextrow;
             col = nextcol;
@@ -154,7 +162,7 @@ int firespread( int firereg, int fsize ) {
 			                index2 = row2 * maxcol + col2;
 							if(fgrid2[index2] != 0 )
 								goodcell = 0;
-							if(buffer[index2] <= 0) // Comment Need special care for Buffer and Regime to create good cell.- if(regime[index2] <= 0)
+							if(regime[index2] <= 0) // Comment Need special care for Buffer and Regime to create good cell.- if(regime[index2] <= 0)
 								goodcell = 0;
 							if(tsfire[index2] < mintsfire)
 								goodcell = 0;

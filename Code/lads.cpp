@@ -153,7 +153,9 @@ struct mortality decayrate; // dead wood decay (by time since fire)
 
 //Land cover parameters
 int numlcc;					//Number of lcc types
-int lcccode[40];			//LCC code works upto 40 different LCC types.
+int inlcccode[40];			//Input lcc code works upto 40 different LCC types.
+int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
+int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
 
 // Summary arrays
 double sum_deadwood[100];   // dead wood loading summary array
@@ -314,7 +316,7 @@ int main( int argc, char *argv[] ) {
 	infile >> biom_flag; infile.ignore(100, '\n');
 	infile >> distnum; infile.ignore(100, '\n');
 	infile >> mgmtnum; infile.ignore(100, '\n');
-
+	infile.close();
 
 	// Read community input file
 	numstate = 0;
@@ -359,6 +361,7 @@ int main( int argc, char *argv[] ) {
 			}
 		}
 	}
+	comfile.close();
 
 	for(comcnt = 0; comcnt < numcom; comcnt++) {
 		for(statecnt = 0; statecnt < comnumstate[comcnt]; statecnt ++) {
@@ -417,6 +420,7 @@ int main( int argc, char *argv[] ) {
 			landfile >> landsevmod[landcnt]; landfile.ignore(100, '\n');
 			landfile >> landsevmod2[landcnt]; landfile.ignore(100, '\n');
 		}
+		landfile.close();
 	}
 
 
@@ -435,17 +439,22 @@ int main( int argc, char *argv[] ) {
 				inharvfile >> treatorder[unitcnt][treatcnt]; inharvfile.ignore(100, '\n');
 			}
 		}
+		inharvfile.close();
 	}
 
-	// Read lcc inputfile
+	// Read lcc inputfile -Modified by Ashis 12/12/2012
 	inlccfile.open(lccfilename);
+	inlccfile.ignore(100,'\n'); //Skip to the new line
 	inlccfile>>numlcc; inlccfile.ignore(100,'\n');
+	printf("%d\n",numlcc);
+	inlccfile.ignore(100,'\n'); //Skip to the new line
 	for(lcccnt=0;lcccnt<numlcc;lcccnt++)
 	{
-		inlccfile>>lcccode[lcccnt]; inlccfile.ignore(100,'\n');
-		//std::cout<<lcccode[lcccnt]; 
+		inlccfile>>inlcccode[lcccnt]>>outlcccode[lcccnt]>>lcc_flag[lcccnt];inlccfile.ignore(100,'\n');			
+		std::cout<<inlcccode[lcccnt]<<"\t"<< outlcccode[lcccnt]<<"\t"<<lcc_flag[lcccnt] <<endl; 
 
 	}
+	inlccfile.close();
 
 	// Only read wood biomass intput file if we're simulating biomass
 	biosum = 0;
@@ -675,7 +684,8 @@ int main( int argc, char *argv[] ) {
 	sgenrand(time((unsigned long)(time_t)0));
 
 	// If read map flag is set, read initial landscape configurations from input files
-	if( read_map > 1) {
+	if( read_map > 1) 
+	{
 		state_head = read_veg_grid("initstate", stategrid);
 		age_head = read_veg2_grid("initage", age, runstep);
 		tsfire_head = read_veg2_grid("inittsfire", tsfire, runstep);
@@ -685,12 +695,15 @@ int main( int argc, char *argv[] ) {
 		}
 		// "fix" ages and tsfire values so they are within the possible range for each stage
 		for(index=0; index<size; index++) {
-			if(age[index] < initage[comgrid[index] - 1][stategrid[index] - 1]) {
+			if(age[index] < initage[comgrid[index] - 1][stategrid[index] - 1]) 
+			{
 				age[index] = initage[comgrid[index] - 1][stategrid[index] - 1];
 				if(biom_flag > 0) {
 					bioagegrid[index] = age[index];
 				}
-			} else if(age[index] >= initage[comgrid[index] - 1][stategrid[index] - 1] + suclag[comgrid[index] - 1][stategrid[index] - 1]) {
+			} 
+			else if(age[index] >= initage[comgrid[index] - 1][stategrid[index] - 1] + suclag[comgrid[index] - 1][stategrid[index] - 1]) 
+			{
 				age[index] = initage[comgrid[index] - 1][stategrid[index] - 1] + suclag[comgrid[index] - 1][stategrid[index] - 1] - runstep;
 				if(biom_flag > 0) {
 					bioagegrid[index] = age[index];
@@ -700,7 +713,9 @@ int main( int argc, char *argv[] ) {
 		}
 
 		// otherwise use default initial stage for each community type
-	} else {
+	} 
+	else 
+	{
 		for(index=0; index<size; index++) {
 			if(buffer[index] > 0) {
 				stategrid[index] = (short int)init_state[comgrid[index] - 1];
@@ -881,7 +896,7 @@ int main( int argc, char *argv[] ) {
 						curmixedfire = curfiresev2 * (1 - curfiresev);
 						curlowfire = 1 - (curfiresev + curmixedfire);
 						// distribute fire across the landscape
-						printf("%d\t%d\n",regcnt,fsize);
+						printf("%d\t%d\n",regcnt,int(fsize));
 						firespread( regcnt, (int)fsize );
 						// Print fire information to screen
 						printf("runname=%s year=%d size=%lf regime=%d %d\n", runname, year, fsize, regcnt + 1, is_bdin);
@@ -1068,6 +1083,7 @@ int main( int argc, char *argv[] ) {
 	delete(patchy);
 	delete(strucsum);
 	delete(lccgrid);
+	printf("Simulation is finished !!!");
 	cin.get();
 
 	return 0;
