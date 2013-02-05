@@ -42,6 +42,9 @@
     <ClCompile Include="..\..\Code\lcc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Code\errorCheck.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Code\biomass.h">
@@ -72,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Code\lcc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Code\errorCheck.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -78,6 +78,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\Code\biomass.cpp" />
     <ClCompile Include="..\..\Code\celllist.cpp" />
+    <ClCompile Include="..\..\Code\errorCheck.cpp" />
     <ClCompile Include="..\..\Code\fires.cpp" />
     <ClCompile Include="..\..\Code\lads.cpp" />
     <ClCompile Include="..\..\Code\ladsio.cpp" />
@@ -89,6 +90,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Code\biomass.h" />
     <ClInclude Include="..\..\Code\celllist.h" />
+    <ClInclude Include="..\..\Code\errorCheck.h" />
     <ClInclude Include="..\..\Code\fires.h" />
     <ClInclude Include="..\..\Code\lads.h" />
     <ClInclude Include="..\..\Code\ladsio.h" />

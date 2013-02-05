@@ -16,6 +16,7 @@
 #include "fires.h"
 #include "celllist.h"
 #include "lcc.h"
+#include "errorCheck.h"
 #include <iostream>
 using namespace std;
 
@@ -185,7 +186,7 @@ int main( int argc, char *argv[] ) {
 	char yearstr[10];       // current year
 
 	int init_state[40];		// default initial state for each community type
-
+	int input_error_flag;	// input files error checking flag
 	int burnin;      	    // number of years burn-in time
 	int maxyear;    	    // max year in the simulation
 	int step;        	    // time step between summaries
@@ -267,7 +268,7 @@ int main( int argc, char *argv[] ) {
 	struct image_header tsfire_head;	// ERDAS file header for time since fire grid
 
 	using namespace std;
-
+		
 	// Read input file name from the command line
 	strcpy(runname, argv[1]);
 	strcpy(infilename, argv[1]);
@@ -281,8 +282,16 @@ int main( int argc, char *argv[] ) {
 	strcpy(harvfilename, runname);
 	strcat(harvfilename, ".hrv");
 	strcpy(lccfilename, runname);
-
 	strcat(lccfilename, ".lcc");
+
+	//Check parameter files existance
+	input_error_flag=1; //Check file input error if flag=1
+	if(input_error_flag==1)
+	{
+		ErrorCheck check;
+		check.check_file_exits(infilename, comfilename,landfilename,firefilename, harvfilename,lccfilename);
+
+	}
 
 	// Open input files and read scenario parameters
 	ifstream infile;
@@ -307,16 +316,24 @@ int main( int argc, char *argv[] ) {
 	infile >> maxyear; infile.ignore(100, '\n');
 	infile >> runstep; infile.ignore(100, '\n');
 	infile >> step; infile.ignore(100, '\n');
-	infile >> runtype; infile.ignore(100, '\n');
-	infile >> sumtype; infile.ignore(100, '\n');
-	infile >> tsumtype; infile.ignore(100, '\n'); 
-	infile >> snapsum; infile.ignore(100, '\n');
-	infile >> landfiresum; infile.ignore(100, '\n');
-	infile >> landstrusum; infile.ignore(100, '\n');
-	infile >> biom_flag; infile.ignore(100, '\n');
-	infile >> distnum; infile.ignore(100, '\n');
-	infile >> mgmtnum; infile.ignore(100, '\n');
+	infile >> runtype; infile.ignore(100, '\n');//Vegetation summary flag
+	infile >> sumtype; infile.ignore(100, '\n'); //Fire summary flag
+	infile >> tsumtype; infile.ignore(100, '\n'); //Harvest summary flag
+	infile >> snapsum; infile.ignore(100, '\n');	// Landscape map flag
+	infile >> landfiresum; infile.ignore(100, '\n'); //Landscape fire summary
+	infile >> landstrusum; infile.ignore(100, '\n'); //Landscape structure summary flag
+	infile >> biom_flag; infile.ignore(100, '\n');	 //Biomass flag
+	infile >> distnum; infile.ignore(100, '\n');	//# of non spatial disturbances
+	infile >> mgmtnum; infile.ignore(100, '\n');	//# of treatments
 	infile.close();
+	
+	//Check input file parameters
+	if(input_error_flag==1)
+	{
+		ErrorCheck check;
+		check.check_input_param(cellsize,read_map, maxrow,maxcol,simfire_flag,simharv_flag,burnin,maxyear,runstep,step,runtype,sumtype,tsumtype,snapsum,landfiresum,landstrusum,biom_flag,distnum,mgmtnum);
+	
+	}
 
 	// Read community input file
 	numstate = 0;
@@ -362,6 +379,15 @@ int main( int argc, char *argv[] ) {
 		}
 	}
 	comfile.close();
+	//	//Check community type input file parameters
+	if(input_error_flag==1)
+	{
+		ErrorCheck check;
+		check.check_communityType_param(numcom,comcode,comnumstate,init_state,statecode,stateout,statefiremod,statefireinit,statesev,statesev2,initage,suclag,suctrans,suclagreset,firexlag,
+			firextrans,hsfiretrans,hsfirereset,msfiretrans,msfirereset,lsfiretrans,lsfirereset,treatelig,treattrans,treatreset,distprob,disttrans,distreset,distnum,mgmtnum);
+
+	}
+
 
 	for(comcnt = 0; comcnt < numcom; comcnt++) {
 		for(statecnt = 0; statecnt < comnumstate[comcnt]; statecnt ++) {
@@ -410,6 +436,14 @@ int main( int argc, char *argv[] ) {
 
 	}
 
+	//Check fire regime file parameters
+	if(input_error_flag==1)
+	{
+		ErrorCheck check;
+		check.check_fireRegim_param(regnum,shapetype,w_dir,w_var,w_speed,w_shift,fire_cal,fire_cal2,fire_pat,torus,mintsfire,nslopeclass,runstep);
+
+	}
+
 	// Read landtype input file
 	if( simfire_flag == 1 ) {
 		landfile >> numland; landfile.ignore(100,'\n');
@@ -421,6 +455,13 @@ int main( int argc, char *argv[] ) {
 			landfile >> landsevmod2[landcnt]; landfile.ignore(100, '\n');
 		}
 		landfile.close();
+		//Check land type file parameters
+		if(input_error_flag==1)
+			{
+				ErrorCheck check;
+				check.check_landType_param(numland,landcode,landfiremod,landfireinit,landsevmod,landsevmod2);
+
+			}
 	}
 
 
@@ -446,8 +487,9 @@ int main( int argc, char *argv[] ) {
 	inlccfile.open(lccfilename);
 	inlccfile.ignore(100,'\n'); //Skip to the new line
 	inlccfile>>numlcc; inlccfile.ignore(100,'\n');
-	printf("%d\n",numlcc);
+	printf("Total # of LCC class descriptionin parameter file:%d\n",numlcc);
 	inlccfile.ignore(100,'\n'); //Skip to the new line
+	std::cout<<"Input LCC class Code \t Output LCC class code \t Simulation Flag"<<endl;
 	for(lcccnt=0;lcccnt<numlcc;lcccnt++)
 	{
 		inlccfile>>inlcccode[lcccnt]>>outlcccode[lcccnt]>>lcc_flag[lcccnt];inlccfile.ignore(100,'\n');			
@@ -614,14 +656,90 @@ int main( int argc, char *argv[] ) {
 		if( simfire_flag == 1 ) {
 			regime_head = read_grid("regime", regime);
 			dem_head = read_16bit_grid("elevation", dem);
+			//Compare # of fire regime class in regime grid with runname.fre file
+			if(input_error_flag==1)
+			{
+				int no_fire_regime;  // Number of fire regime
+				ErrorCheck ec;
+				no_fire_regime=ec.get_grid_class(regime,size);
+				if(no_fire_regime==regnum)
+				{
+					std::cout<<"# of Fire regime class \t OK"<<endl;
+				}
+				else
+				{
+					std::cout<<"@@@ ERROR:Number of fire regime is mismatched between runname.fre & regime.gis file"<<endl;
+					cin.get();
+					exit(1);
+				}
+			}
 		}
 		if( simharv_flag == 1 ) {
 			manage_head = read_16bit_grid("management", management);
 		}
-
+		
+		// Read grid landtype.gis
 		land_head = read_grid("landtype", landgrid);
-		com_head = read_grid("community", comgrid); 
-		lcc_head= read_grid("lcc",lccgrid);
+		//Compare # of class in landtype grid with runname.lnd file
+		if(input_error_flag==1)
+		{
+			int no_landtype; // Number of landtypes
+			ErrorCheck ec;
+			no_landtype=ec.get_grid_class(landgrid,size);
+			if(no_landtype==numland)
+			{
+				std::cout<<"# of Landtype class \t OK"<<endl;
+			}
+			else
+			{
+				std::cout<<"@@@ ERROR:Number of landtypes is mismatched between runname.lnd & landtype.gis file"<<endl;
+				cin.get();
+				exit(1);
+			}
+
+		}
+
+		// Read grid community.gis
+		com_head = read_grid("community", comgrid);  
+		//Compare # of class in community grid with runname.ctp file
+		if(input_error_flag==1)
+		{
+			int no_community; // Number of community
+			ErrorCheck ec;
+			no_community=ec.get_grid_class(comgrid,size);
+			if(no_community==numcom)
+			{
+				std::cout<<"# of Community class \t OK"<<endl;
+			}
+			else
+			{
+				std::cout<<"@@@ ERROR:Number of communities is mismatched between runname.ctp & community.gis file"<<endl;
+				cin.get();
+				exit(1);
+			}
+
+		}
+		//Read grid lcc.gis
+		lcc_head= read_grid("lcc",lccgrid);			 
+		//Compare # of class in lcc grid with runname.lcc file
+		if(input_error_flag==1)
+		{
+			int no_lcc; // Number of lcc class
+			ErrorCheck ec;
+			no_lcc=ec.get_grid_class(lccgrid,size);
+			if(no_lcc<= numlcc)
+			{
+				std::cout<<"# of LCC class in *.GIS \t"<<no_lcc <<endl;
+			}
+			else
+			{
+				std::cout<<"@@@ ERROR:Number of communities is mismatched between runname.lcc & lcc.gis file "<<endl;
+				cin.get();
+				exit(1);
+			}
+		
+		}
+
 
 		// or generate homogeneous grids
 		// not sure if this still works - do I need to add a generator for the elevation grid?
