@@ -1,0 +1,23 @@
+*********************************NLCD LCC classification 2006 legends******************************
+20 		Total number of LCC classes
+****************Input lcc code, output lcc code, simulation flag, and lcc type *****************
+11	211 0 Open Water
+12	212 0 Perennial Ice,Snow
+20	213 0 Developed, Open Space
+22	214 0 Developed, Low Intensity
+23	215 0 Developed, Medium Intensity
+24	216 0 Developed High Intensity
+31	217 0 Barren Land (Rock/Sand/Clay)
+41	218 1 Deciduous Forest
+42	219 1 Evergreen Forest
+43	220 1 Mixed Forest
+51	221 0 Dwarf Scrub
+52	222 1 Shrub/Scrub 
+71	223 1 Grassland/Herbaceous
+72	224	1 Sedge/Herbaceous 
+73	225	1 Lichens 
+74	226	1 Moss 
+81	227 0 Pasture/Hay
+82	228	0 Cultivated Crops 
+90	229 0 Woody wetlands
+95	230 0 Emergent Herbaceous Wetlands

@@ -1,3 +1,10 @@
+//----------------------------------------------------------------------------
+// File:		errorCheckH.h
+// Author: 		Ashis Lamsal
+// Last Update:	1/16/2012
+// Decription:	This module is responsible for checking *.gis file's availability in the program's running path, comparing their unsigned integer value classes with paramater files,
+// checking each line of parameter files to check for invalid  parameter values.
+//----------------------------------------------------------------------------
 #include "errorCheck.h"
 #include <vector>
 #include <fstream>

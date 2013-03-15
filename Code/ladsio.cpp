@@ -11,6 +11,8 @@
 #include "lads.h"
 #include "biomass.h"
 #include "lcc.h"
+#include <iostream>
+using namespace std;
 //----------------------------------------------------------------------------
 // read_veg3_grid - reads in initial dead biomass grid
 //----------------------------------------------------------------------------
@@ -146,7 +148,7 @@ struct image_header read_grid( char *filename, char *gridname )
     ingrid = fopen(infilename, "rb");
 
     fread(&imagehd, sizeof(struct image_header), 1, ingrid);
-
+	//printf("%d",sizeof(struct image_header));
     maxrow = imagehd.rrows;
     maxcol = imagehd.rcols;
 
@@ -155,6 +157,7 @@ struct image_header read_grid( char *filename, char *gridname )
         for(col=0; col<maxcol; col++) {
 			index=row*maxcol + col;
             gridname[index] = (char) fgetc(ingrid);
+			
 		}
 	}
 

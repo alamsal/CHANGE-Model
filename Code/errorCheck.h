@@ -1,3 +1,10 @@
+//----------------------------------------------------------------------------
+// File:		errorCheckH.h
+// Author: 		Ashis Lamsal
+// Last Update:	1/16/2012
+// Decription:	Contains external variable declarations and function prototypes
+//              for errorCheck.cpp
+//----------------------------------------------------------------------------
 #ifndef errorCheckH
 #define errorCheckH
 using namespace std;

@@ -92,7 +92,7 @@ double genrand(void)
     y ^= TEMPERING_SHIFT_L(y);
 
     return ( (double)y * 2.3283064370807974e-10 ); /* reals */
-    /* return y; */ /* for integer generation */
+	//   return y;  /* for integer generation */
 }
 
 //----------------------------------------------------------------------------
@@ -126,8 +126,8 @@ int rand_int( int maxval )
 {
 
 	int newnum;
-
-    newnum = (int)( 1 + maxval * genrand() );
+	double rand=genrand();
+    newnum = (int)( 1 + maxval *rand);
 
     return( newnum );
 

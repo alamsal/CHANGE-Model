@@ -285,12 +285,16 @@ int main( int argc, char *argv[] ) {
 	strcat(lccfilename, ".lcc");
 
 	//Check parameter files existance
-	input_error_flag=1; //Check file input error if flag=1
+	input_error_flag=0; //Check file input error if flag=1
 	if(input_error_flag==1)
 	{
 		ErrorCheck check;
 		check.check_file_exits(infilename, comfilename,landfilename,firefilename, harvfilename,lccfilename);
 
+	}
+	{
+		cout<<"input_error_flag=0 =>> Error checking is disabled"<<endl;
+	
 	}
 
 	// Open input files and read scenario parameters
@@ -336,7 +340,7 @@ int main( int argc, char *argv[] ) {
 	}
 
 	// Read community input file
-	numstate = 0;
+ 	numstate = 0;
 	largestnumstate = 0;
 	comfile >> numcom; comfile.ignore(100, '\n');
 	for(comcnt = 0; comcnt < numcom; comcnt++) {
@@ -649,6 +653,9 @@ int main( int argc, char *argv[] ) {
 		zonesumgrid = new char[size];
 	}
 
+	// initialize random number generator
+	sgenrand(time((unsigned long)(time_t)0));
+
 	// setup state variable grids
 	// either read from input files
 	if( read_map > 0 ) {
@@ -797,9 +804,11 @@ int main( int argc, char *argv[] ) {
 			}
 		}
 	}
+	////////////////////////////////////////////////////////////////
+	extract_forestCells(lccgrid);
 
-	// initialize random number generator
-	sgenrand(time((unsigned long)(time_t)0));
+	////////////////////////////////////////////////////////////////
+
 
 	// If read map flag is set, read initial landscape configurations from input files
 	if( read_map > 1) 

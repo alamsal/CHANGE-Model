@@ -4,8 +4,8 @@
 1000 		Maxcol
 1		Simulate Fire
 1		Simulate Harvest
-0		Burn-in Period
-10		Simulation Length
+1		Burn-in Period
+30		Simulation Length
 1 		Run Step
 10 		Summary Step
 1 		Vegetation summary flag
