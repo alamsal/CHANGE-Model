@@ -5,15 +5,21 @@
 // Decription:	The lcc.cpp module merge man made and non vegetated areas with buffer and prevent them from fire simulation.
 // It also generates explicitly coded LCC output for landscape fire simulation snapshot results based on LCC classes provided in lcc.gis file.
 //----------------------------------------------------------------------------
-#include "lcc.h"
-#include "randnum.h"
-#include "celllist.h"
-#include "probSurface.h"
+#include <boost/thread.hpp>
+#include <boost/array.hpp>
+#include <boost/lambda/lambda.hpp>
+
 #include <iostream>
 #include <map>
 #include <vector>
 #include <cstdlib>
 #include <string>
+
+#include "lcc.h"
+#include "randnum.h"
+#include "celllist.h"
+#include "probSurface.h"
+
 using namespace std;
 
 void merg_lccBuffer(char *buffergrid,char *lcc)
@@ -132,9 +138,156 @@ void merg_lccSnapshot()
 
 }
 
+////////////////////////////
+// Create and return the map of structure vectors to store all extracted values based upon probability surfaces and LCC.
+std::map<int,vector<lccCells> > extract_LandCoverCells(char *lcc, int lccCode)
+{
+	unsigned int index; // array index
+	unsigned int node_counter=0; //Counter to track the lenght of forest list.
+
+	lccCells tempLcc; // Struct object to store row and columns of a raster cell.
+
+	std::map<int,vector<lccCells> > ext_lcc_vector;	// Map of vectors containing sturcuture to hold all extracted values based upon probability surfaces and LCC.
+
+
+	// Read LCC grid and extract forest cell into a separate linked list, named forest_list. 
+	for(unsigned int row=0; row<maxrow; row++) 
+	{
+		for(unsigned int col=0; col<maxcol; col++) 
+		{
+			index=row*maxcol + col;
+			for(unsigned register short int lclass=0;lclass<numlcc;lclass++) //loop to determine the lcc class and their corresponding lcc flag and input code 
+			{
+				if(lcc[index]==lccCode) //Extract LCC class based upon lcc code 
+				{
+					if(probability_surfaces[0][row][col]>0.95)				//Extract water having  water transition prob threshold >95% i.e 0.95 ( to water)
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[0].push_back(tempLcc);
+
+					}
+					else if(probability_surfaces[1][row][col]>0.95)			//Extract water having  ice transition prob threshold >95% i.e 0.95 ( to ice)
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[1].push_back(tempLcc);
+	
+					
+					}
+					else if(probability_surfaces[2][row][col]>0.93)			//Extract water having transition prob threshold>93% ie. 0.93 (to urban)
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[2].push_back(tempLcc);
+					}
+					else if(probability_surfaces[3][row][col]>0.85)			//Extract water having trasnition prob threshold>85 ie. 0.84 ( to barren)
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[3].push_back(tempLcc);
+					}
+					else if(probability_surfaces[4][row][col]>0.85)			//to decdidous forest
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[4].push_back(tempLcc);
+					
+					}
+					else if(probability_surfaces[5][row][col]>0.85)			//to evergreen forest
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[5].push_back(tempLcc);
+					}
+					else if(probability_surfaces[6][row][col]>0.85)			//to shrubland
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[6].push_back(tempLcc);
+					}
+					else if(probability_surfaces[7][row][col]>0.85)			//to grassland
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[7].push_back(tempLcc);
+					}
+					else if(probability_surfaces[8][row][col]>0.90)			//to hay/pasture
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[8].push_back(tempLcc);
+					}
+					else if(probability_surfaces[9][row][col]>0.85)			//to crops
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[9].push_back(tempLcc);
+					}
+					else
+					{
+						cout <<"@@@ Error: Either LCC code or Probability surfaces do not exist in file: lcc.cpp"<<endl;
+						cin.get();
+						exit(1);
+					}
+				}
+			}
+        }
+    }		
+		
+	return ext_lcc_vector;
+}
+
+
+
+vector <lccCells> ext_Cells(char *lcc)
+{
+	extract_LandCoverCells(lcc,42);
+
+	unsigned int index; // array index
+	unsigned int node_counter=0; //Counter to track the lenght of forest list.
+	
+	std::vector <lccCells> extracted_LCC;
+	lccCells tempLcc;
+
+	extracted_LCC.clear();
+
+	// Read LCC grid and extract forest cell into a separate linked list, named forest_list. 
+	for(unsigned int row=0; row<maxrow; row++) 
+	{
+		for(unsigned int col=0; col<maxcol; col++) 
+		{
+			index=row*maxcol + col;
+			for(unsigned register short int lclass=0;lclass<numlcc;lclass++) //loop to determine the lcc class and their corresponding lcc flag and input code 
+			{
+				if((lcc[index]==inlcccode[lclass]) && (lcc_flag[lclass]==1)) //Extract naturally vegetated areas
+				{
+					if(probability_surfaces[1][row][col]>0.93)				//Extract nat veg areas having transition prob threshold >93% i.e 0.93 (Nat veg to urban)
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						extracted_LCC.push_back(tempLcc);
+						node_counter++;
+					}
+				}
+			}
+        }
+    }		
+
+	cout<<node_counter<<endl;
+	return extracted_LCC;
+}
+
+
+
+
+/////////////////////////////
+
 //Make a list of cells that are currently forests
 void extract_forestCells(char *lcc)
 {
+	extract_waterCells(lcc);
+
 	double irand; // u0_1 random variable assigned to all cells in each iteration of the algorithm
 	unsigned int index; // array index
 	unsigned int node_counter=0; //Counter to track the lenght of forest list.
@@ -152,14 +305,14 @@ void extract_forestCells(char *lcc)
 
 	celllist forest_list; //List to store forest and vegetated pixel x,y coordinate.
 
-	//Read Probability surfaces grid.
-	float NumberOfFiles = 5;
-	float rows=1000;
-	float columns=1500;
-    std::vector< std::vector<std::vector< float > > > probability_surfaces(NumberOfFiles,std::vector<std::vector<float>>(rows,std::vector<float>(columns)));
-	
-	read_probabilitySurfaces(probability_surfaces,NumberOfFiles,rows,columns);
-	probability_surfaces;
+	////Read Probability surfaces grid.
+	//float NumberOfFiles = 5;
+	//float rows=1000;
+	//float columns=1500;
+ //   std::vector< std::vector<std::vector< float > > > probability_surfaces(NumberOfFiles,std::vector<std::vector<float>>(rows,std::vector<float>(columns)));
+	//
+	//read_probabilitySurfaces(probability_surfaces,NumberOfFiles,rows,columns);
+	//probability_surfaces;
 
 	//for(int row=0; row<10; row++) 
  //   {
@@ -202,7 +355,7 @@ void extract_forestCells(char *lcc)
 	cout<<node_counter<<endl;
 
 	
-	unsigned int demand_area=90*90*100; //Area of 100 cell
+	unsigned int demand_area=90*90*1000; //Area of 100 cell
 	unsigned int demand_cells = (unsigned int)demand_area/(90*90); //Area of unit cell = 90*90
 	
 	//// Mike's Algorithm with Linked list
@@ -223,33 +376,11 @@ void extract_forestCells(char *lcc)
 	//	unsigned int col=forest_list.getcol();
 	//	//forest_list.printcell();
 
-	//	//Transition probability value
-	//	tras_probability=double(probability_surfaces[1][row][col]);
-
-	//	//Generate a uniform random variable for the forest cell
-	//	irand=u0_1();
-	//	if(irand<tras_probability)
-	//	{
-	//		unsigned int cell_index=row*maxcol + col;
-	//		lcc[cell_index]=20; // 20 Developed , open space
-	//		//demand_cells--;
-	//		cout<<"fasyo maya jal ma..."<<endl;
-	//	}
-	//	
-
-	//	//Delete cell from current list location
-	//	forest_list.deletecell();
-	//	forest_list.reset();
-	//	node_counter--;
-	//	
-	//}
-	
-
 	// Mike's Algorithm with modified with map
 	int rand_forestrow;
 	int rand_forestcol;
 	unsigned int rand_index=1;
-	while(fcell_length.size()>0)//demand_cells>1||findex>1
+	while((demand_cells>0)&&(fcell_length.size()>0))//demand_cells>1||findex>1
 	{
 		//Generare a random integer between 1 and forest length.
 		unsigned int rand_index=(unsigned int) rand_int(fcell_length.size());
@@ -275,6 +406,7 @@ void extract_forestCells(char *lcc)
 			//cout<<"fasyo maya jal ma..."<<endl;
 			lcc[cell_index]=20; // 20 Developed , open space
 			demand_cells--;
+			cout<<demand_cells<<endl;
 
 		}
 		
@@ -288,4 +420,106 @@ void extract_forestCells(char *lcc)
 
 	
 		
+}
+
+
+// Extract water cells from LCC
+void extract_waterCells(char *lcc)
+{
+	std::vector <lccCells> mytestCells;
+	mytestCells=ext_Cells(lcc);
+	int vec_size=mytestCells.size()-1;
+	while(vec_size>=0)
+	{
+		cout<< mytestCells[vec_size].lccCol<<"<****>"<<	mytestCells[vec_size].lccRow<<endl;
+		vec_size--;
+	}
+	
+
+
+}
+
+// Extract developed cells from LCC
+void extract_developedCells(char *lcc)
+{
+
+}
+// Extract barren cells from LCC 
+void extract_barrenCells(char *lcc)
+{
+
+}
+// Extract deci forest cells from LCC 
+void extract_deci_forestCells(char *lcc)
+{
+
+}
+// Extract evergreen forest cells from LCC
+void extract_evergreen_forestCells(char *lcc)
+{
+
+}
+// Extract mixed forest cells from LCC 
+void extract_mixed_forestCells(char *lcc)
+{
+
+}
+// Extract grassland cells from LCC 
+void extract_grasslandCells(char *lcc)
+{
+
+}
+// Extract shrubland cells from LCC 
+void extract_shrublandCells(char *lcc)
+{
+
+}
+// Extract cropland cells from LCC
+void extract_croplandCells(char *lcc)
+{
+
+}
+ // Extract hay/pasture cells from LCC
+void extract_hay_pastureCells(char *lcc)
+{
+
+}
+// Extract herbaceous wetlands cells from LCC
+void extract_herbaceous_wetlandCells(char *lcc)
+{
+
+}
+// Extract woody wetlands cells from LCC 
+void extract_woody_wetlandCells(char *lcc)
+{
+
+}
+// Extract ice/snow cells from LCC
+void extract_ice_snowCells(char *lcc)
+{
+
+}
+///////////////////////////////////////////////////////// NEED to update current LCC to extract following cells- ASK Mike //////////////////////////////////////
+// Extract mecanically distrubed/ non forest cells from LCC
+void extract_md_nfCells(char *lcc)
+{
+
+}
+
+// Extract mecanically distrubed/open cells from LCC
+void extract_md_opCells(char *lcc)
+{
+
+}
+
+// Extract mecanically distrubed/private cells from LCC 
+void extract_md_pvtCells(char *lcc)
+{
+
+}
+
+// Extract mining cells from LCC 
+void extract_minningCells(char *lcc)
+{
+
 }

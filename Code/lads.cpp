@@ -7,6 +7,8 @@
 // Modified: Aashis Lamsal
 // Last Update:	1/4/2008
 //----------------------------------------------------------------------------
+#include <iostream>
+#include <vector>
 #include "stdafx.h"
 #include "lads.h"
 #include "ladsio.h"
@@ -16,8 +18,11 @@
 #include "fires.h"
 #include "celllist.h"
 #include "lcc.h"
+#include "probSurface.h"
 #include "errorCheck.h"
-#include <iostream>
+//Total no of probabiltiy surfaces
+# define NO_PROBABILITY_FILES 10
+
 using namespace std;
 
 // POINTERS TO MAIN LANDSCAPE ARRAYS
@@ -169,6 +174,9 @@ double liburnarea[40];		// non-lethal area burned summary array
 double miburnarea[40];		// mixed-severity area burned summary array
 double hiburnarea[40];		// stand-replacement area burned summary array
 double totburncount[40];	// total number of fires summary array
+
+// Probabilty surfaces container
+std::vector< std::vector<std::vector< float > > > probability_surfaces(NO_PROBABILITY_FILES,std::vector<std::vector<float>>(1000,std::vector<float>(1500))); //Holds the probability surfaces rasters as 3D vector
 
 int main( int argc, char *argv[] ) {
 
@@ -502,6 +510,15 @@ int main( int argc, char *argv[] ) {
 	}
 	inlccfile.close();
 
+	// Read probability surfaces raster files
+	float rows=1000;
+	float columns=1500;
+    //probability_surfaces(NumberOfFiles,std::vector<std::vector<float>>(rows,std::vector<float>(columns)));
+	
+	read_probabilitySurfaces(probability_surfaces,NO_PROBABILITY_FILES,rows,columns);
+	probability_surfaces;
+
+
 	// Only read wood biomass intput file if we're simulating biomass
 	biosum = 0;
 	if(biom_flag == 1) {
@@ -804,11 +821,6 @@ int main( int argc, char *argv[] ) {
 			}
 		}
 	}
-	////////////////////////////////////////////////////////////////
-	extract_forestCells(lccgrid);
-
-	////////////////////////////////////////////////////////////////
-
 
 	// If read map flag is set, read initial landscape configurations from input files
 	if( read_map > 1) 
@@ -1071,6 +1083,9 @@ int main( int argc, char *argv[] ) {
 
 			// Output the landscape "snapshot"
 			if(snapsum >= 1) {
+				//////////////////////////////////////////////////////////
+				extract_forestCells(lccgrid); // ///Use fORSCE algorithm
+				///////////////////////////////////////////////////////////
 				gen_snapshot(runname, year, buffer_head, snapsum, 0);
 			}
 			// or output age summaries
