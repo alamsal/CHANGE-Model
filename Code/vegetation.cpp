@@ -56,7 +56,7 @@ void grow_veg( void ) {
 
     // Increment the age of every cell
     for(index=0; index<size; index++) {
-        if(buffer[index] > 0) {
+        if((buffer[index] > 0) && (regime[index]>0)) {					// Original: if(buffer[index] > 0) //Edited :  if((buffer[index] > 0) && (regime[index]>0))  // Date:4/15/2013
             age[index]+=(short int)runstep;
             tsfire[index]+=(short int)runstep;
             if(suclag[comgrid[index] - 1][stategrid[index] - 1] < 999) {

@@ -89,6 +89,7 @@
     <ClCompile Include="..\..\Code\lcc.cpp" />
     <ClCompile Include="..\..\Code\probSurface.cpp" />
     <ClCompile Include="..\..\Code\randnum.cpp" />
+    <ClCompile Include="..\..\Code\demand.cpp" />
     <ClCompile Include="..\..\Code\stdafx.cpp" />
     <ClCompile Include="..\..\Code\vegetation.cpp" />
   </ItemGroup>
@@ -102,6 +103,7 @@
     <ClInclude Include="..\..\Code\lcc.h" />
     <ClInclude Include="..\..\Code\probSurface.h" />
     <ClInclude Include="..\..\Code\randnum.h" />
+    <ClInclude Include="..\..\Code\demand.h" />
     <ClInclude Include="..\..\Code\stdafx.h" />
     <ClInclude Include="..\..\Code\vegetation.h" />
     <ClInclude Include="resource.h" />

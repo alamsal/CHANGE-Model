@@ -10,6 +10,7 @@
 #define lccH
 // Define header files
 #include <vector>
+#include <map>
 
 //Global variables
 extern char *lccgrid;           // lcc classes grid
@@ -32,24 +33,10 @@ void merg_lccBuffer(char *buffergridname,char *lccgridname);	//Merging original 
 void merg_lccSnapshot(); // Merging lcc class into output grid snapshot.
 void extract_forestCells(char *lccgridname);//Extract forest cells from LCC
 
-void extract_waterCells(char *lccgridname); // Extract water cells from LCC
-void extract_developedCells(char *lccgridname); // Extract developed cells from LCC
-void extract_md_nfCells(char *lccgridname); // Extract mecanically distrubed/ non forest cells from LCC
-void extract_md_opCells(char *lccgridname); // Extract mecanically distrubed/open cells from LCC
-void extract_md_pvtCells(char *lccgridname); // Extract mecanically distrubed/private cells from LCC 
-void extract_minningCells(char *lccgridname); // Extract mining cells from LCC 
-void extract_barrenCells(char *lccgridname); // Extract barren cells from LCC 
-void extract_deci_forestCells(char *lccgridname); // Extract deci forest cells from LCC 
-void extract_evergreen_forestCells(char *lccgridname); // Extract evergreen forest cells from LCC
-void extract_mixed_forestCells(char *lccgridname); // Extract mixed forest cells from LCC 
-void extract_grasslandCells(char *lccgridname); // Extract grassland cells from LCC 
-void extract_shrublandCells(char *lccgridname); // Extract shrubland cells from LCC 
-void extract_croplandCells(char *lccgridname); // Extract cropland cells from LCC
-void extract_hay_pastureCells(char *lccgridname); // Extract hay/pasture cells from LCC
-void extract_herbaceous_wetlandCells(char *lccgridname); // Extract herbaceous wetlands cells from LCC
-void extract_woody_wetlandCells(char *lccgridname); // Extract woody wetlands cells from LCC 
-void extract_ice_snowCells(char *lccgridname); // Extract ice/snow cells from LCC
 
+void extract_developedCells(char *lccgridname); // Extract developed cells from LCC
+
+void allocate_lccCells(char *lccgridname); //allocate  LCC cells
 
 
 // Hold filtered raster cells
@@ -59,6 +46,8 @@ struct lccCells
 	int lccCol;
 };
 
-std::vector <lccCells> ext_Cells(char *lccgridname); //Extract vector of cells from LLC
+//std::vector <lccCells> ext_Cells(char *lccgridname); //Extract vector of cells from LLC
+
+std::map <int,std::vector <lccCells> > extract_LandCoverCells(char *lccgridname, int lccCode); // Extract LCC cells based upon lcccode
 
 #endif

@@ -59,7 +59,7 @@ int firespread( int firereg, int fsize ) {
 	// Initialize the fire grids
     for(index=0;index<size;index++)
 	{
-        if(regime[index] > 0)  //Edited by Ashis:1/4/2013 : if(regime[index] > 0)
+        if((buffer[index] > 0) && (regime[index]>0))  //Original: if(regime[index] > 0) //Edited: if((buffer[index] > 0) && (regime[index]>0)) //Date:4/15/2013
 		{		
 			fsusc[index] = statefireinit[comgrid[index] - 1][stategrid[index] - 1] * landfireinit[landgrid[index] - 1];
 			//printf("%d \t %d \n",statefireinit[comgrid[index] - 1][stategrid[index] - 1],landfireinit[landgrid[index] - 1]);
@@ -73,17 +73,20 @@ int firespread( int firereg, int fsize ) {
 	    row = rand_int(maxrow) - 1;
 		col = rand_int(maxcol) - 1;
 		index = row * maxcol + col;
-        if((int)regime[index] == (firereg + 1) ) {  //Edited by Ashis:1/4/2013 : f( ((int)regime[index] == firereg + 1)
+		if(buffer[index]>0)			//Original: No buffer checking  //Edited: if(buffer[index] > 0)  //Date:4/15/2013
+		{
+			if((int)regime[index] == (firereg + 1) ) {  
 		    
-			f_susc = fsusc[index];
+				f_susc = fsusc[index];
 			
-			//printf("Fire suc...%f\t\t%f\n",f_susc,u0_1());
+				//printf("Fire suc...%f\t\t%f\n",f_susc,u0_1());
 		    
-			if(u0_1() < f_susc )
-			{
-				break;
+				if(u0_1() < f_susc )
+				{
+					break;
+				}
 			}
-        }
+		}
     }
 
     // Burn the initial cell 

@@ -9,6 +9,6 @@
 #define probSurfaceH
 #include<vector>
 //Function Prototypes
-void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > & grid_value,float NumberOfFiles,float rows,float columns);
+void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > & grid_value,float NumberOfFiles,float rows,float columns,float prob_max[]);
 
 #endif

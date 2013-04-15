@@ -20,6 +20,7 @@
 #include "lcc.h"
 #include "probSurface.h"
 #include "errorCheck.h"
+#include "demand.h"
 //Total no of probabiltiy surfaces
 # define NO_PROBABILITY_FILES 10
 
@@ -513,9 +514,11 @@ int main( int argc, char *argv[] ) {
 	// Read probability surfaces raster files
 	float rows=1000;
 	float columns=1500;
-    //probability_surfaces(NumberOfFiles,std::vector<std::vector<float>>(rows,std::vector<float>(columns)));
+	float prob_max[10]={248.0,185.0,255.0,53.0,53.0,173.0,227.0,242.0,213.0,240.0}; //Holds the maximum pixel value of each probability file in prob0, prob1, prob2,...porb9 order to change the pixel probabilty between 0-1. 
+    
+	//probability_surfaces(NumberOfFiles,std::vector<std::vector<float>>(rows,std::vector<float>(columns)));
 	
-	read_probabilitySurfaces(probability_surfaces,NO_PROBABILITY_FILES,rows,columns);
+	read_probabilitySurfaces(probability_surfaces,NO_PROBABILITY_FILES,rows,columns,prob_max);
 	probability_surfaces;
 
 
@@ -798,7 +801,11 @@ int main( int argc, char *argv[] ) {
 	}
 
 	//Integrating buffer with LCC type added by Ashis 12/18/2012
+	read_demandCsv();
+	extract_forestCells(lccgrid); // ///Use fORSCE algorithm
+	gen_snapshot(runname, 55, buffer_head, snapsum, 0); //snapshot from forsce
 	merg_lccBuffer(buffer,lccgrid);
+	gen_snapshot(runname, 555, buffer_head, snapsum, 0); //snapshot from forsce
 
 	// compute the size of the active landscape, fire regime zones, and summary zones
 	for(index=0; index<size; index++) {
@@ -1084,7 +1091,7 @@ int main( int argc, char *argv[] ) {
 			// Output the landscape "snapshot"
 			if(snapsum >= 1) {
 				//////////////////////////////////////////////////////////
-				extract_forestCells(lccgrid); // ///Use fORSCE algorithm
+				//extract_forestCells(lccgrid); // ///Use fORSCE algorithm
 				///////////////////////////////////////////////////////////
 				gen_snapshot(runname, year, buffer_head, snapsum, 0);
 			}

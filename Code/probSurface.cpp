@@ -31,7 +31,7 @@ using namespace std;
 	}
 */
 
-void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > & grid_value,float NumberOfFiles,float rows,float columns)
+void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > & grid_value,float NumberOfFiles,float rows,float columns,float prob_max[] )
 {
    FILE *f[20];
     char FileName[120];  /* Plenty large for your file naming */
@@ -58,8 +58,7 @@ void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > 
     }
 
     cout<<"Reading probability surface files..."<<endl;
-
-
+	
 	//Loop through all probability files and read their rows/columns into 3D vector named grid-value[][][].
     for (unsigned int nof=0; nof<NumberOfFiles;nof++)
     {
@@ -70,7 +69,7 @@ void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > 
             for(unsigned register int col=0; col<columns; col++) 
             {
               unsigned int tvar = (unsigned int) fgetc(f[nof]);
-              grid_value[nof][row][col]=(float)tvar/255.0;
+              grid_value[nof][row][col]=(float)tvar/(prob_max[nof]);
              // cout<<"("<<nof<<","<<col+1<<","<<row+1<<")"<<grid_value[nof][row][col]<<"\t";
 			  if(grid_value[nof][row][col]<0)
 			  {
