@@ -19,6 +19,7 @@
 #include "randnum.h"
 #include "celllist.h"
 #include "probSurface.h"
+#include "demand.h"
 
 using namespace std;
 // Merge buffer cells and Non Vegetated areas (with LCC flag 0) with buffer to prevent them from burning during LADS simulation.
@@ -44,7 +45,7 @@ void merg_lccBuffer(char *buffergrid,char *lcc)
 	//}
 	for (int index=0;index<size;index++)
 	{
-		if(buffergrid[index]>=0 && lcc[index]>0)
+		if((buffergrid[index]>=0) && (lcc[index]>0))
 		{
 			for(int lclass=0;lclass<numlcc;lclass++) //loop to determine the lcc class and their corresponding lcc flag and input code 
 			{
@@ -65,8 +66,21 @@ void merg_lccBuffer(char *buffergrid,char *lcc)
 	}
 	cout <<i;
 }
+//Comparing neighbouring lcc 8 cells to generate LCC patch
+bool getNeighbour(int row,int col,int lcccode)
+{
+	if(((int)lccgrid[((row-1)*maxcol+(col-1))]==lcccode)||((int)lccgrid[((row-1)*maxcol+(col))]==lcccode)||((int)lccgrid[((row-1)*maxcol+(col+1))]==lcccode)||((int)lccgrid[((row)*maxcol+(col-1))]==lcccode)
+		||((int)lccgrid[((row)*maxcol+(col+1))]==lcccode)||((int)lccgrid[((row+1)*maxcol+(col-1))]==lcccode)||((int)lccgrid[((row+1)*maxcol+(col))]==lcccode)||((int)lccgrid[((row+1)*maxcol+(col+1))]==lcccode)) 
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 
-////////////////////////////
+}
+
 // Create and return the map of structure vectors to store all extracted values based upon probability surfaces and LCC.
 std::map<int,vector<lccCells> > extract_LandCoverCells(char *lcc, int lccCode)
 {
@@ -163,8 +177,8 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(char *lcc, int lccCode)
 //Make a list of cells that are currently forests
 void extract_forestCells(char *lcc)
 {
-	 //allocate_lccCells(lcc);
-	 extract_developedCells(lcc);
+	 allocate_lccCells(lcc);
+	// extract_developedCells(lcc);
 
 	/*    Original Working algorithm */
 	/*start */
@@ -306,56 +320,53 @@ void extract_forestCells(char *lcc)
 //Spatial allocation of Demands
 void allocate_lccCells(char *lcc)
 {
-	// Extract water cells from LCC
-	std::map<int,vector<lccCells> > lcc_water;	
-	lcc_water= extract_LandCoverCells(lcc,11);
-
-	// Extract ice/snow cells from LCC
-	std::map<int,vector<lccCells> > lcc_ice_snow;
-	lcc_ice_snow=extract_LandCoverCells(lcc,12);
-
-	// Extract developed cells from LCC
-	std::map<int,vector<lccCells> > lcc_developed;
-	lcc_developed= extract_LandCoverCells(lcc,20); 
-
-	// Extract barren cells from LCC 
-	std::map<int,vector<lccCells> > lcc_barren;
-	lcc_barren=extract_LandCoverCells(lcc,31);
-
-	// Extract deci forest cells from LCC 
-	std::map<int,vector<lccCells> > lcc_deci_forest;
-	lcc_deci_forest=extract_LandCoverCells(lcc,41);
-
-	// Extract evergreen forest cells from LCC
-	std::map<int,vector<lccCells> > lcc_evergreen_forest;
-	lcc_evergreen_forest=extract_LandCoverCells(lcc,42);
-
-	// Extract mixed forest cells from LCC 
-	std::map<int,vector<lccCells> > lcc_mixsed_forest;
-	lcc_mixsed_forest=extract_LandCoverCells(lcc,43);
-
-	// Extract shrubland cells from LCC 
-	std::map<int,vector<lccCells> > lcc_shrublands;
-	lcc_shrublands=extract_LandCoverCells(lcc,52);
-
-	// Extract grassland cells from LCC 
-	std::map<int,vector<lccCells> > lcc_grasslands;
-	lcc_grasslands=extract_LandCoverCells(lcc,71);
-
-	// Extract hay/pasture cells from LCC
-	std::map<int,vector<lccCells> > lcc_hay_pasture;
-	lcc_hay_pasture=extract_LandCoverCells(lcc,81);
-
-	// Extract cropland cells from LCC
-	std::map<int,vector<lccCells> > lcc_croplands;
-	lcc_croplands=extract_LandCoverCells(lcc,82);
-
-	//Extract wetland cells from LCC
-	std::map<int,vector<lccCells> > lcc_wetlands;
-	lcc_wetlands=extract_LandCoverCells(lcc,90);
 	
+	// Extracted  cells from LCC
+	std::map<int,vector<lccCells> > extracted_lcc[20];
+	
+	extracted_lcc[0]=extract_LandCoverCells(lcc,11); // Extract water cells from LCC
+	extracted_lcc[1]=extract_LandCoverCells(lcc,12); // Extract ice/snow cells from LCC
+	extracted_lcc[2]=extract_LandCoverCells(lcc,20); // Extract developed cells from LCC
+	extracted_lcc[3]=extract_LandCoverCells(lcc,31); // Extract barren cells from LCC 
+	extracted_lcc[4]=extract_LandCoverCells(lcc,41); // Extract deci forest cells from LCC 
+	extracted_lcc[5]=extract_LandCoverCells(lcc,42); // Extract evergreen forest cells from LCC
+	//extracted_lcc[6]=extract_LandCoverCells(lcc,43); // Extract mixed forest cells from LCC  /*Excluding mixed forest from Forsce MODEL becasue we do not have Probability surface for this*/
+	extracted_lcc[6]=extract_LandCoverCells(lcc,52); // Extract shrubland cells from LCC 
+	extracted_lcc[7]=extract_LandCoverCells(lcc,71); // Extract grassland cells from LCC 
+	extracted_lcc[8]=extract_LandCoverCells(lcc,81); // Extract hay/pasture cells from LCC
+	extracted_lcc[9]=extract_LandCoverCells(lcc,82); // Extract cropland cells from LCC
+	//extracted_lcc[10]=extract_LandCoverCells(lcc,90); //Extract wetland cells from LCC     /*Excluding wetlands from Forsce MODEL becasue we do not have Probability surface for this*/
+	
+	int extractSize= 10; //Becasue we got 10 sets of lcc transformation
+	int lcccode[10]={11,12,20,31,41,42,52,71,81,82}; // Once we got all datasets, I think we can replace this array with inlcccode[40].
+	
+	std::map<int,vector<lccCells> > lcc_cells;
+	std::vector<lccCells> vec_lcc_cells;
 
-
+	//Read demand file in row/column order
+	for(int i=0; i<DEMANDROW;i++)
+	{
+		for (int j=0; j<DEMANDCOL; j++)
+		{
+			//cout<<"("<<i<<","<<j<<")"<<demand_matrix[i][j]<<"\t";
+			if(i==j)		//No demand allocation diagonally 
+			{
+				cout<<"No demand allocation"<<endl;
+				
+			}
+			else
+			{
+				//demand value comes from here..
+				int demand=stoi(demand_matrix[i][j]);	//Convert from string type to integer.
+				lcc_cells=extracted_lcc[i];
+				vec_lcc_cells=lcc_cells[j];
+				//space_allocation( vecobj,lcccode[j], lcccode[j], demand);
+				cout<<vec_lcc_cells.size()<<"--"<<lcccode[j] <<"--"<<j <<"--"<<demand <<endl;
+				space_allocation(vec_lcc_cells,lcccode[j],j,demand);
+			}
+		}
+		cout<<endl<<endl;
+	}
 
 	////********************************************************************///
 	// NEED to update current LCC to extract following cells- ASK Mike & Zhihuwa//
@@ -373,7 +384,72 @@ void allocate_lccCells(char *lcc)
 	std::map<int,vector<lccCells> > lcc_minning;
 	////********************************************************************///
 }
+void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int demand)
+{
+	int rand_forestrow;
+	int rand_forestcol;
+	double tras_probability;
+	unsigned int cell_index;
+	double irand;
+	int counter=0;
+	if((demand>0)&&(vecobj.size()>0))
+	{
+		cout<< "Start Demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Transition prob pixel #::" <<vecobj.size() << endl;
+		while((vecobj.size()>0) && (demand>0))
+		{
 
+			//Generare a random integer between 1 and cell length.
+			unsigned int rand_index=(unsigned int) rand_int(vecobj.size());
+
+
+			//Retrive random index from vector
+			rand_forestrow=vecobj.at(rand_index-1).lccRow;
+			rand_forestcol=vecobj.at(rand_index-1).lccCol;
+
+
+			////Transition probability value
+			tras_probability=(double)(probability_surfaces[prob_index][rand_forestrow][rand_forestcol]);		//(1/255*probability_surfaces[1][rand_forestrow][rand_forestcol])
+
+			////Generate a uniform random variable for the forest cell
+			irand=u0_1();
+			if(irand<tras_probability)
+			{
+				cell_index=rand_forestrow*maxcol + rand_forestcol;
+				//if(getNeighbour(rand_forestrow,rand_forestcol,lcccode))
+				if(true)
+				{
+					int index_value=(int)(lccgrid[cell_index]);
+					//cout<<index_value<<endl;   
+
+					//If FORSCE change the cell transition form non-veg to vegetated; we must assign community[index]==1 to start future successional stages.
+					if(((index_value==11)||(index_value==12)||(index_value==20)||(index_value==31)||(index_value==81)||(index_value==82)||(index_value==90))&&((lcccode==41)||(lcccode==42)||(lcccode==43)||(lcccode==52)||(lcccode==71)))	
+					{
+						comgrid[cell_index]=1;
+					}
+					lccgrid[cell_index]=lcccode; 
+
+					//cout<<int(lccgrid[cell_index])<<endl;
+
+					demand--;
+					counter++;
+				}
+
+			}
+			vecobj.erase(vecobj.begin()+rand_index-1);
+			vecobj.begin();		
+
+		}
+		cout<< "Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter<< endl; 
+	}
+	
+	else
+	{
+		cout<< "Demand or transition prob pixel size/#::"<<demand <<"::\t"<<vecobj.size()<< endl;
+	}
+
+	
+
+}
 // Extract developed cells from LCC
 void extract_developedCells(char *lcc)
 {
@@ -414,13 +490,15 @@ void extract_developedCells(char *lcc)
 		if(irand<tras_probability)
 		{
 			cell_index=rand_forestrow*maxcol + rand_forestcol;
-			//cout<<"fasyo maya jal ma..."<<endl;
-			cout<<int(lccgrid[cell_index])<<endl;
-			lccgrid[cell_index]=20; // 20 Urban
-			cout<<int(lccgrid[cell_index])<<endl;
-			//cout<< demand << endl;
-			demand--;
-			counter++;
+			if(getNeighbour(rand_forestrow,rand_forestcol,20))
+			{
+				cout<<int(lccgrid[cell_index])<<endl;
+				lccgrid[cell_index]=20; // 20 Urban
+				cout<<int(lccgrid[cell_index])<<endl;
+				//cout<< demand << endl;
+				demand--;
+				counter++;
+			}
 
 		}
 		vecobj.erase(vecobj.begin()+rand_index-1);
@@ -432,9 +510,6 @@ void extract_developedCells(char *lcc)
 	cout<< counter<<endl;
 	
 }
-
-
-
 
 // Assign output codes to  NDLC 2006 input LCC codes to generate output grid.
 void merg_lccSnapshot()
@@ -497,7 +572,7 @@ void merg_lccSnapshot()
 	{
 		for(int lclass=0;lclass<numlcc;lclass++)
 		{
-			if(lccgrid[index]==inlcccode[lclass] && lcc_flag[lclass]==0 )
+			if((lccgrid[index]==inlcccode[lclass]) && (lcc_flag[lclass]==0))
 			{
 				temp[index]=outlcccode[lclass];			
 			}

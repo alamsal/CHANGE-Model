@@ -349,7 +349,8 @@ int main( int argc, char *argv[] ) {
 	}
 
 	// Read community input file
- 	numstate = 0;
+
+	numstate = 0;
 	largestnumstate = 0;
 	comfile >> numcom; comfile.ignore(100, '\n');
 	for(comcnt = 0; comcnt < numcom; comcnt++) {
@@ -803,10 +804,8 @@ int main( int argc, char *argv[] ) {
 	//Integrating buffer with LCC type added by Ashis 12/18/2012
 	read_demandCsv();
 	extract_forestCells(lccgrid); // ///Use fORSCE algorithm
-	gen_snapshot(runname, 55, buffer_head, snapsum, 0); //snapshot from forsce
-	merg_lccBuffer(buffer,lccgrid);
-	gen_snapshot(runname, 555, buffer_head, snapsum, 0); //snapshot from forsce
-
+	gen_lccsnapshot(runname, 55, buffer_head, snapsum, 0); //snapshot from forsce
+	
 	// compute the size of the active landscape, fire regime zones, and summary zones
 	for(index=0; index<size; index++) {
 		if(buffer[index] > 0)  {

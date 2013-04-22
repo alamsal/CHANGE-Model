@@ -11,10 +11,14 @@
 // Define header files
 #include <vector>
 #include <map>
+#include <string>
+
+using namespace std;
 
 //Global variables
 extern char *lccgrid;           // lcc classes grid
 extern char *buffer;			// fire buffer zone grid
+extern char *comgrid;			// community type grid
 extern int size;				// total # of cells in landscape (includes background)
 extern unsigned char *temp;				// temporary grid for holding classified veg data
 
@@ -25,6 +29,15 @@ extern int numlcc;					//Number of lcc types
 extern int inlcccode[40];			//Input lcc code works upto 40 different LCC types.
 extern int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
 extern int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
+
+// Hold filtered raster cells
+struct lccCells
+{
+	int lccRow;
+	int lccCol;
+};
+
+extern std::vector<std::vector<string> > demand_matrix; //Container to hold demand matrix
 
 extern std::vector< std::vector<std::vector< float > > >probability_surfaces; //Holds the probability surfaces rasters as 3D vector
 
@@ -38,13 +51,9 @@ void extract_developedCells(char *lccgridname); // Extract developed cells from 
 
 void allocate_lccCells(char *lccgridname); //allocate  LCC cells
 
+void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int demand);// Allocate space in lcc grid as well as change the community type
 
-// Hold filtered raster cells
-struct lccCells
-{
-	int lccRow;
-	int lccCol;
-};
+
 
 //std::vector <lccCells> ext_Cells(char *lccgridname); //Extract vector of cells from LLC
 

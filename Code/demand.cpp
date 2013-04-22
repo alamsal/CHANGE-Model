@@ -58,13 +58,13 @@ std::vector<std::vector<string> > read_demandCsv()
 	cout<<demand_matrix[0].size()<<endl;
 	cout<<demand_matrix[0][0].size()<<endl;
 
-	for(int i =0; i<DEMANDROW;i++)
+	/*for(int i =0; i<DEMANDROW;i++)
 	{
 		for (int j=0; j<DEMANDCOL; j++)
 		{
 			cout<<"("<<i<<","<<j<<")"<<demand_matrix[i][j]<<"\t";
 		}
-	}
+	}*/
 	return demand_matrix;
 }
 

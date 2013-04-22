@@ -4,15 +4,17 @@
 #include <vector>
 #include <string>
 
-const int DEMANDROW = 17;
-const int DEMANDCOL=17;
-
 using namespace std;
 
-extern std::vector<std::vector<string> > demand_matrix;
+const int DEMANDROW = 10; //Total # of rows in demand matrix
+const int DEMANDCOL=10;   //Total # of columns in demand matrix
 
-void split_line(string& line, string demlim);
 
-std::vector<std::vector<string> > read_demandCsv();
+
+extern std::vector<std::vector<string> > demand_matrix; //Container to hold demand matrix
+
+void split_line(string& line, string demlim);			//Method to split the lines in demand matrix csv
+
+std::vector<std::vector<string> > read_demandCsv();		//Method to read and retrun demand matrix
 
 #endif 
