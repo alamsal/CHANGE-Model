@@ -801,10 +801,7 @@ int main( int argc, char *argv[] ) {
 		zsize[zonecnt] = 0;
 	}
 
-	//Integrating buffer with LCC type added by Ashis 12/18/2012
-	read_demandCsv();
-	extract_forestCells(lccgrid); // ///Use fORSCE algorithm
-	gen_lccsnapshot(runname, 55, buffer_head, snapsum, 0); //snapshot from forsce
+
 	
 	// compute the size of the active landscape, fire regime zones, and summary zones
 	for(index=0; index<size; index++) {
@@ -904,6 +901,11 @@ int main( int argc, char *argv[] ) {
 	is_bdin = 0;
 	next_sum = step;
 	endy = 0;
+	
+	//Integrating buffer with LCC type added by Ashis 12/18/2012
+	read_demandCsv();
+	extract_forestCells(lccgrid); // ///Use fORSCE algorithm
+	gen_lccsnapshot(runname, 55, buffer_head, snapsum, 0); //snapshot from forsce
 
 	// process the simulation step by step
 	for(year=runstep; year<=maxyear || is_bdin ==0;year+=runstep){

@@ -5,9 +5,9 @@
 // Decription:	The lcc.cpp module merge man made and non vegetated areas with buffer and prevent them from fire simulation.
 // It also generates explicitly coded LCC output for landscape fire simulation snapshot results based on LCC classes provided in lcc.gis file.
 //----------------------------------------------------------------------------
-#include <boost/thread.hpp>
-#include <boost/array.hpp>
-#include <boost/lambda/lambda.hpp>
+//#include <boost/thread.hpp>
+//#include <boost/array.hpp>			//Got this error after VS & Java udpate but not sure which one casue this one.
+//#include <boost/lambda/lambda.hpp>
 
 #include <iostream>
 #include <map>
@@ -422,9 +422,9 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 					//cout<<index_value<<endl;   
 
 					//If FORSCE change the cell transition form non-veg to vegetated; we must assign community[index]==1 to start future successional stages.
-					if(((index_value==11)||(index_value==12)||(index_value==20)||(index_value==31)||(index_value==81)||(index_value==82)||(index_value==90))&&((lcccode==41)||(lcccode==42)||(lcccode==43)||(lcccode==52)||(lcccode==71)))	
+					if(((index_value==11)||(index_value==12)||(index_value==20)||(index_value==31)||(index_value==81)||(index_value==82)||(index_value==90)||(index_value==41)||(index_value==42)||(index_value==43)||(index_value==52)||(index_value==71))&&((lcccode==41)||(lcccode==42)||(lcccode==43)||(lcccode==52)||(lcccode==71)))	
 					{
-						comgrid[cell_index]=1;
+						stategrid[cell_index]=1; // When forsce simulate veg to veg/ non-veg to veg the successional stage is set to 1.
 					}
 					lccgrid[cell_index]=lcccode; 
 

@@ -19,6 +19,7 @@ using namespace std;
 extern char *lccgrid;           // lcc classes grid
 extern char *buffer;			// fire buffer zone grid
 extern char *comgrid;			// community type grid
+extern short int *stategrid;	//successional state
 extern int size;				// total # of cells in landscape (includes background)
 extern unsigned char *temp;				// temporary grid for holding classified veg data
 
