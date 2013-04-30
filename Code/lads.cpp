@@ -905,7 +905,8 @@ int main( int argc, char *argv[] ) {
 	//Integrating buffer with LCC type added by Ashis 12/18/2012
 	read_demandCsv();
 	extract_forestCells(lccgrid); // ///Use fORSCE algorithm
-	gen_lccsnapshot(runname, 55, buffer_head, snapsum, 0); //snapshot from forsce
+	gen_lccsnapshot(runname, 55, buffer_head, snapsum, 0); //Temporary intermediate snapshot from forsce only.
+	merg_lccBuffer(buffer,lccgrid); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
 
 	// process the simulation step by step
 	for(year=runstep; year<=maxyear || is_bdin ==0;year+=runstep){

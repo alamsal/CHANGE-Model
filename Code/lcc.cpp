@@ -41,7 +41,7 @@ void merg_lccBuffer(char *buffergrid,char *lcc)
 	//	{
 	//		buffergrid[index]=0;
 	//	}
-	int i=0;
+	
 	//}
 	for (int index=0;index<size;index++)
 	{
@@ -53,7 +53,6 @@ void merg_lccBuffer(char *buffergrid,char *lcc)
 					{
 						//std::cout<<(int)buffergrid[index]<<"\t"<<int(lcc[index])<<"\t"<<inlcccode[lclass]<<"\t"<<lcc_flag[lclass]<<endl;
 						buffergrid[index]=0;
-						i++;
 						break;
 					}
 			}
@@ -64,7 +63,7 @@ void merg_lccBuffer(char *buffergrid,char *lcc)
 			buffergrid[index]=0;
 		}
 	}
-	cout <<i;
+	cout <<"Merge buffer with lcc grid" <<endl;
 }
 //Comparing neighbouring lcc 8 cells to generate LCC patch
 bool getNeighbour(int row,int col,int lcccode)
@@ -81,7 +80,7 @@ bool getNeighbour(int row,int col,int lcccode)
 
 }
 
-// Create and return the map of structure vectors to store all extracted values based upon probability surfaces and LCC.
+// Create and return the map of structure vectors to store all extracted values based upon probability surfaces,LCC, and breakpoints.
 std::map<int,vector<lccCells> > extract_LandCoverCells(char *lcc, int lccCode)
 {
 	unsigned int index; // array index
@@ -421,10 +420,11 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 					int index_value=(int)(lccgrid[cell_index]);
 					//cout<<index_value<<endl;   
 
-					//If FORSCE change the cell transition form non-veg to vegetated; we must assign community[index]==1 to start future successional stages.
+					//If FORSCE change the cell transition form non-veg to vegetated; we must assign succesational state[index]==1 to start future successional stages.
 					if(((index_value==11)||(index_value==12)||(index_value==20)||(index_value==31)||(index_value==81)||(index_value==82)||(index_value==90)||(index_value==41)||(index_value==42)||(index_value==43)||(index_value==52)||(index_value==71))&&((lcccode==41)||(lcccode==42)||(lcccode==43)||(lcccode==52)||(lcccode==71)))	
 					{
-						stategrid[cell_index]=1; // When forsce simulate veg to veg/ non-veg to veg the successional stage is set to 1.
+						stategrid[cell_index]=1; // When forsce simulate veg to veg/ non-veg to veg the successional stage is set to 1. 
+												// When forsce simulate non-veg to non-veg * veg to non-veg the buffer is  set to 0, which will handle by "merg_lccBuffer()" after the completion this demand allocation look at lads.cpp.
 					}
 					lccgrid[cell_index]=lcccode; 
 
