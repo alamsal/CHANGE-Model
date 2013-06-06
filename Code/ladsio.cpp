@@ -417,6 +417,7 @@ void gen_snapshot( char *runname, int year, struct image_header out_head,
             if(buffer[index] == 1) {
                 struc = get_struc(index);
                 temp[index] = (unsigned char)struc;
+				
             } else {
                 temp[index] = 0;
             }
@@ -433,7 +434,7 @@ void gen_snapshot( char *runname, int year, struct image_header out_head,
     if (snapsum > 0) {
         write_grid(outfilename, temp, out_head);
     }
-
+	
     return;
 }
 
@@ -649,25 +650,27 @@ void gen_lccsnapshot( char *runname, int year, struct image_header out_head,
     strcat(outfilename, ".gis");
 
     // write grid cell information to temporary grids
-   	for(row=0; row<maxrow; row++) {
-		for(col=0; col<maxcol; col++) {
-			index=row*maxcol + col;
-            /*if(buffer[index] == 1) {
-                temp[index] = lccgrid[index];
-            } else {
-                temp[index] = 0;
-            }*/
+	//this block should unblock to see temp foresce output.
+  // 	for(row=0; row<maxrow; row++) {
+		//for(col=0; col<maxcol; col++) {
+		//	index=row*maxcol + col;
+  //          /*if(buffer[index] == 1) {
+  //              temp[index] = lccgrid[index];
+  //          } else {
+  //              temp[index] = 0;
+  //          }*/
 
-			temp[index] = lccgrid[index];
+		//	temp[index] = lccgrid[index];
 
 
-        }
-    }
+  //      }
+  //  }
+	
 	
 	//Added by Ashis 12/28/2012
 	// write lcc info into temp grid
 
-	merg_lccSnapshot();
+	//merg_lccSnapshot();
 
     // write grids to output files
     if (snapsum > 0) {

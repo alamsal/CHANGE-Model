@@ -20,6 +20,11 @@ extern char *lccgrid;           // lcc classes grid
 extern char *buffer;			// fire buffer zone grid
 extern char *comgrid;			// community type grid
 extern short int *stategrid;	//successional state
+
+extern short int *timeinstage;	// time in current successional stage grid
+extern short int *age;		    // patch age grid
+extern short int *tsfire;      // time since last fire grid
+
 extern int size;				// total # of cells in landscape (includes background)
 extern unsigned char *temp;				// temporary grid for holding classified veg data
 
@@ -45,7 +50,7 @@ extern std::vector< std::vector<std::vector< float > > >probability_surfaces; //
 //Function prototypes
 void merg_lccBuffer(char *buffergridname,char *lccgridname);	//Merging original buffer with LCC.
 void merg_lccSnapshot(); // Merging lcc class into output grid snapshot.
-void extract_forestCells(char *lccgridname);//Extract forest cells from LCC
+void extract_changeCells(char *lccgridname);//Extract LCC cells goint to change
 
 
 void extract_developedCells(char *lccgridname); // Extract developed cells from LCC
@@ -54,6 +59,7 @@ void allocate_lccCells(char *lccgridname); //allocate  LCC cells
 
 void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int demand);// Allocate space in lcc grid as well as change the community type
 
+void reclassify_lclu(unsigned int stateout[],unsigned int lclustate[],unsigned int statecounter);
 
 
 //std::vector <lccCells> ext_Cells(char *lccgridname); //Extract vector of cells from LLC

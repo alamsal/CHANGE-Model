@@ -91,6 +91,7 @@ int comcode[40];				// ID code for community type
 int comnumstate[40];			// Numeber of successional stages in each community type
 int statecode[40][40];			// ID code for successional stage
 int stateout[40][40];			// Output code for successional stage
+int lclustate[40][40];			// Output code for LCLU successional stage
 double statefiremod[40][40];	// Fire spread modifier for successional stage
 double statefireinit[40][40];	// Fire initiation modifier for successional stage
 double statesev[40][40];		// Fire severity (stand replacmenent) modifier 
@@ -262,6 +263,11 @@ int main( int argc, char *argv[] ) {
 	double tempprob;		// temp variable for non-spatial disturbance probability calculation
 	double totprob;			// total of non-spatial disturbance probabilities
 	double cumprob;			// cumulative non-spatial disturbance probability
+	
+	//6/5/2013- Aashis
+	unsigned int com_counter=0;		//Total # of communties coutner
+	unsigned int com_stateout[255];	//Community o/p codes container
+	unsigned int com_lclustate[255]; //Community LCLU codes container
 
 	struct image_header buffer_head;    // ERDAS file header for buffer grid
 	struct image_header regime_head;    // ERDAS file header for regime grid
@@ -349,6 +355,7 @@ int main( int argc, char *argv[] ) {
 	}
 
 	// Read community input file
+	
 
 	numstate = 0;
 	largestnumstate = 0;
@@ -363,7 +370,14 @@ int main( int argc, char *argv[] ) {
 			if(statecode[comcnt][statecnt] > largestnumstate) {
 				largestnumstate = statecode[comcnt][statecnt];
 			}
-			comfile >> stateout[comcnt][statecnt]; comfile.ignore(100, '\n');
+			
+			comfile >> stateout[comcnt][statecnt]; comfile.ignore(100, '\n');	
+			com_stateout[com_counter]=stateout[comcnt][statecnt];		
+
+			comfile >> lclustate[comcnt][statecnt]; comfile.ignore(100, '\n');						// 6/5/2013 - recently added LCLU code
+			com_lclustate[com_counter]=lclustate[comcnt][statecnt];
+			com_counter++;
+
 			comfile >> statefiremod[comcnt][statecnt]; comfile.ignore(100, '\n');
 			comfile >> statefireinit[comcnt][statecnt]; comfile.ignore(100, '\n');
 			comfile >> statesev[comcnt][statecnt]; comfile.ignore(100, '\n');
@@ -396,6 +410,7 @@ int main( int argc, char *argv[] ) {
 	//	//Check community type input file parameters
 	if(input_error_flag==1)
 	{
+		//Need to add lclustate as parameter to check
 		ErrorCheck check;
 		check.check_communityType_param(numcom,comcode,comnumstate,init_state,statecode,stateout,statefiremod,statefireinit,statesev,statesev2,initage,suclag,suctrans,suclagreset,firexlag,
 			firextrans,hsfiretrans,hsfirereset,msfiretrans,msfirereset,lsfiretrans,lsfirereset,treatelig,treattrans,treatreset,distprob,disttrans,distreset,distnum,mgmtnum);
@@ -515,11 +530,11 @@ int main( int argc, char *argv[] ) {
 	// Read probability surfaces raster files
 	float rows=1000;
 	float columns=1500;
-	float prob_max[10]={248.0,185.0,255.0,53.0,53.0,173.0,227.0,242.0,213.0,240.0}; //Holds the maximum pixel value of each probability file in prob0, prob1, prob2,...porb9 order to change the pixel probabilty between 0-1. 
+	//float prob_max[10]={248.0,185.0,255.0,53.0,53.0,173.0,227.0,242.0,213.0,240.0}; //Holds the maximum pixel value of each probability file in prob0, prob1, prob2,...porb9 order to change the pixel probabilty between 0-1. 
     
 	//probability_surfaces(NumberOfFiles,std::vector<std::vector<float>>(rows,std::vector<float>(columns)));
 	
-	read_probabilitySurfaces(probability_surfaces,NO_PROBABILITY_FILES,rows,columns,prob_max);
+	read_probabilitySurfaces(probability_surfaces,NO_PROBABILITY_FILES,rows,columns);
 	probability_surfaces;
 
 
@@ -904,10 +919,16 @@ int main( int argc, char *argv[] ) {
 	
 	//Integrating buffer with LCC type added by Ashis 12/18/2012
 	read_demandCsv();
-	extract_forestCells(lccgrid); // ///Use fORSCE algorithm
-	gen_lccsnapshot(runname, 55, buffer_head, snapsum, 0); //Temporary intermediate snapshot from forsce only.
+	
+	// Implement fORSCE algorithm
+	extract_changeCells(lccgrid); 
+	//gen_lccsnapshot(runname, 55, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.
+	
 	merg_lccBuffer(buffer,lccgrid); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
-
+	
+	
+	//BEYOND THIS POINT THE CONTROL HANDOVER TO LADS FOR FURTHER SIMULATION
+	
 	// process the simulation step by step
 	for(year=runstep; year<=maxyear || is_bdin ==0;year+=runstep){
 
@@ -1092,10 +1113,9 @@ int main( int argc, char *argv[] ) {
 
 			// Output the landscape "snapshot"
 			if(snapsum >= 1) {
-				//////////////////////////////////////////////////////////
-				//extract_forestCells(lccgrid); // ///Use fORSCE algorithm
-				///////////////////////////////////////////////////////////
 				gen_snapshot(runname, year, buffer_head, snapsum, 0);
+				reclassify_lclu(com_stateout,com_lclustate,com_counter-1);
+				gen_lccsnapshot(runname, 9999, buffer_head, snapsum, 0); //Temporary intermediate snapshot  of lclugrid- just to make sure program is working.
 			}
 			// or output age summaries
 			if(snapsum == 2) {
@@ -1233,7 +1253,7 @@ int main( int argc, char *argv[] ) {
 	delete(patchx);
 	delete(patchy);
 	delete(strucsum);
-	delete(lccgrid);
+	//delete(lccgrid); // Unable to delete lccgrid why?
 	printf("Simulation is finished !!!");
 	cin.get();
 

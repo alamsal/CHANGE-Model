@@ -38,11 +38,13 @@ void split_line(string& line, string delim)
 std::vector<std::vector<string> > read_demandCsv()
 {
 	ifstream file ( "demand.csv" ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
+	//ifstream file ( "demand05.txt" ); // Read from text file need to check if it works or not.
 	string value;
   
 	while ( file.good() )
 	{
 		getline ( file, value, ',' ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
+		
 		if (value.find('\n') != string::npos) 
 		{
 				split_line(value, "\n");
@@ -57,14 +59,16 @@ std::vector<std::vector<string> > read_demandCsv()
 	cout<<demand_matrix.size()<<endl;
 	cout<<demand_matrix[0].size()<<endl;
 	cout<<demand_matrix[0][0].size()<<endl;
-
-	/*for(int i =0; i<DEMANDROW;i++)
+	/*
+	for(int i =0; i<DEMANDROW;i++)
 	{
 		for (int j=0; j<DEMANDCOL; j++)
 		{
 			cout<<"("<<i<<","<<j<<")"<<demand_matrix[i][j]<<"\t";
 		}
-	}*/
+	} 
+	*/
+
 	return demand_matrix;
 }
 

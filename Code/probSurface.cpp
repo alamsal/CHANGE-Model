@@ -30,8 +30,10 @@ using namespace std;
 		 }
 	}
 */
+std::vector<int> probabilitymax; // Holds porbability maximum value
+int max_value= 0; // Initialize maximum value to 0
 
-void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > & grid_value,float NumberOfFiles,float rows,float columns,float prob_max[] )
+void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > & grid_value,float NumberOfFiles,float rows,float columns)
 {
    FILE *f[20];
     char FileName[120];  /* Plenty large for your file naming */
@@ -59,6 +61,29 @@ void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > 
 
     cout<<"Reading probability surface files..."<<endl;
 	
+	//Loop through all probability files and read their maximum value.
+    for (unsigned int nof=0; nof<NumberOfFiles;nof++)
+    {
+        fseek ( f[nof], 128, SEEK_SET ); //Skip 128 byte *.GIS header byte to read acutal data from prob grid. 
+
+        for(unsigned int row=0; row<rows; row++) 
+        {
+            for(unsigned register int col=0; col<columns; col++) 
+            {
+              unsigned int tvar = (unsigned int) fgetc(f[nof]);
+			  //find the maximum value in the probability raster
+			  
+			  if(tvar>max_value)
+			  {
+				  max_value=tvar;
+			  }
+                             
+    		}
+    	}
+		probabilitymax.push_back(max_value); //Add probability max value into the vector
+		max_value=0; //reset max value for another probability raster
+    }
+
 	//Loop through all probability files and read their rows/columns into 3D vector named grid-value[][][].
     for (unsigned int nof=0; nof<NumberOfFiles;nof++)
     {
@@ -69,26 +94,19 @@ void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > 
             for(unsigned register int col=0; col<columns; col++) 
             {
               unsigned int tvar = (unsigned int) fgetc(f[nof]);
-              grid_value[nof][row][col]=(float)tvar/(prob_max[nof]);
+              grid_value[nof][row][col]=(float)tvar/(probabilitymax[nof]);
              // cout<<"("<<nof<<","<<col+1<<","<<row+1<<")"<<grid_value[nof][row][col]<<"\t";
 			  if(grid_value[nof][row][col]<0)
 			  {
 				  cout<<"Hit the -ve Value !! in the Probability GIS file. Program is Ready to quit...."<<endl;
 				   cin.get();
-				   exit(1);
-			  
+				   exit(1);			  
 			  }
                 
     		}
     	}
+
     }
-    /*for(int row=0; row<10; row++) 
-        {
-            for(int col=0; col<100; col++) 
-            {
-                    cout<<grid_value[1][row][col]<<"\t";
-                
-    		}
-    	} */
+  
 
 }
