@@ -161,9 +161,9 @@ struct mortality decayrate; // dead wood decay (by time since fire)
 
 //Land cover parameters
 int numlcc;					//Number of lcc types
-int inlcccode[40];			//Input lcc code works upto 40 different LCC types.
-int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
-int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
+unsigned int inlcccode[40];			//Input lcc code works upto 40 different LCC types.
+unsigned int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
+unsigned int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
 
 // Summary arrays
 double sum_deadwood[100];   // dead wood loading summary array

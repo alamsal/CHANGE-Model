@@ -32,9 +32,9 @@ extern int maxrow;         // max row and column address of grid
 extern int maxcol;
 
 extern int numlcc;					//Number of lcc types
-extern int inlcccode[40];			//Input lcc code works upto 40 different LCC types.
-extern int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
-extern int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
+extern unsigned int inlcccode[40];			//Input lcc code works upto 40 different LCC types.
+extern unsigned int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
+extern unsigned int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
 
 // Hold filtered raster cells
 struct lccCells
