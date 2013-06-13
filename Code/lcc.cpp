@@ -109,7 +109,7 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(char *lcc, int lccCode)
 	std::map<int,vector<lccCells> > ext_lcc_vector;	// Map of vectors containing sturcuture to hold all extracted values based upon probability surfaces and LCC.
 	ext_lcc_vector.clear();
 
-	int count=0; //Cell counter for each class of LCC.
+	unsigned int count=0; //Cell counter for each class of LCC.
 	
 	// Read LCC grid and extract forest cell into a separate linked list, named forest_list. 
 	for(unsigned int row=0; row<maxrow; row++) 
@@ -192,14 +192,14 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(char *lcc, int lccCode)
 
 
 //Make a list of cells that are going to change
-void extract_changeCells(char *lcc)
+void extract_changeCells(char *lcc,int demperiod)
 {
-	 allocate_lccCells(lcc);
+	 allocate_lccCells(lcc,demperiod);
 }
 
 
 //Spatial allocation of Demands
-void allocate_lccCells(char *lcc)
+void allocate_lccCells(char *lcc,int demperiod)
 {
 	
 	// Extracted  cells from LCC
@@ -223,28 +223,32 @@ void allocate_lccCells(char *lcc)
 	std::vector<lccCells> vec_lcc_cells;
 
 	//Read demand file in row/column order
-	for(int i=0; i<DEMANDROW;i++)
-	{
-		for (int j=0; j<DEMANDCOL; j++)
+		for(unsigned int i=0; i<10;i++)	// Total
 		{
-			//cout<<"("<<i<<","<<j<<")"<<demand_matrix[i][j]<<"\t";
-			if(i==j)		//No demand allocation diagonally 
+			for (unsigned int j=0; j<10; j++)
 			{
-				cout<<"No demand allocation"<<endl;
+				//cout<<"("<<i<<","<<j<<")"<<demand_matrix[i][j]<<"\t";
+				if(i==j)		//No demand allocation diagonally 
+				{
+					cout<<"No demand allocation"<<endl;
 				
+				}
+				else
+				{
+					//demand value comes from here..
+					//int demand=(int)demand_matrix[i][j][dfile];	//Convert from string type to integer.
+					int demand=(int)demand_matrix[demperiod][i][j];
+					lcc_cells=extracted_lcc[i];
+					vec_lcc_cells=lcc_cells[j];
+					cout<<vec_lcc_cells.size()<<"--"<<inlcccode[j] <<"--"<<j <<"--"<<demand <<endl;
+					space_allocation(vec_lcc_cells,inlcccode[j],j,demand);
+				}
 			}
-			else
-			{
-				//demand value comes from here..
-				int demand=stoi(demand_matrix[i][j]);	//Convert from string type to integer.
-				lcc_cells=extracted_lcc[i];
-				vec_lcc_cells=lcc_cells[j];
-				cout<<vec_lcc_cells.size()<<"--"<<inlcccode[j] <<"--"<<j <<"--"<<demand <<endl;
-				space_allocation(vec_lcc_cells,inlcccode[j],j,demand);
-			}
+			cout<<endl<<endl;
 		}
-		cout<<endl<<endl;
-	}
+	
+
+
 
 	////********************************************************************///
 	// NEED to update current LCC to extract following cells- ASK Mike & Zhihuwa//
@@ -457,7 +461,9 @@ void reclassify_lclu(unsigned int stateout[],unsigned int lclustate[],unsigned i
 	reclassify_HumanDominated();
 	//Assign temp lcc grid as new land cover land use grid (new lccgrid) for subsequent processing
 
-	lccgrid=reinterpret_cast<char*>(temp); //convert from 'unsigned char *' to 'char *' 
+	//lccgrid=reinterpret_cast<char*>(temp); //convert from 'unsigned char *' to 'char *'
+	strcpy(lccgrid,reinterpret_cast<char*>(temp));
+	
 
 	
 }

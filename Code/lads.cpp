@@ -8,6 +8,7 @@
 // Last Update:	1/4/2008
 //----------------------------------------------------------------------------
 #include <iostream>
+#include <stdio.h>
 #include <vector>
 #include "stdafx.h"
 #include "lads.h"
@@ -22,7 +23,10 @@
 #include "errorCheck.h"
 #include "demand.h"
 //Total no of probabiltiy surfaces
-# define NO_PROBABILITY_FILES 10
+#define NO_PROBABILITY_FILES 10
+#define NO_DEMAND_FILES 5
+#define DEMAND_ROWS 10
+#define DEMAND_COLS 10
 
 using namespace std;
 
@@ -78,6 +82,8 @@ int tsumtype;		// flag for treatment output summary
 int read_map;       // read external map or generate simulated landscape
 int torus;			// indicates whether fires wrap around simulation landscape edges
 int mintsfire;		// number of years after burnining at which a cell can reburn
+
+
 
 // Community Type/Successional Stage Parameters
 // The first array index is the community type, the second array index is the successional stage
@@ -179,6 +185,7 @@ double totburncount[40];	// total number of fires summary array
 
 // Probabilty surfaces container
 std::vector< std::vector<std::vector< float > > > probability_surfaces(NO_PROBABILITY_FILES,std::vector<std::vector<float>>(1000,std::vector<float>(1500))); //Holds the probability surfaces rasters as 3D vector
+std::vector< std::vector<std::vector< int > > > demand_matrix(NO_DEMAND_FILES,std::vector<std::vector<int>>(DEMAND_ROWS,std::vector<int>(DEMAND_COLS))); // Holds the demand csv files
 
 int main( int argc, char *argv[] ) {
 
@@ -268,6 +275,7 @@ int main( int argc, char *argv[] ) {
 	unsigned int com_counter=0;		//Total # of communties coutner
 	unsigned int com_stateout[255];	//Community o/p codes container
 	unsigned int com_lclustate[255]; //Community LCLU codes container
+					
 
 	struct image_header buffer_head;    // ERDAS file header for buffer grid
 	struct image_header regime_head;    // ERDAS file header for regime grid
@@ -918,323 +926,345 @@ int main( int argc, char *argv[] ) {
 	endy = 0;
 	
 	//Integrating buffer with LCC type added by Ashis 12/18/2012
-	read_demandCsv();
-	
-	// Implement fORSCE algorithm
-	extract_changeCells(lccgrid); 
-	//gen_lccsnapshot(runname, 55, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.
-	
-	merg_lccBuffer(buffer,lccgrid); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
-	
-	
-	//BEYOND THIS POINT THE CONTROL HANDOVER TO LADS FOR FURTHER SIMULATION
-	
-	// process the simulation step by step
-	for(year=runstep; year<=maxyear || is_bdin ==0;year+=runstep){
+	read_demandCsv(demand_matrix,NO_DEMAND_FILES,DEMAND_ROWS,DEMAND_COLS);
+	demand_matrix;
 
-		// If the end year for the current parameter set if reached,
-		// then read in the next parameter set
-		if( simfire_flag == 1 ) {
-			if((is_bdin == 0 && year == runstep) || (is_bdin == 1 && year > endy )) {
-				// Read parameters for the specified number of fire regimes
-				// Added by Ashis: Loop to read parameter fire in the fire regime input file .
+	for(int demperiod=0;demperiod<NO_DEMAND_FILES;demperiod++)
+	{
+		// Implement fORSCE algorithm
+		extract_changeCells(lccgrid,demperiod); 
+		//gen_lccsnapshot(runname, 55, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.
+	
+		merg_lccBuffer(buffer,lccgrid); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
+	
+	
+		//BEYOND THIS POINT THE CONTROL HANDOVER TO LADS FOR FURTHER SIMULATION
+	
+		// process the simulation step by step
+		for(year=runstep; year<=maxyear || is_bdin ==0;year+=runstep){
+
+			// If the end year for the current parameter set if reached,
+			// then read in the next parameter set
+			if( simfire_flag == 1 ) {
+				if((is_bdin == 0 && year == runstep) || (is_bdin == 1 && year > endy )) {
+					// Read parameters for the specified number of fire regimes
+					// Added by Ashis: Loop to read parameter fire in the fire regime input file .
+					for(regcnt = 0; regcnt < regnum; regcnt ++) {
+						infirefile >> endy;
+						for(sevcnt = 0; sevcnt < 2; sevcnt ++) {
+							infirefile >> nfr[regcnt][sevcnt];
+							infirefile >> mfsizeha[regcnt][sevcnt];
+							infirefile >> sdfsizeha[regcnt][sevcnt];
+							infirefile >> cursevmod[regcnt][sevcnt];
+							infirefile >> cursevmod2[regcnt][sevcnt];
+							mfsize[regcnt][sevcnt] = mfsizeha[regcnt][sevcnt] / cell_ha;
+							sdfsize[regcnt][sevcnt] = sdfsizeha[regcnt][sevcnt] / cell_ha;
+							mlsize[regcnt][sevcnt] = log( pow(mfsize[regcnt][sevcnt],2) /
+								sqrt( pow(mfsize[regcnt][sevcnt],2) + pow(sdfsize[regcnt][sevcnt],2) ) );
+							stdlsize[regcnt][sevcnt] = sqrt( log( pow(sdfsize[regcnt][sevcnt],2) /
+								pow(mfsize[regcnt][sevcnt],2) + 1) );
+							if (nfr[regcnt][sevcnt] == 0) {
+								mff[regcnt][sevcnt] = 0;
+							} else {
+								mff[regcnt][sevcnt] = runstep * rsize[regcnt] / (nfr[regcnt][sevcnt] * 
+									(mfsize[regcnt][sevcnt]));
+							}
+						}
+						infirefile.ignore(100, '\n');
+					}
+				}
+			}
+
+			// Test to see if the burn-in period is finished
+			//Added By Ashis: Burn in period is optional for new the model, Mike used it to model historical landscapes before European came to US.
+			if(year > burnin && is_bdin == 0) {
+				is_bdin = 1;
+				year = runstep;
+				next_sum = step;
 				for(regcnt = 0; regcnt < regnum; regcnt ++) {
-					infirefile >> endy;
-					for(sevcnt = 0; sevcnt < 2; sevcnt ++) {
-						infirefile >> nfr[regcnt][sevcnt];
-						infirefile >> mfsizeha[regcnt][sevcnt];
-						infirefile >> sdfsizeha[regcnt][sevcnt];
-						infirefile >> cursevmod[regcnt][sevcnt];
-						infirefile >> cursevmod2[regcnt][sevcnt];
-						mfsize[regcnt][sevcnt] = mfsizeha[regcnt][sevcnt] / cell_ha;
-						sdfsize[regcnt][sevcnt] = sdfsizeha[regcnt][sevcnt] / cell_ha;
-						mlsize[regcnt][sevcnt] = log( pow(mfsize[regcnt][sevcnt],2) /
-							sqrt( pow(mfsize[regcnt][sevcnt],2) + pow(sdfsize[regcnt][sevcnt],2) ) );
-						stdlsize[regcnt][sevcnt] = sqrt( log( pow(sdfsize[regcnt][sevcnt],2) /
-							pow(mfsize[regcnt][sevcnt],2) + 1) );
-						if (nfr[regcnt][sevcnt] == 0) {
-							mff[regcnt][sevcnt] = 0;
-						} else {
-							mff[regcnt][sevcnt] = runstep * rsize[regcnt] / (nfr[regcnt][sevcnt] * 
-								(mfsize[regcnt][sevcnt]));
-						}
-					}
-					infirefile.ignore(100, '\n');
+					totburnarea[regcnt] = 0;
+					totburncount[regcnt] = 0;
+					liburnarea[regcnt] = 0;
+					miburnarea[regcnt] = 0;
+					hiburnarea[regcnt] = 0;
 				}
 			}
-		}
 
-		// Test to see if the burn-in period is finished
-		//Added By Ashis: Burn in period is optional for new the model, Mike used it to model historical landscapes before European came to US.
-		if(year > burnin && is_bdin == 0) {
-			is_bdin = 1;
-			year = runstep;
-			next_sum = step;
-			for(regcnt = 0; regcnt < regnum; regcnt ++) {
-				totburnarea[regcnt] = 0;
-				totburncount[regcnt] = 0;
-				liburnarea[regcnt] = 0;
-				miburnarea[regcnt] = 0;
-				hiburnarea[regcnt] = 0;
+			// Set up fire spread summary grid
+			if(sumtype > 0) {
+				for(index=0; index<size; index++) {
+					firespreadgrid[index] = 0;
+				}
 			}
-		}
 
-		// Set up fire spread summary grid
-		if(sumtype > 0) {
-			for(index=0; index<size; index++) {
-				firespreadgrid[index] = 0;
-			}
-		}
+			// Increment the age of every cell based on fire rotation, fire severity etc.
+			grow_veg();
 
-		// Increment the age of every cell based on fire rotation, fire severity etc.
-		grow_veg();
+			// Non-spatial disturbances 
+			nsdisturb_veg(distnum);
 
-		// Non-spatial disturbances 
-		nsdisturb_veg(distnum);
+			// Forest management disturbances
+			if( simharv_flag == 1 ) {
 
-		// Forest management disturbances
-		if( simharv_flag == 1 ) {
+				for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
+					// Cycle through the management loop
+					cumtreat[treatcnt] = 0;
+					initindex = unitcounter[treatcnt];
 
-			for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
-				// Cycle through the management loop
-				cumtreat[treatcnt] = 0;
-				initindex = unitcounter[treatcnt];
+					// Start chugging through the treatment list
+					while (1) {
+						// Find the next unit in the treatment list
+						treatunit = treatorder[unitcounter[treatcnt]][treatcnt];
+						// Determine the total area treated within the unit
+						curtreat = gentreatment(treatunit, treatcnt);
+						// Tally the cumulative treatment area
+						cumtreat[treatcnt] += curtreat;
+						printf("runname=%s year=%d unit=%d treatsize=%d\n", runname, year, treatunit, curtreat);
 
-				// Start chugging through the treatment list
-				while (1) {
-					// Find the next unit in the treatment list
-					treatunit = treatorder[unitcounter[treatcnt]][treatcnt];
-					// Determine the total area treated within the unit
-					curtreat = gentreatment(treatunit, treatcnt);
-					// Tally the cumulative treatment area
-					cumtreat[treatcnt] += curtreat;
-					printf("runname=%s year=%d unit=%d treatsize=%d\n", runname, year, treatunit, curtreat);
-
-					unitcounter[treatcnt] ++;
-					if(curtreat > 0) {
-						if(tsumtype == 3) {
-							itoa(year, yearstr, 10);
-							outtreat << yearstr << " " << treatunit << " " << curtreat << endl;
-						} else if(tsumtype == 4) {
-							itoa(year, yearstr, 10);
-							outtreat << runname << " " << yearstr << " " << treatunit << " " << curtreat << endl;
+						unitcounter[treatcnt] ++;
+						if(curtreat > 0) {
+							if(tsumtype == 3) {
+								itoa(year, yearstr, 10);
+								outtreat << yearstr << " " << treatunit << " " << curtreat << endl;
+							} else if(tsumtype == 4) {
+								itoa(year, yearstr, 10);
+								outtreat << runname << " " << yearstr << " " << treatunit << " " << curtreat << endl;
+							}
 						}
-					}
 
-					// Loop to the beginning of the treatment unit list if necessary
-					if(unitcounter[treatcnt] >= munitnum[treatcnt]) {
-						unitcounter[treatcnt] = 0;
-					}
-					// Bail out of the loop if we've already gone through the entire treatment list
-					if(unitcounter[treatcnt] == initindex) {
-						break;
-					}
-					// Bail out of the loop if we've treated the max area for the run step
-					if(cumtreat[treatcnt] >= maxtreat[treatcnt]) {
-						break;
+						// Loop to the beginning of the treatment unit list if necessary
+						if(unitcounter[treatcnt] >= munitnum[treatcnt]) {
+							unitcounter[treatcnt] = 0;
+						}
+						// Bail out of the loop if we've already gone through the entire treatment list
+						if(unitcounter[treatcnt] == initindex) {
+							break;
+						}
+						// Bail out of the loop if we've treated the max area for the run step
+						if(cumtreat[treatcnt] >= maxtreat[treatcnt]) {
+							break;
+						}
 					}
 				}
 			}
-		}
 
-		// Fire disturbances
-		if( simfire_flag == 1) {
+			// Fire disturbances
+			if( simfire_flag == 1) {
 
-			// Cycle through the fire loop
-			for(regcnt = 0; regcnt < regnum; regcnt ++) {
-				for(sevcnt = 0; sevcnt < 2; sevcnt ++ ) {
-					if( mff[regcnt][sevcnt] < 30) {
-						nfires = poisson_rv( mff[regcnt][sevcnt]);
-					} else {
-						nfires_f = normal_rv( mff[regcnt][sevcnt], sqrt(mff[regcnt][sevcnt]));
-						if (nfires_f < 0) {
-							nfires = 0;
+				// Cycle through the fire loop
+				for(regcnt = 0; regcnt < regnum; regcnt ++) {
+					for(sevcnt = 0; sevcnt < 2; sevcnt ++ ) {
+						if( mff[regcnt][sevcnt] < 30) {
+							nfires = poisson_rv( mff[regcnt][sevcnt]);
 						} else {
-							nfires = floor(nfires_f + 0.5);
+							nfires_f = normal_rv( mff[regcnt][sevcnt], sqrt(mff[regcnt][sevcnt]));
+							if (nfires_f < 0) {
+								nfires = 0;
+							} else {
+								nfires = floor(nfires_f + 0.5);
+							}
 						}
-					}
-					for( fire = 0;fire < nfires; fire++ ) {
+						for( fire = 0;fire < nfires; fire++ ) {
 
-						totburncount[regcnt]++;		// Increment the fire counter
-						// Generate a maximum fire size
-						fsize = gen_firesize(mfsize[regcnt][sevcnt], sdfsize[regcnt][sevcnt], shapetype);
-						totburnarea[regcnt] += fsize;	// Increment the (potential) total area burned
-						// Figure out the base distribution of severities
-						curfiresev = gen_firesev(sevlow[regcnt][sevcnt], sevhigh[regcnt][sevcnt] );
-						curfiresev2 = gen_firesev(sev2low[regcnt][sevcnt], sev2high[regcnt][sevcnt] );
-						curmixedfire = curfiresev2 * (1 - curfiresev);
-						curlowfire = 1 - (curfiresev + curmixedfire);
-						// distribute fire across the landscape
-						printf("%d\t%d\n",regcnt,int(fsize));
-						firespread( regcnt, (int)fsize );
-						// Print fire information to screen
-						printf("runname=%s year=%d size=%lf regime=%d %d\n", runname, year, fsize, regcnt + 1, is_bdin);
-						// modify vegetation affected by fire
-						disturb_veg( landfiresum, sevcnt, regcnt );
+							totburncount[regcnt]++;		// Increment the fire counter
+							// Generate a maximum fire size
+							fsize = gen_firesize(mfsize[regcnt][sevcnt], sdfsize[regcnt][sevcnt], shapetype);
+							totburnarea[regcnt] += fsize;	// Increment the (potential) total area burned
+							// Figure out the base distribution of severities
+							curfiresev = gen_firesev(sevlow[regcnt][sevcnt], sevhigh[regcnt][sevcnt] );
+							curfiresev2 = gen_firesev(sev2low[regcnt][sevcnt], sev2high[regcnt][sevcnt] );
+							curmixedfire = curfiresev2 * (1 - curfiresev);
+							curlowfire = 1 - (curfiresev + curmixedfire);
+							// distribute fire across the landscape
+							printf("%d\t%d\n",regcnt,int(fsize));
+							firespread( regcnt, (int)fsize );
+							// Print fire information to screen
+							printf("runname=%s year=%d size=%lf regime=%d %d\n", runname, year, fsize, regcnt + 1, is_bdin);
+							// modify vegetation affected by fire
+							disturb_veg( landfiresum, sevcnt, regcnt );
 
-						// If past burn-in period, write fire information to file
-						if(is_bdin == 1) {
+							// If past burn-in period, write fire information to file
+							if(is_bdin == 1) {
 
-							// Output for individual-fire summary types
-							if(sumtype == 3) {
-								islands = fill_islands();
-								fperim = get_perim();
-								felong = get_elongation();
-								itoa(year, yearstr, 10);
-								outfire << yearstr << " " << fsize << " " << burned << " " << fperim << " "
-									<< islands << " " << felong << " " << (regcnt + 1) << endl;
-							} else if(sumtype == 4) {
-								islands = fill_islands();
-								fperim = get_perim();
-								felong = get_elongation();
-								itoa(year, yearstr, 10);
-								outfire << runname << " " << yearstr << " " << fsize << " " << burned << " "
-									<< fperim << " " << islands << " " << felong << " " << (regcnt + 1) << endl;
+								// Output for individual-fire summary types
+								if(sumtype == 3) {
+									islands = fill_islands();
+									fperim = get_perim();
+									felong = get_elongation();
+									itoa(year, yearstr, 10);
+									outfire << yearstr << " " << fsize << " " << burned << " " << fperim << " "
+										<< islands << " " << felong << " " << (regcnt + 1) << endl;
+								} else if(sumtype == 4) {
+									islands = fill_islands();
+									fperim = get_perim();
+									felong = get_elongation();
+									itoa(year, yearstr, 10);
+									outfire << runname << " " << yearstr << " " << fsize << " " << burned << " "
+										<< fperim << " " << islands << " " << felong << " " << (regcnt + 1) << endl;
+								}
 							}
 						}
 					}
-				}
 
-			} // end fires loop
-		} // end if fireflag == 1
+				} // end fires loop
+			} // end if fireflag == 1
 
-		// If landscape structure summary is selected, increment structure
-		// summary grids
-		if(is_bdin == 1 && landstrusum == 1) {
-			for( index = 0; index < size; index++ ) {
-				if(buffer[index] == 1) {
-					strucsum[index + (stategrid[index] - 1) * size] ++;
+			// If landscape structure summary is selected, increment structure
+			// summary grids
+			if(is_bdin == 1 && landstrusum == 1) {
+				for( index = 0; index < size; index++ ) {
+					if(buffer[index] == 1) {
+						strucsum[index + (stategrid[index] - 1) * size] ++;
+					}
 				}
 			}
+
+			// If the current year is a summary year, write output grids
+			//if( year == next_sum && is_bdin == 1 ) //Orignal LADS
+			if( year == 5 && is_bdin == 1 ) //Changed by Aashis next_sum =5 for each 5 year period
+			{ 
+
+				// Output the landscape "snapshot"
+				if(snapsum >= 1) {
+					gen_snapshot(runname, demperiod, buffer_head, snapsum, 0);
+					reclassify_lclu(com_stateout,com_lclustate,com_counter-1);
+					gen_lccsnapshot(runname, demperiod+91, buffer_head, snapsum, 0); //Temporary intermediate snapshot  of lclugrid- just to make sure program is working.
+
+				}
+				// or output age summaries
+				if(snapsum == 2) {
+					gen_agesum(runname, year, buffer_head, runstep);
+				}
+
+				// Output wood biomass summaries
+				if(biosum > 0 && biom_flag > 0) {
+					gen_biosum(runname, year, buffer_head);
+				}
+
+				// Output fire summaries
+				// To a separate file for each model run
+				if(simfire_flag == 1 && sumtype == 1) {
+					itoa(year, yearstr, 10);
+					outfire << yearstr; 
+					for(regcnt = 0; regcnt < regnum; regcnt ++) {
+						if(totburncount[regcnt] > 0) {
+							meanfireout = totburnarea[regcnt] / totburncount[regcnt];
+						} else {
+							meanfireout = 0;
+						}
+						outfire << " " << liburnarea[regcnt] << " " << miburnarea[regcnt] << " " << hiburnarea[regcnt] << " " << meanfireout;
+						totburnarea[regcnt] = 0;
+						totburncount[regcnt] = 0;
+						liburnarea[regcnt] = 0;
+						miburnarea[regcnt] = 0;
+						hiburnarea[regcnt] = 0;
+					}
+					outfire << endl;
+					// or all runs appended to a single file
+				} else if (simfire_flag == 1 && sumtype == 2) {
+					itoa(year, yearstr, 10);
+					outfire << runname << " " << yearstr;
+					for(regcnt = 0; regcnt < regnum; regcnt ++) {
+						if(totburncount[regcnt] > 0) {
+							meanfireout = totburnarea[regcnt] / totburncount[regcnt];
+						} else {
+							meanfireout = 0;
+						}
+						outfire << " " << liburnarea[regcnt] << " " << miburnarea[regcnt] << " " << hiburnarea[regcnt] << " " << meanfireout;
+						totburnarea[regcnt] = 0;
+						totburncount[regcnt] = 0;
+						liburnarea[regcnt] = 0;
+						miburnarea[regcnt] = 0;
+						hiburnarea[regcnt] = 0;
+					}
+					outfire << endl;
+				}
+
+				// Output harvest summary information
+				// A separate file for each model run
+				if(simharv_flag == 1 && tsumtype == 1) {
+					itoa(year, yearstr, 10);
+					outtreat << yearstr << " ";
+					for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
+						outtreat << cumtreat[treatcnt] << " ";
+					}
+					outtreat << endl;
+					// or all runs appended to a single file
+				} else if (simharv_flag == 1 && tsumtype == 2) {
+					itoa(year, yearstr, 10);
+					outtreat << runname << " " << yearstr << " ";
+					for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
+						outtreat << cumtreat[treatcnt] << " ";
+					}
+					outtreat << endl;
+				}
+
+
+				// Output successional stage summaries
+				// This is coded a bit differently from the preceding sections - this way is more concise
+				if(runtype > 0) {
+
+					// Compute the successional stage summaries for each community type
+					landscape_sum(comnumstate, numcom );
+
+					// Output the runname if we're appending to a single file
+					if(runtype == 2) {
+						outsum  << runname << " ";
+					}
+
+					outsum << year << " ";
+
+					// Write the % area of each structure (and possbility biomass summaries) for each zone
+					for(zonecnt = 0; zonecnt < numcom; zonecnt ++) {
+						for(classcnt = 1; classcnt <= comnumstate[zonecnt]; classcnt ++) {
+							outsum << sum_array[classcnt][zonecnt] << " ";
+						}
+						if(biom_flag > 0) {
+							outsum << sum_livebio[zonecnt] << " " << sum_deadwood[zonecnt] << " ";
+						}
+					}
+
+					outsum << endl;
+
+				}
+
+				next_sum += step;	// Set the next summary year
+
+			} // end summary year if statement
+
+
+		}  // end year loop
+
+		// Do I need to worry about explicitly closing any other files?
+		outfire.close();
+		outsum.close();
+
+		// Write fire frequency summary grid
+		if(landfiresum == 1) {
+			gen_firesum(runname, maxyear, buffer_head, runstep);
+			gen_sevsum(runname, maxyear, buffer_head);
 		}
 
-		// If the current year is a summary year, write output grids
-		if( year == next_sum && is_bdin == 1 ) {
+		// Write the structure summary grid
+		if(landstrusum == 1) {
+			gen_strucsum(runname, largestnumstate, maxyear, buffer_head);
+		}
 
-			// Output the landscape "snapshot"
-			if(snapsum >= 1) {
-				gen_snapshot(runname, year, buffer_head, snapsum, 0);
-				reclassify_lclu(com_stateout,com_lclustate,com_counter-1);
-				gen_lccsnapshot(runname, 9999, buffer_head, snapsum, 0); //Temporary intermediate snapshot  of lclugrid- just to make sure program is working.
-			}
-			// or output age summaries
-			if(snapsum == 2) {
-				gen_agesum(runname, year, buffer_head, runstep);
-			}
-
-			// Output wood biomass summaries
-			if(biosum > 0 && biom_flag > 0) {
-				gen_biosum(runname, year, buffer_head);
-			}
-
-			// Output fire summaries
-			// To a separate file for each model run
-			if(simfire_flag == 1 && sumtype == 1) {
-				itoa(year, yearstr, 10);
-				outfire << yearstr; 
-				for(regcnt = 0; regcnt < regnum; regcnt ++) {
-					if(totburncount[regcnt] > 0) {
-						meanfireout = totburnarea[regcnt] / totburncount[regcnt];
-					} else {
-						meanfireout = 0;
-					}
-					outfire << " " << liburnarea[regcnt] << " " << miburnarea[regcnt] << " " << hiburnarea[regcnt] << " " << meanfireout;
-					totburnarea[regcnt] = 0;
-					totburncount[regcnt] = 0;
-					liburnarea[regcnt] = 0;
-					miburnarea[regcnt] = 0;
-					hiburnarea[regcnt] = 0;
-				}
-				outfire << endl;
-				// or all runs appended to a single file
-			} else if (simfire_flag == 1 && sumtype == 2) {
-				itoa(year, yearstr, 10);
-				outfire << runname << " " << yearstr;
-				for(regcnt = 0; regcnt < regnum; regcnt ++) {
-					if(totburncount[regcnt] > 0) {
-						meanfireout = totburnarea[regcnt] / totburncount[regcnt];
-					} else {
-						meanfireout = 0;
-					}
-					outfire << " " << liburnarea[regcnt] << " " << miburnarea[regcnt] << " " << hiburnarea[regcnt] << " " << meanfireout;
-					totburnarea[regcnt] = 0;
-					totburncount[regcnt] = 0;
-					liburnarea[regcnt] = 0;
-					miburnarea[regcnt] = 0;
-					hiburnarea[regcnt] = 0;
-				}
-				outfire << endl;
-			}
-
-			// Output harvest summary information
-			// A separate file for each model run
-			if(simharv_flag == 1 && tsumtype == 1) {
-				itoa(year, yearstr, 10);
-				outtreat << yearstr << " ";
-				for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
-					outtreat << cumtreat[treatcnt] << " ";
-				}
-				outtreat << endl;
-				// or all runs appended to a single file
-			} else if (simharv_flag == 1 && tsumtype == 2) {
-				itoa(year, yearstr, 10);
-				outtreat << runname << " " << yearstr << " ";
-				for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
-					outtreat << cumtreat[treatcnt] << " ";
-				}
-				outtreat << endl;
-			}
+	
+		
+		
+		
+	
 
 
-			// Output successional stage summaries
-			// This is coded a bit differently from the preceding sections - this way is more concise
-			if(runtype > 0) {
-
-				// Compute the successional stage summaries for each community type
-				landscape_sum(comnumstate, numcom );
-
-				// Output the runname if we're appending to a single file
-				if(runtype == 2) {
-					outsum  << runname << " ";
-				}
-
-				outsum << year << " ";
-
-				// Write the % area of each structure (and possbility biomass summaries) for each zone
-				for(zonecnt = 0; zonecnt < numcom; zonecnt ++) {
-					for(classcnt = 1; classcnt <= comnumstate[zonecnt]; classcnt ++) {
-						outsum << sum_array[classcnt][zonecnt] << " ";
-					}
-					if(biom_flag > 0) {
-						outsum << sum_livebio[zonecnt] << " " << sum_deadwood[zonecnt] << " ";
-					}
-				}
-
-				outsum << endl;
-
-			}
-
-			next_sum += step;	// Set the next summary year
-
-		} // end summary year if statement
 
 
-	}  // end year loop
-
-	// Do I need to worry about explicitly closing any other files?
-	outfire.close();
-	outsum.close();
-
-	// Write fire frequency summary grid
-	if(landfiresum == 1) {
-		gen_firesum(runname, maxyear, buffer_head, runstep);
-		gen_sevsum(runname, maxyear, buffer_head);
+	
 	}
 
-	// Write the structure summary grid
-	if(landstrusum == 1) {
-		gen_strucsum(runname, largestnumstate, maxyear, buffer_head);
-	}
+	
+
+
 
 	// Free memory (am I missing any arrays here?)
 	delete(age);

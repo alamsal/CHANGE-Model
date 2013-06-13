@@ -6,15 +6,10 @@
 
 using namespace std;
 
-const int DEMANDROW = 10; //Total # of rows in demand matrix
-const int DEMANDCOL=10;   //Total # of columns in demand matrix
 
 
+void split_line(string& line, string delim, int defile,std::vector< std::vector<std::vector< int > > > & demand);		//Method to split the lines in demand matrix csv
 
-extern std::vector<std::vector<string> > demand_matrix; //Container to hold demand matrix
-
-void split_line(string& line, string demlim);			//Method to split the lines in demand matrix csv
-
-std::vector<std::vector<string> > read_demandCsv();		//Method to read and retrun demand matrix
+void read_demandCsv(std::vector< std::vector<std::vector< int > > > & demand,int NumberOfFiles,int rows,int columns);		//Method to read and retrun demand matrix
 
 #endif 

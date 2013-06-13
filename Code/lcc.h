@@ -43,19 +43,19 @@ struct lccCells
 	int lccCol;
 };
 
-extern std::vector<std::vector<string> > demand_matrix; //Container to hold demand matrix
+extern std::vector< std::vector<std::vector< int > > > demand_matrix;  //Container to hold demand matrix
 
 extern std::vector< std::vector<std::vector< float > > >probability_surfaces; //Holds the probability surfaces rasters as 3D vector
 
 //Function prototypes
 void merg_lccBuffer(char *buffergridname,char *lccgridname);	//Merging original buffer with LCC.
 void merg_lccSnapshot(); // Merging lcc class into output grid snapshot.
-void extract_changeCells(char *lccgridname);//Extract LCC cells goint to change
+void extract_changeCells(char *lccgridname,int demperiod);//Extract LCC cells goint to change
 
 
 void extract_developedCells(char *lccgridname); // Extract developed cells from LCC
 
-void allocate_lccCells(char *lccgridname); //allocate  LCC cells
+void allocate_lccCells(char *lccgridname, int demandperiod); //allocate  LCC cells
 
 void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int demand);// Allocate space in lcc grid as well as change the community type
 
