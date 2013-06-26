@@ -57,7 +57,7 @@ void extract_developedCells(char *lccgridname); // Extract developed cells from 
 
 void allocate_lccCells(char *lccgridname, int demandperiod); //allocate  LCC cells
 
-void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int demand);// Allocate space in lcc grid as well as change the community type
+void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int & demand);// Allocate space in lcc grid as well as change the community type
 
 void reclassify_lclu(unsigned int stateout[],unsigned int lclustate[],unsigned int statecounter);
 

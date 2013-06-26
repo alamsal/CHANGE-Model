@@ -53,7 +53,6 @@ void merg_lccBuffer(char *buffergrid,char *lcc)
 			{
 				if((buffergrid[index]==0 )||((lcc[index]==inlcccode[lclass]) && (lcc_flag[lclass]==0))) //Extract man made & non vegetated areas areas only(Exclude- natural vegetated areas) and treat them as background (buffer=0)
 					{
-						//std::cout<<(int)buffergrid[index]<<"\t"<<int(lcc[index])<<"\t"<<inlcccode[lclass]<<"\t"<<lcc_flag[lclass]<<endl;
 						buffergrid[index]=0;
 						break;
 					}
@@ -91,6 +90,91 @@ bool getNeighbour(int row,int col,int lcccode)
 		}
 	}
 	
+}
+
+void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int lcccode,int prob_index,int &demand)
+{
+	int initdem=demand;
+	int veclen=vecobj.size();
+
+	if((demand>0) && (veclen>0))
+	{
+		
+		int ilcccol1;
+		int ilccrow1;
+		int ilcccol2;
+		int ilccrow2;
+		int index1;
+		int index2;
+		double trans_probaility;
+		double irand;
+
+		for(int j=-1;j<=1;j++)
+			{
+				for (int k=-1;k<=1;k++)
+				{
+					if(j!=0||k!=0)
+					{
+						irow=irow+j;
+						icol=icol+k;
+
+						index1=irow*maxcol+icol;
+					
+						for(unsigned int i=0;i<veclen;i++)
+						{
+							ilcccol2=vecobj.at(i).lccCol;
+							ilccrow2=vecobj.at(i).lccRow;	
+							index2=ilccrow2*maxcol+ilcccol2;
+							
+							//cout<<"ilcccol2:"<<ilcccol2<<endl;
+							//cout<<"ilccrow2:"<<ilccrow2<<endl;
+
+							if((((icol>0) && (icol<maxcol)) && ((ilcccol2>0) && (ilcccol2<maxcol))) && (((irow>0) && (irow<maxrow)) && ((ilccrow2>0) && (ilccrow2<maxrow))))
+							{
+								if(demand>0)
+								{
+									if((index1==index2) && (lccgrid[index1]!=lcccode))
+									{
+										//Get the transitional probability value;
+										trans_probaility=(double)(probability_surfaces[prob_index][ilccrow2][ilcccol2]);
+										//Generate a uniform random variable;
+										irand=u0_1();
+										if(irand<trans_probaility)
+										{
+											int index_value= (int)(lccgrid[index1]);
+											//If FORSCE change the cell transition form non-veg to vegetated; we must assign succesational stage [index]==1 to start future successional stages.
+											if(((index_value==11)||(index_value==12)||(index_value==20)||(index_value==30)||(index_value==81)||(index_value==82)||(index_value==41)||(index_value==42)||(index_value==43)||(index_value==52)||(index_value==71))&&((lcccode==41)||(lcccode==42)||(lcccode==52)||(lcccode==71)))	
+											{
+												stategrid[index1]=1;     // When forsce simulate veg to veg/ non-veg to veg the successional stage= 1;timeinstage =0; age=0; time since fire=0. 
+																		 // When forsce simulate non-veg to non-veg * veg to non-veg the buffer is  set to 0, which will handle by "merg_lccBuffer()" after the completion this demand allocation look at lads.cpp.
+												timeinstage[index1]=0;	 // time in current successional stage grid
+												age[index1]=0;		     // patch age grid
+												tsfire[index1]=0;        // time since last fire grid
+												buffer[index1]=1;       // Active natrual vegetation
+											}
+											lccgrid[index2]=lcccode; 
+
+										demand--;
+										}
+							
+									}
+								}
+								else
+								{
+									return;
+								}								
+							}							
+						}						
+					}
+				}
+				//cout<<"demand:\t"<<demand<<endl;
+			}
+		if((initdem==demand) && (demand>0))
+		{
+			space_allocation( vecobj, lcccode,  prob_index,  demand);
+
+		}
+	}
 }
 
 /****************************************************************************
@@ -241,8 +325,13 @@ void allocate_lccCells(char *lcc,int demperiod)
 					lcc_cells=extracted_lcc[i];
 					vec_lcc_cells=lcc_cells[j];
 					cout<<vec_lcc_cells.size()<<"--"<<inlcccode[j] <<"--"<<j <<"--"<<demand <<endl;
+					if (demand>1200)
+					{
+						cout<< "kharab";
+					}
 					space_allocation(vec_lcc_cells,inlcccode[j],j,demand);
 				}
+
 			}
 			cout<<endl<<endl;
 		}
@@ -275,7 +364,7 @@ Parameters: Extracted LCLU cell vectors to change, lcccode to be assigned after 
 
 Returns:	
 ****************************************************************************/
-void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int demand)
+void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand)
 {
 	int rand_forestrow;
 	int rand_forestcol;
@@ -283,9 +372,9 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 	unsigned int cell_index;
 	double irand;
 	int counter=0;
-	if((demand>0)&&(vecobj.size()>0))
+	if(((demand>0) && (vecobj.size()>0)) && (demand<vecobj.size()))
 	{
-		cout<< "Start Demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Transition prob pixel #::" <<vecobj.size() << endl;
+		//cout<< "Start Demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Transition prob pixel #::" <<vecobj.size() << endl;
 		while((vecobj.size()>0) && (demand>0))
 		{
 
@@ -326,24 +415,48 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 
 					demand--;
 					counter++;
+					
+					getEightNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand);
 				}
-
+				
 			}
 			vecobj.erase(vecobj.begin()+rand_index-1);
-			vecobj.begin();		
-
+			if(vecobj.size()!=0)
+			{
+				vecobj.begin(); 
+			}
+			
+			
 		}
-		cout<< "Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter<< endl; 
+		//cout<< "Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter<< endl; 
 	}
-	
 	else
 	{
-		cout<< "Demand or transition prob pixel size/#::"<<demand <<"::\t"<<vecobj.size()<< endl;
+		cout<< "Demand & transition prob pixel size/#::"<<demand <<"::\t"<<vecobj.size()<< endl;
 	}
 
 	
 
 }
+void patchGeneration(std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand)
+{
+	unsigned int r_forestcol;
+	unsigned int r_forestrow;
+	unsigned int c_index;
+
+
+	unsigned int r_index=(unsigned int) rand_int(vecobj.size());
+
+	r_forestcol=vecobj.at(r_index-1).lccCol;
+	r_forestrow=vecobj.at(r_index-1).lccRow;
+
+	c_index=r_forestrow*maxcol+r_forestcol;
+	
+	getEightNeighborhood(vecobj,r_forestrow,r_forestcol,lcccode,prob_index,demand);
+	
+}
+
+
 
 // Assign output codes to  NDLC 2006 input LCC codes to generate output grid.
 //Place to merge LADS & FORESCE outputs
