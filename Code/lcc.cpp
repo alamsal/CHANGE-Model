@@ -22,6 +22,8 @@
 #include "demand.h"
 
 using namespace std;
+std::vector<lccCells> neighborVecObj; // vector to hold all neighborhing cells temporaily
+
 // Merge buffer cells and Non Vegetated areas (with LCC flag 0) with buffer to prevent them from burning during LADS simulation.
 void merg_lccBuffer(char *buffergrid,char *lcc)
 {
@@ -66,8 +68,13 @@ void merg_lccBuffer(char *buffergrid,char *lcc)
 	}
 	cout <<"Merge buffer with lcc grid" <<endl;
 }
-//Comparing neighbouring lcc 8 cells to generate LCC patch
-//Need to update with MIKE's neighbourhood patch generation code
+
+/****************************************************************************
+//Comparing 8 neighbouring lcc cells to initialize the LCC patch seed
+Function: 	getNeighbour
+Parameters: cell row, cell column
+Returns:	bool
+****************************************************************************/
 bool getNeighbour(int row,int col,int lcccode)
 {
 	if(((row<maxrow) && (row>0)) && ((col< maxcol)&& (col>0)))
@@ -92,6 +99,13 @@ bool getNeighbour(int row,int col,int lcccode)
 	
 }
 
+/****************************************************************************
+//Allocation of cells in eight neighbourhoood locations recursively
+Function: 	getEightNeighborhood
+Parameters: Extracted LCLU cell vectors to change, cell row, cell column,lcccode to be assigned after change, probability surface index in the probaility surfaces vector, total # of demand
+
+Returns:	
+****************************************************************************/
 void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int lcccode,int prob_index,int &demand)
 {
 	int initdem=demand;
@@ -100,14 +114,14 @@ void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int l
 	if((demand>0) && (veclen>0))
 	{
 		
-		int ilcccol1;
-		int ilccrow1;
 		int ilcccol2;
 		int ilccrow2;
 		int index1;
 		int index2;
 		double trans_probaility;
 		double irand;
+		
+		lccCells tempCells;
 
 		for(int j=-1;j<=1;j++)
 			{
@@ -155,6 +169,11 @@ void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int l
 											lccgrid[index2]=lcccode; 
 
 										demand--;
+
+										tempCells.lccCol=ilcccol2;
+										tempCells.lccRow=ilccrow2;
+										neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
+										
 										}
 							
 									}
@@ -169,11 +188,30 @@ void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int l
 				}
 				//cout<<"demand:\t"<<demand<<endl;
 			}
-		if((initdem==demand) && (demand>0))
+		if((initdem==demand) && (demand>0) && (neighborVecObj.size()<1)) 
 		{
-			space_allocation( vecobj, lcccode,  prob_index,  demand);
+			space_allocation( vecobj, lcccode,  prob_index,  demand); // Assign new seed to change
 
 		}
+		else //Recursive algorithm to visit all the neighbouring cells
+		{
+			if((demand>0) && (neighborVecObj.size()>0))
+			{
+				for( unsigned int i=0;i<neighborVecObj.size();i++)
+				{
+					int neighrow=neighborVecObj.at(i).lccRow;
+					int neighcol=neighborVecObj.at(i).lccCol;
+					
+					neighborVecObj.erase(neighborVecObj.begin()+i);
+					neighborVecObj.begin();			
+					
+					getEightNeighborhood(vecobj,neighrow,neighcol,lcccode,prob_index,demand);
+
+
+				}
+			}
+		}
+		
 	}
 }
 
@@ -325,10 +363,6 @@ void allocate_lccCells(char *lcc,int demperiod)
 					lcc_cells=extracted_lcc[i];
 					vec_lcc_cells=lcc_cells[j];
 					cout<<vec_lcc_cells.size()<<"--"<<inlcccode[j] <<"--"<<j <<"--"<<demand <<endl;
-					if (demand>1200)
-					{
-						cout<< "kharab";
-					}
 					space_allocation(vec_lcc_cells,inlcccode[j],j,demand);
 				}
 
@@ -395,7 +429,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 			if(irand<tras_probability)
 			{
 				cell_index=rand_forestrow*maxcol + rand_forestcol;
-				if(getNeighbour(rand_forestrow,rand_forestcol,lcccode))
+				if(((getNeighbour(rand_forestrow,rand_forestcol,lcccode)) && (lcccode != lccgrid[cell_index]) ))
 				{
 					int index_value=(int)(lccgrid[cell_index]);
 					//cout<<index_value<<endl;   
@@ -438,25 +472,6 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 	
 
 }
-void patchGeneration(std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand)
-{
-	unsigned int r_forestcol;
-	unsigned int r_forestrow;
-	unsigned int c_index;
-
-
-	unsigned int r_index=(unsigned int) rand_int(vecobj.size());
-
-	r_forestcol=vecobj.at(r_index-1).lccCol;
-	r_forestrow=vecobj.at(r_index-1).lccRow;
-
-	c_index=r_forestrow*maxcol+r_forestcol;
-	
-	getEightNeighborhood(vecobj,r_forestrow,r_forestcol,lcccode,prob_index,demand);
-	
-}
-
-
 
 // Assign output codes to  NDLC 2006 input LCC codes to generate output grid.
 //Place to merge LADS & FORESCE outputs
