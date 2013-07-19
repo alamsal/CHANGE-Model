@@ -9,6 +9,7 @@
 //----------------------------------------------------------------------------
 #include <iostream>
 #include <stdio.h>
+#include <string.h>
 #include <vector>
 #include "stdafx.h"
 #include "lads.h"
@@ -27,6 +28,7 @@
 #define NO_DEMAND_FILES 5
 #define DEMAND_ROWS 10
 #define DEMAND_COLS 10
+
 
 using namespace std;
 
@@ -63,6 +65,7 @@ unsigned short int *patchy;      // patch grid - y coords of patch cells
 unsigned long int *strucsum;     // summary grid for tallying structure locations
 char *zonesumgrid;				 // zonal summary grid
 char *firespreadgrid;			 // keeps track of burned areas for fire map output			
+
 
 // OTHER GLOBAL VARIABLES
 int biom_flag;		// flag for log biomass simulation
@@ -187,6 +190,9 @@ double totburncount[40];	// total number of fires summary array
 std::vector< std::vector<std::vector< float > > > probability_surfaces(NO_PROBABILITY_FILES,std::vector<std::vector<float>>(1000,std::vector<float>(1500))); //Holds the probability surfaces rasters as 3D vector
 std::vector< std::vector<std::vector< int > > > demand_matrix(NO_DEMAND_FILES,std::vector<std::vector<int>>(DEMAND_ROWS,std::vector<int>(DEMAND_COLS))); // Holds the demand csv files
 
+//temp grid to hold vegetation trasition flag (0- ready for trasition & 1- already changed & no trasnition)
+std::vector <int> tempgridFlag;
+
 int main( int argc, char *argv[] ) {
 
 	char runname[80];       // run name
@@ -275,7 +281,7 @@ int main( int argc, char *argv[] ) {
 	unsigned int com_counter=0;		//Total # of communties coutner
 	unsigned int com_stateout[255];	//Community o/p codes container
 	unsigned int com_lclustate[255]; //Community LCLU codes container
-					
+			
 
 	struct image_header buffer_head;    // ERDAS file header for buffer grid
 	struct image_header regime_head;    // ERDAS file header for regime grid
@@ -290,7 +296,7 @@ int main( int argc, char *argv[] ) {
 	struct image_header age_head;		// ERDAS file header for forest age grid
 	struct image_header tsfire_head;	// ERDAS file header for time since fire grid
 
-	using namespace std;
+	
 		
 	// Read input file name from the command line
 	strcpy(runname, argv[1]);
@@ -927,10 +933,16 @@ int main( int argc, char *argv[] ) {
 	
 	//Integrating buffer with LCC type added by Ashis 12/18/2012
 	read_demandCsv(demand_matrix,NO_DEMAND_FILES,DEMAND_ROWS,DEMAND_COLS);
-	demand_matrix;
+	demand_matrix;	
 
 	for(int demperiod=0;demperiod<NO_DEMAND_FILES;demperiod++)
 	{
+		//tempGridFlag= new char[size];
+		//std::fill(tempGridFlag,tempGridFlag+size,0);	// Fill temp grid with 0 	
+		//cout<<strlen((char*)tempGridFlag)<<endl;
+		tempgridFlag.clear();
+		tempgridFlag.resize(size,0);
+
 		// Implement fORSCE algorithm
 		extract_changeCells(lccgrid,demperiod); 
 		//gen_lccsnapshot(runname, 55, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.

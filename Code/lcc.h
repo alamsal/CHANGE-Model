@@ -47,6 +47,8 @@ extern std::vector< std::vector<std::vector< int > > > demand_matrix;  //Contain
 
 extern std::vector< std::vector<std::vector< float > > >probability_surfaces; //Holds the probability surfaces rasters as 3D vector
 
+extern std::vector<int> tempgridFlag;		//temp grid to hold vegetation trasition flag (0- ready for trasition & 1- already changed & no trasnition)
+
 //Function prototypes
 void merg_lccBuffer(char *buffergridname,char *lccgridname);	//Merging original buffer with LCC.
 void merg_lccSnapshot(); // Merging lcc class into output grid snapshot.
@@ -57,10 +59,11 @@ void extract_developedCells(char *lccgridname); // Extract developed cells from 
 
 void allocate_lccCells(char *lccgridname, int demandperiod); //allocate  LCC cells
 
-void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int & demand);// Allocate space in lcc grid as well as change the community type
+void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand);// Allocate space in lcc grid as well as change the community type
 
 void reclassify_lclu(unsigned int stateout[],unsigned int lclustate[],unsigned int statecounter);
 
+void getEightNeighborhood(std::vector<lccCells> vecobj, int row, int col,int lcccode,int prob_index,int &demand, int &patch_size); // Recursive function to change the landscape's transition
 
 //std::vector <lccCells> ext_Cells(char *lccgridname); //Extract vector of cells from LLC
 

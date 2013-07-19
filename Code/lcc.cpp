@@ -14,12 +14,15 @@
 #include <vector>
 #include <cstdlib>
 #include <string>
+#include <algorithm>
 
 #include "lcc.h"
 #include "randnum.h"
 #include "celllist.h"
 #include "probSurface.h"
 #include "demand.h"
+
+#define TRANSITION_PATCH_SIZE 25
 
 using namespace std;
 std::vector<lccCells> neighborVecObj; // vector to hold all neighborhing cells temporaily
@@ -77,7 +80,7 @@ Returns:	bool
 ****************************************************************************/
 bool getNeighbour(int row,int col,int lcccode)
 {
-	if(((row<maxrow) && (row>0)) && ((col< maxcol)&& (col>0)))
+	if(((row<maxrow) && (row>0)) && ((col<maxcol)&& (col>0)))
 	{
 		try{
 			if(((int)lccgrid[((row-1)*maxcol+(col-1))]==lcccode)||((int)lccgrid[((row-1)*maxcol+(col))]==lcccode)||((int)lccgrid[((row-1)*maxcol+(col+1))]==lcccode)||((int)lccgrid[((row)*maxcol+(col-1))]==lcccode)
@@ -106,14 +109,13 @@ Parameters: Extracted LCLU cell vectors to change, cell row, cell column,lcccode
 
 Returns:	
 ****************************************************************************/
-void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int lcccode,int prob_index,int &demand)
+void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int lcccode,int prob_index,int &demand, int &patch_size)
 {
 	int initdem=demand;
 	int veclen=vecobj.size();
 
 	if((demand>0) && (veclen>0))
-	{
-		
+	{	
 		int ilcccol2;
 		int ilccrow2;
 		int index1;
@@ -143,11 +145,11 @@ void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int l
 							//cout<<"ilcccol2:"<<ilcccol2<<endl;
 							//cout<<"ilccrow2:"<<ilccrow2<<endl;
 
-							if((((icol>0) && (icol<maxcol)) && ((ilcccol2>0) && (ilcccol2<maxcol))) && (((irow>0) && (irow<maxrow)) && ((ilccrow2>0) && (ilccrow2<maxrow))))
+							if((((icol>=0) && (icol<=maxcol)) && ((ilcccol2>=0) && (ilcccol2<=maxcol))) && (((irow>=0) && (irow<=maxrow)) && ((ilccrow2>=0) && (ilccrow2<=maxrow))))
 							{
 								if(demand>0)
 								{
-									if((index1==index2) && (lccgrid[index1]!=lcccode))
+									if((index1==index2) && (lccgrid[index1]!=lcccode) && (tempgridFlag[index1]==0) )
 									{
 										//Get the transitional probability value;
 										trans_probaility=(double)(probability_surfaces[prob_index][ilccrow2][ilcccol2]);
@@ -167,8 +169,10 @@ void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int l
 												buffer[index1]=1;       // Active natrual vegetation
 											}
 											lccgrid[index2]=lcccode; 
-
+										tempgridFlag[index1]=1;	
+										
 										demand--;
+										patch_size++;
 
 										tempCells.lccCol=ilcccol2;
 										tempCells.lccRow=ilccrow2;
@@ -188,7 +192,7 @@ void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int l
 				}
 				//cout<<"demand:\t"<<demand<<endl;
 			}
-		if((initdem==demand) && (demand>0) && (neighborVecObj.size()<1)) 
+		if(((initdem==demand) && (demand>0) && (neighborVecObj.size()<1))|| (patch_size>=TRANSITION_PATCH_SIZE)) 
 		{
 			space_allocation( vecobj, lcccode,  prob_index,  demand); // Assign new seed to change
 
@@ -205,7 +209,7 @@ void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int l
 					neighborVecObj.erase(neighborVecObj.begin()+i);
 					neighborVecObj.begin();			
 					
-					getEightNeighborhood(vecobj,neighrow,neighcol,lcccode,prob_index,demand);
+					getEightNeighborhood(vecobj,neighrow,neighcol,lcccode,prob_index,demand,patch_size);
 
 
 				}
@@ -370,8 +374,8 @@ void allocate_lccCells(char *lcc,int demperiod)
 			cout<<endl<<endl;
 		}
 	
-
-
+		
+		
 
 	////********************************************************************///
 	// NEED to update current LCC to extract following cells- ASK Mike & Zhihuwa//
@@ -406,6 +410,8 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 	unsigned int cell_index;
 	double irand;
 	int counter=0;
+	int patch_size=0;		//Counter to hold patch size
+
 	if(((demand>0) && (vecobj.size()>0)) && (demand<vecobj.size()))
 	{
 		//cout<< "Start Demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Transition prob pixel #::" <<vecobj.size() << endl;
@@ -429,7 +435,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 			if(irand<tras_probability)
 			{
 				cell_index=rand_forestrow*maxcol + rand_forestcol;
-				if(((getNeighbour(rand_forestrow,rand_forestcol,lcccode)) && (lcccode != lccgrid[cell_index]) ))
+				if(((getNeighbour(rand_forestrow,rand_forestcol,lcccode)) && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) ))
 				{
 					int index_value=(int)(lccgrid[cell_index]);
 					//cout<<index_value<<endl;   
@@ -444,13 +450,17 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 						tsfire[cell_index]=0;      // time since last fire grid
 					}
 					lccgrid[cell_index]=lcccode; 
+					
+					tempgridFlag[cell_index]=1;		// To prevent from further trasition of the same cell
 
 					//cout<<int(lccgrid[cell_index])<<endl;
 
 					demand--;
 					counter++;
+					patch_size++;
+
 					
-					getEightNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand);
+					getEightNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size);
 				}
 				
 			}
