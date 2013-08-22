@@ -414,12 +414,15 @@ void gen_snapshot( char *runname, int year, struct image_header out_head,
    	for(row=0; row<maxrow; row++) {
 		for(col=0; col<maxcol; col++) {
 			index=row*maxcol + col;
-            if(buffer[index] == 1) {
+            if(buffer[index] == 1) 
+			{
                 struc = get_struc(index);
                 temp[index] = (unsigned char)struc;
 				
-            } else {
-                temp[index] = 0;
+            }
+			if(buffer[index]==0)
+			{
+                temp[index] = lccgrid[index];
             }
 
         }
@@ -428,12 +431,13 @@ void gen_snapshot( char *runname, int year, struct image_header out_head,
 	//Added by Ashis 12/28/2012
 	// write lcc info into temp grid
 
+	
 	merg_lccSnapshot();
 
     // write grids to output files
     if (snapsum > 0) {
         write_grid(outfilename, temp, out_head);
-    }
+    } 
 	
     return;
 }
@@ -633,8 +637,32 @@ void landscape_sum( int *classnum, int zonesum ) {
 //----------------------------------------------------------------------------
 // gen_snapshot - generate "LCC snapshot" of landscape configuration at a single point in time
 //----------------------------------------------------------------------------
-void gen_lccsnapshot( char *runname, int year, struct image_header out_head,
-    int snapsum, int transsum )
+void gen_lccsnapshot( char *runname, int year, struct image_header out_head,  int snapsum, int transsum )
+{
+    int row;                // row counter
+    int col;                // column counter
+    int index;              // array index
+    short int struc;        // forest structure index
+    char yearstr[10];       // current summary year
+    char outfilename[30];   // output file name
+
+    // open output file
+    strcpy(outfilename, runname);
+    itoa(year, yearstr, 10);
+    strcat(outfilename, yearstr);
+    strcat(outfilename, ".gis");
+	
+    // write grids to output files
+    if (snapsum > 0) {
+
+		write_grid(outfilename, temp, out_head);
+    }
+
+    return;
+}
+
+
+void gen_forescesnapshot( char *runname, int year, struct image_header out_head,  int snapsum, int transsum )
 {
     int row;                // row counter
     int col;                // column counter
@@ -649,36 +677,15 @@ void gen_lccsnapshot( char *runname, int year, struct image_header out_head,
     strcat(outfilename, yearstr);
     strcat(outfilename, ".gis");
 
-    // write grid cell information to temporary grids
-	//this block should unblock to see temp foresce output.
-  // 	for(row=0; row<maxrow; row++) {
-		//for(col=0; col<maxcol; col++) {
-		//	index=row*maxcol + col;
-  //          /*if(buffer[index] == 1) {
-  //              temp[index] = lccgrid[index];
-  //          } else {
-  //              temp[index] = 0;
-  //          }*/
-
-		//	temp[index] = lccgrid[index];
-
-
-  //      }
-  //  }
-	
-	
-	//Added by Ashis 12/28/2012
-	// write lcc info into temp grid
-
-	//merg_lccSnapshot();
-
     // write grids to output files
     if (snapsum > 0) {
-        write_grid(outfilename, temp, out_head);
+	    unsigned char* foresceOnly;
+		foresceOnly=reinterpret_cast<unsigned char*>(temp);
+		write_grid(outfilename, foresceOnly, out_head);
+		
+
+		
     }
 
     return;
 }
-
-
-

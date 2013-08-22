@@ -23,12 +23,6 @@
 #include "probSurface.h"
 #include "errorCheck.h"
 #include "demand.h"
-//Total no of probabiltiy surfaces
-#define NO_PROBABILITY_FILES 10
-#define NO_DEMAND_FILES 5
-#define DEMAND_ROWS 10
-#define DEMAND_COLS 10
-
 
 using namespace std;
 
@@ -174,6 +168,19 @@ unsigned int inlcccode[40];			//Input lcc code works upto 40 different LCC types
 unsigned int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
 unsigned int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
 
+//probability surface paramters
+int prbcnt;						// counts number of prob surfaces
+int numProbsurface;				// no of prob surfaces
+float probRows;					// no of prob rows
+float probColumns;				// no of prob columns
+float transitionThreshold[40];   // probsufaces trasition for each class	
+
+//demand paramters
+int numDemand;				//number of demand files
+int rowDemand;              //number of demand rows
+int colDemand;				//number of demand columns
+int meanpatchSize;				//mean output patch size
+
 // Summary arrays
 double sum_deadwood[100];   // dead wood loading summary array
 double sum_livebio[100];    // live wood loading summary array
@@ -187,8 +194,8 @@ double hiburnarea[40];		// stand-replacement area burned summary array
 double totburncount[40];	// total number of fires summary array
 
 // Probabilty surfaces container
-std::vector< std::vector<std::vector< float > > > probability_surfaces(NO_PROBABILITY_FILES,std::vector<std::vector<float>>(1000,std::vector<float>(1500))); //Holds the probability surfaces rasters as 3D vector
-std::vector< std::vector<std::vector< int > > > demand_matrix(NO_DEMAND_FILES,std::vector<std::vector<int>>(DEMAND_ROWS,std::vector<int>(DEMAND_COLS))); // Holds the demand csv files
+std::vector< std::vector<std::vector< float > > > probability_surfaces(12,std::vector<std::vector<float>>(1000,std::vector<float>(1500))); //Holds the probability surfaces rasters as 3D vector
+std::vector< std::vector<std::vector< int > > > demand_matrix(20,std::vector<std::vector<int>>(20,std::vector<int>(20))); // Holds the demand csv files
 
 //temp grid to hold vegetation trasition flag (0- ready for trasition & 1- already changed & no trasnition)
 std::vector <int> tempgridFlag;
@@ -205,6 +212,8 @@ int main( int argc, char *argv[] ) {
 	char outfilename3[80];  // output file name (treatment summary)
 	char harvfilename[80];	// input file name (treatment priority)
 	char lccfilename[80];	// input file name (land cover class)
+	char prbfilename[80];   // input prob parameters file name( probability surface parameters) 
+	char dmdfilename[80];	// input demand parameters file (FORESCE demands )
 
 	char yearstr[10];       // current year
 
@@ -281,7 +290,7 @@ int main( int argc, char *argv[] ) {
 	unsigned int com_counter=0;		//Total # of communties coutner
 	unsigned int com_stateout[255];	//Community o/p codes container
 	unsigned int com_lclustate[255]; //Community LCLU codes container
-			
+	
 
 	struct image_header buffer_head;    // ERDAS file header for buffer grid
 	struct image_header regime_head;    // ERDAS file header for regime grid
@@ -309,9 +318,14 @@ int main( int argc, char *argv[] ) {
 	strcpy(firefilename, runname);
 	strcat(firefilename, ".fre");
 	strcpy(harvfilename, runname);
-	strcat(harvfilename, ".hrv");
+	strcat(harvfilename, ".hrv");	
+	
 	strcpy(lccfilename, runname);
-	strcat(lccfilename, ".lcc");
+	strcat(lccfilename, ".lcc");	
+	strcpy(prbfilename,runname);
+	strcat(prbfilename,".prb");
+	strcpy(dmdfilename,runname);
+	strcat(dmdfilename,".dmd");
 
 	//Check parameter files existance
 	input_error_flag=0; //Check file input error if flag=1
@@ -337,6 +351,8 @@ int main( int argc, char *argv[] ) {
 	ifstream infirefile;
 	ifstream inharvfile;
 	ifstream inlccfile;
+	ifstream inprbfile;
+	ifstream indmdfile;
 
 	// Read main input file
 	infile >> cellsize; infile.ignore(100, '\n');
@@ -378,7 +394,7 @@ int main( int argc, char *argv[] ) {
 		comfile >> comcode[comcnt]; comfile.ignore(100, '\n');
 		comfile >> comnumstate[comcnt]; comfile.ignore(100, '\n');
 		comfile >> init_state[comcnt]; comfile.ignore(100, '\n');
-		for(statecnt = 0; statecnt < comnumstate[comcnt]; statecnt ++) {
+		for(statecnt = 0; statecnt < comnumstate[comcnt]; statecnt++) {
 			numstate ++;
 			comfile >> statecode[comcnt][statecnt]; comfile.ignore(100, '\n');
 			if(statecode[comcnt][statecnt] > largestnumstate) {
@@ -391,6 +407,7 @@ int main( int argc, char *argv[] ) {
 			comfile >> lclustate[comcnt][statecnt]; comfile.ignore(100, '\n');						// 6/5/2013 - recently added LCLU code
 			com_lclustate[com_counter]=lclustate[comcnt][statecnt];
 			com_counter++;
+            cout<<stateout[comcnt][statecnt]<<"\t" <<lclustate[comcnt][statecnt]<<"\t" << comcnt <<"\t" <<statecnt<<endl;
 
 			comfile >> statefiremod[comcnt][statecnt]; comfile.ignore(100, '\n');
 			comfile >> statefireinit[comcnt][statecnt]; comfile.ignore(100, '\n');
@@ -421,6 +438,7 @@ int main( int argc, char *argv[] ) {
 		}
 	}
 	comfile.close();
+
 	//	//Check community type input file parameters
 	if(input_error_flag==1)
 	{
@@ -530,7 +548,7 @@ int main( int argc, char *argv[] ) {
 	inlccfile.open(lccfilename);
 	inlccfile.ignore(100,'\n'); //Skip to the new line
 	inlccfile>>numlcc; inlccfile.ignore(100,'\n');
-	printf("Total # of LCC class descriptionin parameter file:%d\n",numlcc);
+	cout<<"Total # of LCC class descriptionin parameter file: "<<numlcc<<endl;
 	inlccfile.ignore(100,'\n'); //Skip to the new line
 	std::cout<<"Input LCC class Code \t Output LCC class code \t Simulation Flag"<<endl;
 	for(lcccnt=0;lcccnt<numlcc;lcccnt++)
@@ -540,15 +558,31 @@ int main( int argc, char *argv[] ) {
 
 	}
 	inlccfile.close();
+	//Read demand paramter file
+	indmdfile.open(dmdfilename);
+	indmdfile>>numDemand;indmdfile.ignore(100,'\n');
+	indmdfile>>rowDemand;indmdfile.ignore(100,'\n');
+	indmdfile>>colDemand;indmdfile.ignore(100,'\n');
+	indmdfile>>meanpatchSize;indmdfile.ignore(100,'\n');
+	indmdfile.close();
+
+	//Read probability sufrace paramter file
+	inprbfile.open(prbfilename);
+	inprbfile>>numProbsurface;inprbfile.ignore(100,'\n');
+	inprbfile>>probRows;inprbfile.ignore(100,'\n');
+	inprbfile>>probColumns;inprbfile.ignore(100,'\n');
+	
+
+	for(prbcnt=0;prbcnt<numProbsurface;prbcnt++)
+	{
+		inprbfile>>transitionThreshold[prbcnt];inprbfile.ignore(100,'\n');
+		cout<<transitionThreshold[prbcnt]<<endl;
+	}
+
+	inprbfile.close();
 
 	// Read probability surfaces raster files
-	float rows=1000;
-	float columns=1500;
-	//float prob_max[10]={248.0,185.0,255.0,53.0,53.0,173.0,227.0,242.0,213.0,240.0}; //Holds the maximum pixel value of each probability file in prob0, prob1, prob2,...porb9 order to change the pixel probabilty between 0-1. 
-    
-	//probability_surfaces(NumberOfFiles,std::vector<std::vector<float>>(rows,std::vector<float>(columns)));
-	
-	read_probabilitySurfaces(probability_surfaces,NO_PROBABILITY_FILES,rows,columns);
+	read_probabilitySurfaces(probability_surfaces,numProbsurface,probRows,probColumns);
 	probability_surfaces;
 
 
@@ -865,6 +899,8 @@ int main( int argc, char *argv[] ) {
 			dead_head = read_veg3_grid("initdead", deadgrid, runstep);
 		}
 		// "fix" ages and tsfire values so they are within the possible range for each stage
+
+
 		for(index=0; index<size; index++) {
 			if(age[index] < initage[comgrid[index] - 1][stategrid[index] - 1]) 
 			{
@@ -883,12 +919,14 @@ int main( int argc, char *argv[] ) {
 			timeinstage[index] = age[index] - initage[comgrid[index] - 1][stategrid[index] - 1];
 		}
 
+
+
 		// otherwise use default initial stage for each community type
 	} 
 	else 
 	{
 		for(index=0; index<size; index++) {
-			if(buffer[index] > 0) {
+			if((buffer[index] > 0) && (regime[index]>0)) {
 				stategrid[index] = (short int)init_state[comgrid[index] - 1];
 				timeinstage[index] = 0;
 				age[index] = initage[comgrid[index] - 1][stategrid[index] - 1];
@@ -903,8 +941,12 @@ int main( int argc, char *argv[] ) {
 
 	// initialize summary grids
 	for(index=0; index<size; index++) {
-		if(buffer[index] > 0) {
+		if((buffer[index] > 0) && (regime[index]>0)) {
 			temp[index] = get_struc(index);
+   //         if(temp[index]==0)
+			//{
+   //             cout << "come here"<<endl;
+			//}
 			if(landfiresum == 1) {
 				fsum1[index] = 0;
 				fsum2[index] = 0;
@@ -930,12 +972,12 @@ int main( int argc, char *argv[] ) {
 	is_bdin = 0;
 	next_sum = step;
 	endy = 0;
-	
+	gen_forescesnapshot(runname, 50, buffer_head, snapsum, 0);
 	//Integrating buffer with LCC type added by Ashis 12/18/2012
-	read_demandCsv(demand_matrix,NO_DEMAND_FILES,DEMAND_ROWS,DEMAND_COLS);
+	read_demandCsv(demand_matrix,numDemand,rowDemand,colDemand);
 	demand_matrix;	
 
-	for(int demperiod=0;demperiod<NO_DEMAND_FILES;demperiod++)
+	for(int demperiod=0;demperiod<numDemand;demperiod++)
 	{
 		//tempGridFlag= new char[size];
 		//std::fill(tempGridFlag,tempGridFlag+size,0);	// Fill temp grid with 0 	
@@ -944,11 +986,12 @@ int main( int argc, char *argv[] ) {
 		tempgridFlag.resize(size,0);
 
 		// Implement fORSCE algorithm
-		extract_changeCells(lccgrid,demperiod); 
-		//gen_lccsnapshot(runname, 55, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.
-	
-		merg_lccBuffer(buffer,lccgrid); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
-	
+		extract_changeCells(demperiod); 
+		gen_forescesnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
+		merg_lccBuffer(); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
+		gen_forescesnapshot(runname, 60+demperiod, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.
+		
+		
 	
 		//BEYOND THIS POINT THE CONTROL HANDOVER TO LADS FOR FURTHER SIMULATION
 	

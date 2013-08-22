@@ -16,19 +16,21 @@
 #include <string>
 #include <algorithm>
 
+#include "ladsio.h"
+
 #include "lcc.h"
 #include "randnum.h"
 #include "celllist.h"
 #include "probSurface.h"
 #include "demand.h"
 
-#define TRANSITION_PATCH_SIZE 25
+
 
 using namespace std;
 std::vector<lccCells> neighborVecObj; // vector to hold all neighborhing cells temporaily
 
 // Merge buffer cells and Non Vegetated areas (with LCC flag 0) with buffer to prevent them from burning during LADS simulation.
-void merg_lccBuffer(char *buffergrid,char *lcc)
+void merg_lccBuffer()
 {
 	/*
 	for(int index=0;index<size;index++)
@@ -49,24 +51,28 @@ void merg_lccBuffer(char *buffergrid,char *lcc)
 		}
 	
 	} */
-
+	int j=0;
+	int lclass;
 	for (int index=0;index<size;index++)
 	{
-		if((buffergrid[index]>=0) && (lcc[index]>0))
+		if(((int)buffer[index]>=0) && ((int)lccgrid[index]>0))
 		{
-			for(int lclass=0;lclass<numlcc;lclass++) //loop to determine the lcc class and their corresponding lcc flag and input code 
+			for(lclass=0;lclass<numlcc;lclass++) //loop to determine the lcc class and their corresponding lcc flag and input code 
 			{
-				if((buffergrid[index]==0 )||((lcc[index]==inlcccode[lclass]) && (lcc_flag[lclass]==0))) //Extract man made & non vegetated areas areas only(Exclude- natural vegetated areas) and treat them as background (buffer=0)
+				if(((int)buffer[index]==0 )||(((int)lccgrid[index]==(int)inlcccode[lclass]) && ((int)lcc_flag[lclass]==0))) //Extract man made & non vegetated areas areas only(Exclude- natural vegetated areas) and treat them as background (buffer=0)
 					{
-						buffergrid[index]=0;
+						buffer[index]=0;
+						j++;
 						break;
+						
 					}
 			}
 			
 		}
+		// Incase of LCC<0
 		else
 		{
-			buffergrid[index]=0;
+			buffer[index]=0;
 		}
 	}
 	cout <<"Merge buffer with lcc grid" <<endl;
@@ -160,16 +166,23 @@ void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int l
 											int index_value= (int)(lccgrid[index1]);
 											//If FORSCE change the cell transition form non-veg to vegetated; we must assign succesational stage [index]==1 to start future successional stages.
 											if(((index_value==11)||(index_value==12)||(index_value==20)||(index_value==30)||(index_value==81)||(index_value==82)||(index_value==41)||(index_value==42)||(index_value==43)||(index_value==52)||(index_value==71))&&((lcccode==41)||(lcccode==42)||(lcccode==52)||(lcccode==71)))	
-											{
-												stategrid[index1]=1;     // When forsce simulate veg to veg/ non-veg to veg the successional stage= 1;timeinstage =0; age=0; time since fire=0. 
-																		 // When forsce simulate non-veg to non-veg * veg to non-veg the buffer is  set to 0, which will handle by "merg_lccBuffer()" after the completion this demand allocation look at lads.cpp.
-												timeinstage[index1]=0;	 // time in current successional stage grid
-												age[index1]=0;		     // patch age grid
-												tsfire[index1]=0;        // time since last fire grid
-												buffer[index1]=1;       // Active natrual vegetation
+											{												//Put the smallest value from state,initage,and tsfire grids
+												stategrid[index1]=1; // When forsce simulate veg to veg/ non-veg to veg the successional stage= 1;timeinstage =0; age=0; time since fire=0. 
+																		// When forsce simulate non-veg to non-veg * veg to non-veg the buffer is  set to 0, which will handle by "merg_lccBuffer()" after the completion this demand allocation look at lads.cpp.
+												timeinstage[index1]=1;	// time in current successional stage grid
+												age[index1]=5;		    // patch age grid
+												lccgrid[index1]=lcccode;
+												tsfire[index1]=1;      // time since last fire grid
+												buffer[index1]=1;		//Active simulation
+												tempgridFlag[index1]=1;		// To prevent from further trasition of the same cell
+												
 											}
-											lccgrid[index2]=lcccode; 
-										tempgridFlag[index1]=1;	
+											else
+											{
+												lccgrid[index1]=lcccode; 
+												buffer[index1]=250;			//Prevent from simulation human dominated cell
+												tempgridFlag[index1]=1;		// To prevent from further trasition of the same cell
+											}
 										
 										demand--;
 										patch_size++;
@@ -192,7 +205,7 @@ void getEightNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int l
 				}
 				//cout<<"demand:\t"<<demand<<endl;
 			}
-		if(((initdem==demand) && (demand>0) && (neighborVecObj.size()<1))|| (patch_size>=TRANSITION_PATCH_SIZE)) 
+		if(((initdem==demand) && (demand>0) && (neighborVecObj.size()<1))|| (patch_size>=meanpatchSize)) 
 		{
 			space_allocation( vecobj, lcccode,  prob_index,  demand); // Assign new seed to change
 
@@ -225,7 +238,7 @@ Function: 	extract_LandCoverCells
 Parameters: lclu grid, lclu class code 
 Returns:vector of raster cells that have potiential  to change from one class to another
 ****************************************************************************/
-std::map<int,vector<lccCells> > extract_LandCoverCells(char *lcc, int lccCode)
+std::map<int,vector<lccCells> > extract_LandCoverCells(int lccCode)
 {
 	unsigned int index; // array index
 	unsigned int node_counter=0; //Counter to track the lenght of forest list.
@@ -244,8 +257,9 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(char *lcc, int lccCode)
 		{
 			index=row*maxcol + col;			
 
-			if(lcc[index]==lccCode) //Extract LCC class based upon lcc code 
+			if(lccgrid[index]==lccCode) //Extract LCC class based upon lcc code 
 			{
+				/*
 				if((probability_surfaces[0][row][col])>0.95)			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
 				{
 					tempLcc.lccRow=row;
@@ -307,6 +321,18 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(char *lcc, int lccCode)
 					tempLcc.lccCol=col;
 					ext_lcc_vector[9].push_back(tempLcc);
 				}
+				*/
+				for (unsigned int i=0;i<numProbsurface;i++)
+				{
+					if((probability_surfaces[i][row][col])>transitionThreshold[i])			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
+					{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[i].push_back(tempLcc);
+					}
+
+				}
+
 				count++;
 			}
 			
@@ -318,30 +344,37 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(char *lcc, int lccCode)
 
 
 //Make a list of cells that are going to change
-void extract_changeCells(char *lcc,int demperiod)
+void extract_changeCells(int demperiod)
 {
-	 allocate_lccCells(lcc,demperiod);
+	 allocate_lccCells(demperiod);
 }
 
 
 //Spatial allocation of Demands
-void allocate_lccCells(char *lcc,int demperiod)
+void allocate_lccCells(int demperiod)
 {
 	
 	// Extracted  cells from LCC
 	std::map<int,vector<lccCells> > extracted_lcc[50];
-	
-	extracted_lcc[0]=extract_LandCoverCells(lcc,11); // Extract water cells from LCC
-	extracted_lcc[1]=extract_LandCoverCells(lcc,12); // Extract ice/snow cells from LCC
-	extracted_lcc[2]=extract_LandCoverCells(lcc,20); // Extract developed cells from LCC
-	extracted_lcc[3]=extract_LandCoverCells(lcc,30); // Extract barren cells from LCC 
-	extracted_lcc[4]=extract_LandCoverCells(lcc,41); // Extract deci forest cells from LCC 
-	extracted_lcc[5]=extract_LandCoverCells(lcc,42); // Extract evergreen forest cells from LCC
-	extracted_lcc[6]=extract_LandCoverCells(lcc,52); // Extract shrubland cells from LCC 
-	extracted_lcc[7]=extract_LandCoverCells(lcc,71); // Extract grassland cells from LCC 
-	extracted_lcc[8]=extract_LandCoverCells(lcc,81); // Extract hay/pasture cells from LCC
-	extracted_lcc[9]=extract_LandCoverCells(lcc,82); // Extract cropland cells from LCC
-	
+	/*
+	extracted_lcc[0]=extract_LandCoverCells(11); // Extract water cells from LCC
+	extracted_lcc[1]=extract_LandCoverCells(12); // Extract ice/snow cells from LCC
+	extracted_lcc[2]=extract_LandCoverCells(20); // Extract developed cells from LCC
+	extracted_lcc[3]=extract_LandCoverCells(30); // Extract barren cells from LCC 
+	extracted_lcc[4]=extract_LandCoverCells(41); // Extract deci forest cells from LCC 
+	extracted_lcc[5]=extract_LandCoverCells(42); // Extract evergreen forest cells from LCC
+	extracted_lcc[6]=extract_LandCoverCells(52); // Extract shrubland cells from LCC 
+	extracted_lcc[7]=extract_LandCoverCells(71); // Extract grassland cells from LCC 
+	extracted_lcc[8]=extract_LandCoverCells(81); // Extract hay/pasture cells from LCC
+	extracted_lcc[9]=extract_LandCoverCells(82); // Extract cropland cells from LCC
+	extracted_lcc[10]=extract_LandCoverCells(90); // Extract cropland cells from LCC
+	extracted_lcc[11]=extract_LandCoverCells(95); // Extract cropland cells from LCC
+	*/
+	for (unsigned int i=0;i<numlcc;i++)
+	{
+		extracted_lcc[i]=extract_LandCoverCells(inlcccode[i]);
+	}
+
 	//int extractSize= 10; //Becasue we got 10 sets of lcc transformation
 	//int lcccode[10]={11,12,20,30,41,42,52,71,81,82}; // Once we got all datasets, I think we can replace this array with inlcccode[40].
 	
@@ -349,9 +382,9 @@ void allocate_lccCells(char *lcc,int demperiod)
 	std::vector<lccCells> vec_lcc_cells;
 
 	//Read demand file in row/column order
-		for(unsigned int i=0; i<10;i++)	// Total
+		for(unsigned int i=0; i<12;i++)	// Total
 		{
-			for (unsigned int j=0; j<10; j++)
+			for (unsigned int j=0; j<12; j++)
 			{
 				//cout<<"("<<i<<","<<j<<")"<<demand_matrix[i][j]<<"\t";
 				if(i==j)		//No demand allocation diagonally 
@@ -365,7 +398,9 @@ void allocate_lccCells(char *lcc,int demperiod)
 					//int demand=(int)demand_matrix[i][j][dfile];	//Convert from string type to integer.
 					int demand=(int)demand_matrix[demperiod][i][j];
 					lcc_cells=extracted_lcc[i];
+					
 					vec_lcc_cells=lcc_cells[j];
+
 					cout<<vec_lcc_cells.size()<<"--"<<inlcccode[j] <<"--"<<j <<"--"<<demand <<endl;
 					space_allocation(vec_lcc_cells,inlcccode[j],j,demand);
 				}
@@ -374,8 +409,6 @@ void allocate_lccCells(char *lcc,int demperiod)
 			cout<<endl<<endl;
 		}
 	
-		
-		
 
 	////********************************************************************///
 	// NEED to update current LCC to extract following cells- ASK Mike & Zhihuwa//
@@ -443,18 +476,25 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 					//If FORSCE change the cell transition form non-veg to vegetated; we must assign succesational stage [index]==1 to start future successional stages.
 					if(((index_value==11)||(index_value==12)||(index_value==20)||(index_value==30)||(index_value==81)||(index_value==82)||(index_value==41)||(index_value==42)||(index_value==43)||(index_value==52)||(index_value==71))&&((lcccode==41)||(lcccode==42)||(lcccode==52)||(lcccode==71)))	
 					{
+
+						//Put the smallest value from state,initage,and tsfire grids
 						stategrid[cell_index]=1; // When forsce simulate veg to veg/ non-veg to veg the successional stage= 1;timeinstage =0; age=0; time since fire=0. 
 												// When forsce simulate non-veg to non-veg * veg to non-veg the buffer is  set to 0, which will handle by "merg_lccBuffer()" after the completion this demand allocation look at lads.cpp.
-						timeinstage[cell_index]=0;	// time in current successional stage grid
-						age[cell_index]=0;		    // patch age grid
-						tsfire[cell_index]=0;      // time since last fire grid
+						timeinstage[cell_index]=1;	// time in current successional stage grid
+						age[cell_index]=5;		    // patch age grid
+						tsfire[cell_index]=1;      // time since last fire grid
+						lccgrid[cell_index]=lcccode;
+						buffer[cell_index]=1;		//Active simulation
+						tempgridFlag[cell_index]=1;		// To prevent from further trasition of the same cell
+						
 					}
-					lccgrid[cell_index]=lcccode; 
-					
-					tempgridFlag[cell_index]=1;		// To prevent from further trasition of the same cell
-
+					else
+					{
+						lccgrid[cell_index]=lcccode; 
+						buffer[cell_index]=250;			//prevent from simulation for human dominated
+						tempgridFlag[cell_index]=1;		// To prevent from further trasition of the same cell
+					}
 					//cout<<int(lccgrid[cell_index])<<endl;
-
 					demand--;
 					counter++;
 					patch_size++;
@@ -557,6 +597,7 @@ void merg_lccSnapshot()
 	
 }
 
+//Reclassify into broad landcover class
 void reclassify_HumanDominated()
 {
 	for(unsigned int index=0;index<=size;index++)
@@ -573,7 +614,7 @@ void reclassify_HumanDominated()
 	}
 
 }
-
+//Reclassify into broad landcover class
 void reclassify_NatureDominated(unsigned int stateout[],unsigned int lclustate[],unsigned int statecounter)
 {
 	for(unsigned int i=0;i<=statecounter;i++)
@@ -585,9 +626,10 @@ void reclassify_NatureDominated(unsigned int stateout[],unsigned int lclustate[]
 	{
 		for(unsigned int i=0;i<=statecounter;i++)
 		{
-			if(temp[index]==stateout[i])
+			if((int)temp[index]==(int)stateout[i])
 			{
 				temp[index]=lclustate[i];
+				break;
 			}
 		}
 	}
@@ -597,10 +639,9 @@ void reclassify_lclu(unsigned int stateout[],unsigned int lclustate[],unsigned i
 {
 	reclassify_NatureDominated(stateout,lclustate,statecounter);
 	reclassify_HumanDominated();
-	//Assign temp lcc grid as new land cover land use grid (new lccgrid) for subsequent processing
 
-	//lccgrid=reinterpret_cast<char*>(temp); //convert from 'unsigned char *' to 'char *'
-	strcpy(lccgrid,reinterpret_cast<char*>(temp));
+	//Assign temp lcc grid as new land cover land use grid (new lccgrid) for subsequent processing	
+	strcpy(lccgrid,reinterpret_cast<char*>(temp)); //convert from 'unsigned char *' to 'char *'
 	
 
 	

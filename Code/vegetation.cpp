@@ -30,7 +30,7 @@ short int get_struc( int index )
     c_age = age[index];
     c_tsfire = tsfire[index];
 
-    struc = 99;
+    //struc = 99;
 
     // if fire summary, then distinguish burned from unburned cells
     if( sumtype >= 3 ) {
@@ -38,6 +38,7 @@ short int get_struc( int index )
     // otherwise compute structure class based on user inputs
     } else {
         struc = stateout[comgrid[index] - 1][stategrid[index] - 1];
+		
     }
 
     return( struc );

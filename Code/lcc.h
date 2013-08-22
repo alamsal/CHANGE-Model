@@ -36,6 +36,11 @@ extern unsigned int inlcccode[40];			//Input lcc code works upto 40 different LC
 extern unsigned int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
 extern unsigned int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
 
+extern int meanpatchSize;			//Mean output patch size
+extern int numProbsurface; // Number of probability surfaces
+extern float transitionThreshold[40]; // Trasitin threshold for each probability class
+	
+
 // Hold filtered raster cells
 struct lccCells
 {
@@ -50,14 +55,14 @@ extern std::vector< std::vector<std::vector< float > > >probability_surfaces; //
 extern std::vector<int> tempgridFlag;		//temp grid to hold vegetation trasition flag (0- ready for trasition & 1- already changed & no trasnition)
 
 //Function prototypes
-void merg_lccBuffer(char *buffergridname,char *lccgridname);	//Merging original buffer with LCC.
+void merg_lccBuffer();	//Merging original buffer with LCC.
 void merg_lccSnapshot(); // Merging lcc class into output grid snapshot.
-void extract_changeCells(char *lccgridname,int demperiod);//Extract LCC cells goint to change
+void extract_changeCells(int demperiod);//Extract LCC cells goint to change
 
 
-void extract_developedCells(char *lccgridname); // Extract developed cells from LCC
 
-void allocate_lccCells(char *lccgridname, int demandperiod); //allocate  LCC cells
+
+void allocate_lccCells(int demandperiod); //allocate  LCC cells
 
 void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand);// Allocate space in lcc grid as well as change the community type
 
@@ -67,6 +72,6 @@ void getEightNeighborhood(std::vector<lccCells> vecobj, int row, int col,int lcc
 
 //std::vector <lccCells> ext_Cells(char *lccgridname); //Extract vector of cells from LLC
 
-std::map <int,std::vector <lccCells> > extract_LandCoverCells(char *lccgridname, int lccCode); // Extract LCC cells based upon lcccode
+std::map <int,std::vector <lccCells> > extract_LandCoverCells(int lccCode); // Extract LCC cells based upon lcccode
 
 #endif
