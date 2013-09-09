@@ -972,7 +972,7 @@ int main( int argc, char *argv[] ) {
 	is_bdin = 0;
 	next_sum = step;
 	endy = 0;
-	gen_forescesnapshot(runname, 50, buffer_head, snapsum, 0);
+	//gen_forescesnapshot(runname, 50, buffer_head, snapsum, 0);
 	//Integrating buffer with LCC type added by Ashis 12/18/2012
 	read_demandCsv(demand_matrix,numDemand,rowDemand,colDemand);
 	demand_matrix;	
@@ -987,9 +987,9 @@ int main( int argc, char *argv[] ) {
 
 		// Implement fORSCE algorithm
 		extract_changeCells(demperiod); 
-		gen_forescesnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
+		//gen_forescesnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
 		merg_lccBuffer(); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
-		gen_forescesnapshot(runname, 60+demperiod, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.
+		//gen_forescesnapshot(runname, 60+demperiod, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.
 		
 		
 	
@@ -1134,7 +1134,11 @@ int main( int argc, char *argv[] ) {
 							printf("%d\t%d\n",regcnt,int(fsize));
 							firespread( regcnt, (int)fsize );
 							// Print fire information to screen
+							/*   Disabled by ashis
+							
 							printf("runname=%s year=%d size=%lf regime=%d %d\n", runname, year, fsize, regcnt + 1, is_bdin);
+							
+							*/
 							// modify vegetation affected by fire
 							disturb_veg( landfiresum, sevcnt, regcnt );
 
@@ -1184,7 +1188,7 @@ int main( int argc, char *argv[] ) {
 					gen_snapshot(runname, demperiod, buffer_head, snapsum, 0);
 					reclassify_lclu(com_stateout,com_lclustate,com_counter-1);
 					gen_lccsnapshot(runname, demperiod+91, buffer_head, snapsum, 0); //Temporary intermediate snapshot  of lclugrid- just to make sure program is working.
-
+					
 				}
 				// or output age summaries
 				if(snapsum == 2) {

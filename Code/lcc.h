@@ -30,6 +30,9 @@ extern unsigned char *temp;				// temporary grid for holding classified veg data
 
 extern int maxrow;         // max row and column address of grid
 extern int maxcol;
+extern int rowDemand;		//Total no of rows in demand file
+extern int colDemand;		//Total no of columns in demand file
+extern int numDemand;		//Total no of demand file
 
 extern int numlcc;					//Number of lcc types
 extern unsigned int inlcccode[40];			//Input lcc code works upto 40 different LCC types.
@@ -68,7 +71,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 
 void reclassify_lclu(unsigned int stateout[],unsigned int lclustate[],unsigned int statecounter);
 
-void getEightNeighborhood(std::vector<lccCells> vecobj, int row, int col,int lcccode,int prob_index,int &demand, int &patch_size); // Recursive function to change the landscape's transition
+std::vector<lccCells> fillEightNeighborhood(std::vector<lccCells> vecobj, int row, int col,int lcccode,int prob_index,int &demand, int &patch_size); // Recursive function to change the landscape's transition
 
 //std::vector <lccCells> ext_Cells(char *lccgridname); //Extract vector of cells from LLC
 
