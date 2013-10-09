@@ -167,7 +167,10 @@ int numlcc;					//Number of lcc types
 unsigned int inlcccode[40];			//Input lcc code works upto 40 different LCC types.
 unsigned int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
 unsigned int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
-
+//Patch Size parameters
+unsigned int pts_distanceLag[40];	 // Input patch distance lag
+unsigned int pts_pathSize[40];		 // Input mean patch size 
+unsigned int pts_stdDeviation[40];	 // Input patch standard deviation
 //probability surface paramters
 int prbcnt;						// counts number of prob surfaces
 int numProbsurface;				// no of prob surfaces
@@ -199,6 +202,8 @@ std::vector< std::vector<std::vector< int > > > demand_matrix(20,std::vector<std
 
 //temp grid to hold vegetation trasition flag (0- ready for trasition & 1- already changed & no trasnition)
 std::vector <int> tempgridFlag;
+//log file
+ofstream writelog("logfile.txt",fstream::out|fstream::app);
 
 int main( int argc, char *argv[] ) {
 
@@ -214,7 +219,7 @@ int main( int argc, char *argv[] ) {
 	char lccfilename[80];	// input file name (land cover class)
 	char prbfilename[80];   // input prob parameters file name( probability surface parameters) 
 	char dmdfilename[80];	// input demand parameters file (FORESCE demands )
-
+	char ptsizefilename[80]; // input patch size parameters file
 	char yearstr[10];       // current year
 
 	int init_state[40];		// default initial state for each community type
@@ -304,8 +309,6 @@ int main( int argc, char *argv[] ) {
 	struct image_header manage_head;	// ERDAS file header for management unit grid
 	struct image_header age_head;		// ERDAS file header for forest age grid
 	struct image_header tsfire_head;	// ERDAS file header for time since fire grid
-
-	
 		
 	// Read input file name from the command line
 	strcpy(runname, argv[1]);
@@ -326,13 +329,15 @@ int main( int argc, char *argv[] ) {
 	strcat(prbfilename,".prb");
 	strcpy(dmdfilename,runname);
 	strcat(dmdfilename,".dmd");
+	strcpy(ptsizefilename,runname);
+	strcat(ptsizefilename,".pts");
 
 	//Check parameter files existance
 	input_error_flag=0; //Check file input error if flag=1
 	if(input_error_flag==1)
 	{
 		ErrorCheck check;
-		check.check_file_exits(infilename, comfilename,landfilename,firefilename, harvfilename,lccfilename);
+		check.check_file_exits(infilename, comfilename,landfilename,firefilename, harvfilename,ptsizefilename);
 
 	}
 	{
@@ -353,6 +358,7 @@ int main( int argc, char *argv[] ) {
 	ifstream inlccfile;
 	ifstream inprbfile;
 	ifstream indmdfile;
+	ifstream inptsizefile;
 
 	// Read main input file
 	infile >> cellsize; infile.ignore(100, '\n');
@@ -385,8 +391,6 @@ int main( int argc, char *argv[] ) {
 	}
 
 	// Read community input file
-	
-
 	numstate = 0;
 	largestnumstate = 0;
 	comfile >> numcom; comfile.ignore(100, '\n');
@@ -563,9 +567,19 @@ int main( int argc, char *argv[] ) {
 	indmdfile>>numDemand;indmdfile.ignore(100,'\n');
 	indmdfile>>rowDemand;indmdfile.ignore(100,'\n');
 	indmdfile>>colDemand;indmdfile.ignore(100,'\n');
-	indmdfile>>meanpatchSize;indmdfile.ignore(100,'\n');
 	indmdfile.close();
 
+	//Read patch size paramter file
+	inptsizefile.open(ptsizefilename);
+	inptsizefile.ignore(100,'\n'); //Skip to the new line
+	std::cout<<"Distance Lag \t Mean Patch Size \t SDT Deviation"<<endl;
+	for(lcccnt=0;lcccnt<numlcc;lcccnt++)
+	{
+		inptsizefile>>pts_distanceLag[lcccnt]>>pts_pathSize[lcccnt]>>pts_stdDeviation[lcccnt];inptsizefile.ignore(100,'\n');			
+		std::cout<<pts_distanceLag[lcccnt]<<"\t"<< pts_pathSize[lcccnt]<<"\t"<<pts_stdDeviation[lcccnt] <<endl; 
+
+	}
+	inptsizefile.close();
 	//Read probability sufrace paramter file
 	inprbfile.open(prbfilename);
 	inprbfile>>numProbsurface;inprbfile.ignore(100,'\n');
@@ -979,6 +993,7 @@ int main( int argc, char *argv[] ) {
 
 	for(int demperiod=0;demperiod<numDemand;demperiod++)
 	{
+		writelog<<"START DEMAND PERIOD #"<<demperiod<<" ****************************************************************************************************************************"<<endl;
 		//tempGridFlag= new char[size];
 		//std::fill(tempGridFlag,tempGridFlag+size,0);	// Fill temp grid with 0 	
 		//cout<<strlen((char*)tempGridFlag)<<endl;
@@ -1133,12 +1148,10 @@ int main( int argc, char *argv[] ) {
 							// distribute fire across the landscape
 							printf("%d\t%d\n",regcnt,int(fsize));
 							firespread( regcnt, (int)fsize );
-							// Print fire information to screen
-							/*   Disabled by ashis
+							// Print fire information to screen							
 							
-							printf("runname=%s year=%d size=%lf regime=%d %d\n", runname, year, fsize, regcnt + 1, is_bdin);
+							printf("runname=%s year=%d size=%lf regime=%d %d\n", runname, year, fsize, regcnt + 1, is_bdin);							
 							
-							*/
 							// modify vegetation affected by fire
 							disturb_veg( landfiresum, sevcnt, regcnt );
 
@@ -1188,7 +1201,7 @@ int main( int argc, char *argv[] ) {
 					gen_snapshot(runname, demperiod, buffer_head, snapsum, 0);
 					reclassify_lclu(com_stateout,com_lclustate,com_counter-1);
 					gen_lccsnapshot(runname, demperiod+91, buffer_head, snapsum, 0); //Temporary intermediate snapshot  of lclugrid- just to make sure program is working.
-					
+					writelog<<"END DEMAND PERIOD #"<<demperiod<<" ****************************************************************************************************************************"<<endl;
 				}
 				// or output age summaries
 				if(snapsum == 2) {

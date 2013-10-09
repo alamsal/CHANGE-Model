@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-
+#include "probSurface.h"
 using namespace std;
 /* Reference examples on multidimensional vector defination and access.
 	vector<vector<vector<float>>> phantom_energy (height, vector<vector<float>> (width, vector<float> (depth, 0.0f)));

@@ -20,6 +20,10 @@ extern char *lccgrid;           // lcc classes grid
 extern char *buffer;			// fire buffer zone grid
 extern char *comgrid;			// community type grid
 extern short int *stategrid;	//successional state
+//Patch Size parameters
+extern unsigned int pts_distanceLag[40];	 // Input patch distance lag
+extern unsigned int pts_pathSize[40];		 // Input mean patch size 
+extern unsigned int pts_stdDeviation[40];	 // Input patch standard deviation
 
 extern short int *timeinstage;	// time in current successional stage grid
 extern short int *age;		    // patch age grid
@@ -42,7 +46,7 @@ extern unsigned int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
 extern int meanpatchSize;			//Mean output patch size
 extern int numProbsurface; // Number of probability surfaces
 extern float transitionThreshold[40]; // Trasitin threshold for each probability class
-	
+extern ofstream writelog; //log file	
 
 // Hold filtered raster cells
 struct lccCells
@@ -67,7 +71,7 @@ void extract_changeCells(int demperiod);//Extract LCC cells goint to change
 
 void allocate_lccCells(int demandperiod); //allocate  LCC cells
 
-void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand);// Allocate space in lcc grid as well as change the community type
+void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand,unsigned int lag);// Allocate space in lcc grid as well as change the community type
 
 void reclassify_lclu(unsigned int stateout[],unsigned int lclustate[],unsigned int statecounter);
 
