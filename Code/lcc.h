@@ -19,6 +19,7 @@ using namespace std;
 extern char *lccgrid;           // lcc classes grid
 extern char *buffer;			// fire buffer zone grid
 extern char *comgrid;			// community type grid
+extern char *ownergrid;			// ownership type grid
 extern short int *stategrid;	//successional state
 //Patch Size parameters
 extern unsigned int pts_distanceLag[40];	 // Input patch distance lag
@@ -42,6 +43,9 @@ extern int numlcc;					//Number of lcc types
 extern unsigned int inlcccode[40];			//Input lcc code works upto 40 different LCC types.
 extern unsigned int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
 extern unsigned int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
+extern unsigned int numOwnership;				// Number of ownership types
+extern unsigned int ownershipCode[40];			// ID code for ownership types
+extern unsigned int ownershipRestriction[40];			// Ownership restriction flag (1= Non-developable, 0=Developable)
 
 extern int meanpatchSize;			//Mean output patch size
 extern int numProbsurface; // Number of probability surfaces

@@ -472,7 +472,7 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(int lccCode)
 
 	lccCells tempLcc; // Struct object to store row and columns of a raster cell.
 
-	std::map<int,vector<lccCells> > ext_lcc_vector;	// Map of vectors containing sturcuture to hold all extracted values based upon probability surfaces and LCC.
+	std::map<int,vector<lccCells> > ext_lcc_vector;	// Map of vectors containing sturcuture to hold all extracted values based upon probability surfaces, LCC, and ownership.
 	ext_lcc_vector.clear();
 
 	unsigned int count=0; //Cell counter for each class of LCC.
@@ -486,83 +486,91 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(int lccCode)
 
 			if(lccgrid[index]==lccCode) //Extract LCC class based upon lcc code 
 			{
-				/*
-				if((probability_surfaces[0][row][col])>0.95)			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
+				//filter Lcc based on owenership type and development restriction
+				for (unsigned int olayer=0;olayer<numOwnership;olayer++)
 				{
-				tempLcc.lccRow=row;
-				tempLcc.lccCol=col;
-				ext_lcc_vector[0].push_back(tempLcc);
-				}
-				if((probability_surfaces[1][row][col])>0.95)			//Extract cells having  ice transition prob threshold >95% i.e 0.95 ( to ice)
-				{
-				tempLcc.lccRow=row;
-				tempLcc.lccCol=col;
-				ext_lcc_vector[1].push_back(tempLcc);
-				}
-				if((probability_surfaces[2][row][col])>0.93)			//Extract cells having transition prob threshold>93% ie. 0.93 (to urban)
-				{
-				tempLcc.lccRow=row;
-				tempLcc.lccCol=col;
-				ext_lcc_vector[2].push_back(tempLcc);
-				}
-				if((probability_surfaces[3][row][col])>0.85)			//Extract cells having trasnition prob threshold>85 ie. 0.84 ( to barren)
-				{
-				tempLcc.lccRow=row;
-				tempLcc.lccCol=col;
-				ext_lcc_vector[3].push_back(tempLcc);
-				}
-				if((probability_surfaces[4][row][col])>0.85)			//to decdidous forest
-				{
-				tempLcc.lccRow=row;
-				tempLcc.lccCol=col;
-				ext_lcc_vector[4].push_back(tempLcc);
-
-				}
-				if((probability_surfaces[5][row][col])>0.85)			//to evergreen forest
-				{
-				tempLcc.lccRow=row;
-				tempLcc.lccCol=col;
-				ext_lcc_vector[5].push_back(tempLcc);
-				}
-				if((probability_surfaces[6][row][col])>0.85)			//to shrubland
-				{
-				tempLcc.lccRow=row;
-				tempLcc.lccCol=col;
-				ext_lcc_vector[6].push_back(tempLcc);
-				}
-				if((probability_surfaces[7][row][col])>0.85)			//to grassland
-				{
-				tempLcc.lccRow=row;
-				tempLcc.lccCol=col;
-				ext_lcc_vector[7].push_back(tempLcc);
-				}
-				if((probability_surfaces[8][row][col])>0.90)			//to hay/pasture
-				{
-				tempLcc.lccRow=row;
-				tempLcc.lccCol=col;
-				ext_lcc_vector[8].push_back(tempLcc);
-				}
-				if((probability_surfaces[9][row][col])>0.85)			//to crops
-				{
-				tempLcc.lccRow=row;
-				tempLcc.lccCol=col;
-				ext_lcc_vector[9].push_back(tempLcc);
-				}
-				*/
-				for (unsigned int i=0;i<numProbsurface;i++)
-				{
-					if((probability_surfaces[i][row][col])>transitionThreshold[i])			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
+					if((ownergrid[index]==ownershipCode[olayer]) &&	(ownershipRestriction[olayer]==0))
 					{
+
+						/*
+						if((probability_surfaces[0][row][col])>0.95)			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
+						{
 						tempLcc.lccRow=row;
 						tempLcc.lccCol=col;
-						ext_lcc_vector[i].push_back(tempLcc);
-					}
+						ext_lcc_vector[0].push_back(tempLcc);
+						}
+						if((probability_surfaces[1][row][col])>0.95)			//Extract cells having  ice transition prob threshold >95% i.e 0.95 ( to ice)
+						{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[1].push_back(tempLcc);
+						}
+						if((probability_surfaces[2][row][col])>0.93)			//Extract cells having transition prob threshold>93% ie. 0.93 (to urban)
+						{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[2].push_back(tempLcc);
+						}
+						if((probability_surfaces[3][row][col])>0.85)			//Extract cells having trasnition prob threshold>85 ie. 0.84 ( to barren)
+						{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[3].push_back(tempLcc);
+						}
+						if((probability_surfaces[4][row][col])>0.85)			//to decdidous forest
+						{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[4].push_back(tempLcc);
 
+						}
+						if((probability_surfaces[5][row][col])>0.85)			//to evergreen forest
+						{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[5].push_back(tempLcc);
+						}
+						if((probability_surfaces[6][row][col])>0.85)			//to shrubland
+						{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[6].push_back(tempLcc);
+						}
+						if((probability_surfaces[7][row][col])>0.85)			//to grassland
+						{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[7].push_back(tempLcc);
+						}
+						if((probability_surfaces[8][row][col])>0.90)			//to hay/pasture
+						{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[8].push_back(tempLcc);
+						}
+						if((probability_surfaces[9][row][col])>0.85)			//to crops
+						{
+						tempLcc.lccRow=row;
+						tempLcc.lccCol=col;
+						ext_lcc_vector[9].push_back(tempLcc);
+						}
+						*/
+						for (unsigned int i=0;i<numProbsurface;i++)
+						{
+							if((probability_surfaces[i][row][col])>transitionThreshold[i])			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
+							{
+								tempLcc.lccRow=row;
+								tempLcc.lccCol=col;
+								ext_lcc_vector[i].push_back(tempLcc);
+							}
+
+						}
+
+						count++;
+					}
 				}
 
-				count++;
 			}
-
 		}
 	}		
 

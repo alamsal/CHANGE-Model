@@ -8,7 +8,6 @@
 // Last Update:	1/4/2008
 //----------------------------------------------------------------------------
 #include <iostream>
-#include <stdio.h>
 #include <string.h>
 #include <vector>
 #include "stdafx.h"
@@ -31,6 +30,7 @@ using namespace std;
 short int *stategrid;	// successional stage grid
 char *comgrid;			// community type grid
 char *lccgrid;			// lcc type grid
+char *ownergrid;		//ownership type grid
 short int *timeinstage;	// time in current successional stage grid
 short int *dem;			// elevation grid
 short int *age;		    // patch age grid
@@ -177,7 +177,10 @@ int numProbsurface;				// no of prob surfaces
 float probRows;					// no of prob rows
 float probColumns;				// no of prob columns
 float transitionThreshold[40];   // probsufaces trasition for each class	
-
+// ownership parameters
+unsigned int numOwnership;				// Number of ownership types
+unsigned int ownershipCode[40];			// ID code for ownership types
+unsigned int ownershipRestriction[40];			// Ownership restriction flag (1= Non-developable, 0=Developable)
 //demand paramters
 int numDemand;				//number of demand files
 int rowDemand;              //number of demand rows
@@ -220,6 +223,7 @@ int main( int argc, char *argv[] ) {
 	char prbfilename[80];   // input prob parameters file name( probability surface parameters) 
 	char dmdfilename[80];	// input demand parameters file (FORESCE demands )
 	char ptsizefilename[80]; // input patch size parameters file
+	char ownwershipfilename[80]; // input ownwership paramters file
 	char yearstr[10];       // current year
 
 	int init_state[40];		// default initial state for each community type
@@ -265,7 +269,7 @@ int main( int argc, char *argv[] ) {
 	int unitcounter[5];		// treatment unit counter
 	int unitcnt;			// counts number of units treated
 	int lcccnt;				// counts number of lcc types
-
+	int nowner;				//counts number of ownwership types
 	// 9-21-2012: Code updated to allow up to 40 fire regimes
 	double fsize;           // fire size
 	double nfr[40][10];         // natural fire rotation
@@ -290,12 +294,12 @@ int main( int argc, char *argv[] ) {
 	double tempprob;		// temp variable for non-spatial disturbance probability calculation
 	double totprob;			// total of non-spatial disturbance probabilities
 	double cumprob;			// cumulative non-spatial disturbance probability
-	
+
 	//6/5/2013- Aashis
 	unsigned int com_counter=0;		//Total # of communties coutner
 	unsigned int com_stateout[255];	//Community o/p codes container
 	unsigned int com_lclustate[255]; //Community LCLU codes container
-	
+
 
 	struct image_header buffer_head;    // ERDAS file header for buffer grid
 	struct image_header regime_head;    // ERDAS file header for regime grid
@@ -303,34 +307,37 @@ int main( int argc, char *argv[] ) {
 	struct image_header dem_head;		// ERDAS file header for dem grid
 	struct image_header com_head;       // ERDAS file head for age grid
 	struct image_header lcc_head;		// ERDAS file head for lcc grid
+	struct image_header owner_head;		// ERDAS file head for owner grid
 	struct image_header state_head;		// ERDAS file header for successional stage grid
 	struct image_header bioage_head;    // ERDAS file head for bioage grid
 	struct image_header dead_head;      // ERDAS file head for dead grid
 	struct image_header manage_head;	// ERDAS file header for management unit grid
 	struct image_header age_head;		// ERDAS file header for forest age grid
 	struct image_header tsfire_head;	// ERDAS file header for time since fire grid
-		
+
 	// Read input file name from the command line
 	strcpy(runname, argv[1]);
 	strcpy(infilename, argv[1]);
-	strcat(infilename, ".in");
+	strcat(infilename, ".in"); //Main paramters file
 	strcpy(comfilename, runname);
-	strcat(comfilename, ".ctp");
+	strcat(comfilename, ".ctp"); // Community paramters file
 	strcpy(landfilename, runname);
-	strcat(landfilename, ".lnd");
+	strcat(landfilename, ".lnd");	// Land type  paramters file
 	strcpy(firefilename, runname);
-	strcat(firefilename, ".fre");
+	strcat(firefilename, ".fre");  // Fire paramters file
 	strcpy(harvfilename, runname);
-	strcat(harvfilename, ".hrv");	
-	
+	strcat(harvfilename, ".hrv");	// Harves paramters file
+
 	strcpy(lccfilename, runname);
-	strcat(lccfilename, ".lcc");	
+	strcat(lccfilename, ".lcc");	// Land-cover paramters file
 	strcpy(prbfilename,runname);
-	strcat(prbfilename,".prb");
+	strcat(prbfilename,".prb");		// Probability parameters file
 	strcpy(dmdfilename,runname);
-	strcat(dmdfilename,".dmd");
+	strcat(dmdfilename,".dmd");		// Demand paramters file
 	strcpy(ptsizefilename,runname);
-	strcat(ptsizefilename,".pts");
+	strcat(ptsizefilename,".pts");  // Patch size distribution paraters file
+	strcpy(ownwershipfilename,runname); //Ownership parameters file
+	strcat(ownwershipfilename,".own");
 
 	//Check parameter files existance
 	input_error_flag=0; //Check file input error if flag=1
@@ -342,7 +349,7 @@ int main( int argc, char *argv[] ) {
 	}
 	{
 		cout<<"input_error_flag=0 =>> Error checking is disabled"<<endl;
-	
+
 	}
 
 	// Open input files and read scenario parameters
@@ -359,6 +366,7 @@ int main( int argc, char *argv[] ) {
 	ifstream inprbfile;
 	ifstream indmdfile;
 	ifstream inptsizefile;
+	ifstream inownershipfile;
 
 	// Read main input file
 	infile >> cellsize; infile.ignore(100, '\n');
@@ -381,13 +389,13 @@ int main( int argc, char *argv[] ) {
 	infile >> distnum; infile.ignore(100, '\n');	//# of non spatial disturbances
 	infile >> mgmtnum; infile.ignore(100, '\n');	//# of treatments
 	infile.close();
-	
+
 	//Check input file parameters
 	if(input_error_flag==1)
 	{
 		ErrorCheck check;
 		check.check_input_param(cellsize,read_map, maxrow,maxcol,simfire_flag,simharv_flag,burnin,maxyear,runstep,step,runtype,sumtype,tsumtype,snapsum,landfiresum,landstrusum,biom_flag,distnum,mgmtnum);
-	
+
 	}
 
 	// Read community input file
@@ -404,14 +412,14 @@ int main( int argc, char *argv[] ) {
 			if(statecode[comcnt][statecnt] > largestnumstate) {
 				largestnumstate = statecode[comcnt][statecnt];
 			}
-			
+
 			comfile >> stateout[comcnt][statecnt]; comfile.ignore(100, '\n');	
 			com_stateout[com_counter]=stateout[comcnt][statecnt];		
 
 			comfile >> lclustate[comcnt][statecnt]; comfile.ignore(100, '\n');						// 6/5/2013 - recently added LCLU code
 			com_lclustate[com_counter]=lclustate[comcnt][statecnt];
 			com_counter++;
-            cout<<stateout[comcnt][statecnt]<<"\t" <<lclustate[comcnt][statecnt]<<"\t" << comcnt <<"\t" <<statecnt<<endl;
+			cout<<stateout[comcnt][statecnt]<<"\t" <<lclustate[comcnt][statecnt]<<"\t" << comcnt <<"\t" <<statecnt<<endl;
 
 			comfile >> statefiremod[comcnt][statecnt]; comfile.ignore(100, '\n');
 			comfile >> statefireinit[comcnt][statecnt]; comfile.ignore(100, '\n');
@@ -522,11 +530,11 @@ int main( int argc, char *argv[] ) {
 		landfile.close();
 		//Check land type file parameters
 		if(input_error_flag==1)
-			{
-				ErrorCheck check;
-				check.check_landType_param(numland,landcode,landfiremod,landfireinit,landsevmod,landsevmod2);
+		{
+			ErrorCheck check;
+			check.check_landType_param(numland,landcode,landfiremod,landfireinit,landsevmod,landsevmod2);
 
-			}
+		}
 	}
 
 
@@ -580,12 +588,26 @@ int main( int argc, char *argv[] ) {
 
 	}
 	inptsizefile.close();
+	//Read ownwership paramter file
+	inownershipfile.open(ownwershipfilename);
+	inownershipfile>>numOwnership; inownershipfile.ignore(100,'\n');
+	std::cout<< "Total # of ownership layers: "<<numOwnership<<endl;
+	inownershipfile.ignore(100,'\n');// Skip to the new line
+	std::cout<<"Code \t Restricion"<<endl;
+	for(unsigned int nowner=0;nowner<numOwnership; nowner++)
+	{
+		inownershipfile>>ownershipCode[nowner]>>ownershipRestriction[nowner];inownershipfile.ignore(100,'\n');
+		std::cout<<ownershipCode[nowner]<<"\t"<< ownershipRestriction[nowner]<<endl; 
+
+	}
+	inownershipfile.close();
+
 	//Read probability sufrace paramter file
 	inprbfile.open(prbfilename);
 	inprbfile>>numProbsurface;inprbfile.ignore(100,'\n');
 	inprbfile>>probRows;inprbfile.ignore(100,'\n');
 	inprbfile>>probColumns;inprbfile.ignore(100,'\n');
-	
+
 
 	for(prbcnt=0;prbcnt<numProbsurface;prbcnt++)
 	{
@@ -711,6 +733,7 @@ int main( int argc, char *argv[] ) {
 	stategrid = new short int[size];
 	comgrid = new char[size];
 	lccgrid= new char[size];
+	ownergrid= new char[size];
 	timeinstage = new short int[size];
 	age = new short int[size];
 	tsfire = new short int[size];
@@ -756,7 +779,8 @@ int main( int argc, char *argv[] ) {
 
 	// setup state variable grids
 	// either read from input files
-	if( read_map > 0 ) {
+	if( read_map > 0 ) 
+	{
 		buffer_head = read_grid("buffer", buffer);
 		if( simfire_flag == 1 ) {
 			regime_head = read_grid("regime", regime);
@@ -782,7 +806,7 @@ int main( int argc, char *argv[] ) {
 		if( simharv_flag == 1 ) {
 			manage_head = read_16bit_grid("management", management);
 		}
-		
+
 		// Read grid landtype.gis
 		land_head = read_grid("landtype", landgrid);
 		//Compare # of class in landtype grid with runname.lnd file
@@ -803,7 +827,8 @@ int main( int argc, char *argv[] ) {
 			}
 
 		}
-
+		//Read grid ownership.gis
+		owner_head=read_grid("ownership",ownergrid);
 		// Read grid community.gis
 		com_head = read_grid("community", comgrid);  
 		//Compare # of class in community grid with runname.ctp file
@@ -842,13 +867,15 @@ int main( int argc, char *argv[] ) {
 				cin.get();
 				exit(1);
 			}
-		
+
 		}
 
 
 		// or generate homogeneous grids
 		// not sure if this still works - do I need to add a generator for the elevation grid?
-	} else {
+	} 
+	else 
+	{
 		buffer_head = gen_grid(maxrow, maxcol, 1, buffer);
 		if (simfire_flag == 1) {
 			regime_head = gen_grid(maxrow, maxcol, 1, regime);
@@ -879,7 +906,7 @@ int main( int argc, char *argv[] ) {
 	}
 
 
-	
+
 	// compute the size of the active landscape, fire regime zones, and summary zones
 	for(index=0; index<size; index++) {
 		if(buffer[index] > 0)  {
@@ -957,9 +984,9 @@ int main( int argc, char *argv[] ) {
 	for(index=0; index<size; index++) {
 		if((buffer[index] > 0) && (regime[index]>0)) {
 			temp[index] = get_struc(index);
-   //         if(temp[index]==0)
+			//         if(temp[index]==0)
 			//{
-   //             cout << "come here"<<endl;
+			//             cout << "come here"<<endl;
 			//}
 			if(landfiresum == 1) {
 				fsum1[index] = 0;
@@ -1005,11 +1032,11 @@ int main( int argc, char *argv[] ) {
 		//gen_forescesnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
 		merg_lccBuffer(); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
 		//gen_forescesnapshot(runname, 60+demperiod, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.
-		
-		
-	
+
+
+
 		//BEYOND THIS POINT THE CONTROL HANDOVER TO LADS FOR FURTHER SIMULATION
-	
+
 		// process the simulation step by step
 		for(year=runstep; year<=maxyear || is_bdin ==0;year+=runstep){
 
@@ -1149,9 +1176,9 @@ int main( int argc, char *argv[] ) {
 							printf("%d\t%d\n",regcnt,int(fsize));
 							firespread( regcnt, (int)fsize );
 							// Print fire information to screen							
-							
+
 							printf("runname=%s year=%d size=%lf regime=%d %d\n", runname, year, fsize, regcnt + 1, is_bdin);							
-							
+
 							// modify vegetation affected by fire
 							disturb_veg( landfiresum, sevcnt, regcnt );
 
@@ -1322,19 +1349,19 @@ int main( int argc, char *argv[] ) {
 			gen_strucsum(runname, largestnumstate, maxyear, buffer_head);
 		}
 
-	
-		
-		
-		
-	
 
 
 
 
-	
+
+
+
+
+
+
 	}
 
-	
+
 
 
 
