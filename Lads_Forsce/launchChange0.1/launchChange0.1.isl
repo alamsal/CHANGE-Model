@@ -52,7 +52,7 @@
 	<summary>
 		<codepage>1252</codepage>
 		<title>Installation Database</title>
-		<subject></subject>
+		<subject>CHANGE WTH NO HYBRID</subject>
 		<author>##ID_STRING3##</author>
 		<keywords>Installer,MSI,Database</keywords>
 		<comments>Contact:  Your local administrator</comments>
@@ -340,8 +340,7 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td>{40F8A342-AB0D-46AF-8582-88FA769456E0}</td><td>INSTALLDIR</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{7FE2AE1D-1AA7-4276-984D-9312959B6B3E}</td><td>SDSU</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Lads_Forsce.exe</td><td>{0CC0A9D1-5ACD-449A-830B-26F50E6C1556}</td><td>INSTALLDIR</td><td>2</td><td/><td>lads_forsce.exe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Lads_Forsce.exe</td><td>{F4210934-3437-49AE-A272-BECA460A2661}</td><td>INSTALLDIR</td><td>2</td><td/><td>lads_forsce.exe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>vcredist_x86.exe</td><td>{E74C59A1-D2FE-4A6D-BBAD-CB5E285BAD44}</td><td>INSTALLDIR</td><td>2</td><td/><td>vcredist_x86.exe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
@@ -1051,7 +1050,6 @@
 	<table name="CreateFolder">
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>SDSU</td><td>ISX_DEFAULTCOMPONENT1</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -1133,6 +1131,7 @@
 		<row><td>ALLUSERSPROFILE</td><td>TARGETDIR</td><td>.:ALLUSE~1|All Users</td><td/><td>0</td><td/></row>
 		<row><td>AdminToolsFolder</td><td>TARGETDIR</td><td>.:Admint~1|AdminTools</td><td/><td>0</td><td/></row>
 		<row><td>AppDataFolder</td><td>TARGETDIR</td><td>.:APPLIC~1|Application Data</td><td/><td>0</td><td/></row>
+		<row><td>CHANGE0.1</td><td>GIS_CENTER</td><td>CHANGE~1|Change.Bin</td><td/><td>0</td><td/></row>
 		<row><td>CommonAppDataFolder</td><td>TARGETDIR</td><td>.:Common~1|CommonAppData</td><td/><td>0</td><td/></row>
 		<row><td>CommonFilesFolder</td><td>TARGETDIR</td><td>.:Common</td><td/><td>0</td><td/></row>
 		<row><td>DATABASEDIR</td><td>ISYourDataBaseDir</td><td>.</td><td/><td>0</td><td/></row>
@@ -1140,15 +1139,15 @@
 		<row><td>FavoritesFolder</td><td>TARGETDIR</td><td>.:FAVORI~1|Favorites</td><td/><td>0</td><td/></row>
 		<row><td>FontsFolder</td><td>TARGETDIR</td><td>.:Fonts</td><td/><td>0</td><td/></row>
 		<row><td>GISCENTER_SDSU</td><td>ProgramFilesFolder</td><td>GISCEN~1|GISCenter,SDSU</td><td/><td>0</td><td/></row>
+		<row><td>GIS_CENTER</td><td>ProgramFilesFolder</td><td>GISCEN~1|GIS Center</td><td/><td>0</td><td/></row>
 		<row><td>GlobalAssemblyCache</td><td>TARGETDIR</td><td>.:Global~1|GlobalAssemblyCache</td><td/><td>0</td><td/></row>
-		<row><td>INSTALLDIR</td><td>MY_PRODUCT_NAME1</td><td>.</td><td/><td>0</td><td/></row>
+		<row><td>INSTALLDIR</td><td>CHANGE0.1</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>ISCommonFilesFolder</td><td>CommonFilesFolder</td><td>Instal~1|InstallShield</td><td/><td>0</td><td/></row>
 		<row><td>ISMyCompanyDir</td><td>ProgramFilesFolder</td><td>MYCOMP~1|My Company Name</td><td/><td>0</td><td/></row>
 		<row><td>ISMyProductDir</td><td>ISMyCompanyDir</td><td>MYPROD~1|My Product Name</td><td/><td>0</td><td/></row>
 		<row><td>ISYourDataBaseDir</td><td>INSTALLDIR</td><td>Database</td><td/><td>0</td><td/></row>
 		<row><td>LocalAppDataFolder</td><td>TARGETDIR</td><td>.:LocalA~1|LocalAppData</td><td/><td>0</td><td/></row>
 		<row><td>MY_PRODUCT_NAME</td><td>GISCENTER_SDSU</td><td>MYPROD~1|My Product Name</td><td/><td>0</td><td/></row>
-		<row><td>MY_PRODUCT_NAME1</td><td>SDSU</td><td>CHANGE~1|change0.1</td><td/><td>0</td><td/></row>
 		<row><td>MyPicturesFolder</td><td>TARGETDIR</td><td>.:MyPict~1|MyPictures</td><td/><td>0</td><td/></row>
 		<row><td>NetHoodFolder</td><td>TARGETDIR</td><td>.:NetHood</td><td/><td>0</td><td/></row>
 		<row><td>PersonalFolder</td><td>TARGETDIR</td><td>.:Personal</td><td/><td>0</td><td/></row>
@@ -1157,7 +1156,6 @@
 		<row><td>ProgramFilesFolder</td><td>TARGETDIR</td><td>.:PROGRA~1|program files</td><td/><td>0</td><td/></row>
 		<row><td>ProgramMenuFolder</td><td>TARGETDIR</td><td>.:Programs</td><td/><td>3</td><td/></row>
 		<row><td>RecentFolder</td><td>TARGETDIR</td><td>.:Recent</td><td/><td>0</td><td/></row>
-		<row><td>SDSU</td><td>ProgramFilesFolder</td><td>SDSU</td><td/><td>0</td><td/></row>
 		<row><td>SendToFolder</td><td>TARGETDIR</td><td>.:SendTo</td><td/><td>3</td><td/></row>
 		<row><td>StartMenuFolder</td><td>TARGETDIR</td><td>.:STARTM~1|Start Menu</td><td/><td>3</td><td/></row>
 		<row><td>StartupFolder</td><td>TARGETDIR</td><td>.:StartUp</td><td/><td>3</td><td/></row>
@@ -1170,6 +1168,8 @@
 		<row><td>WindowsFolder</td><td>TARGETDIR</td><td>.:Windows</td><td/><td>0</td><td/></row>
 		<row><td>WindowsVolume</td><td>TARGETDIR</td><td>.:WinRoot</td><td/><td>0</td><td/></row>
 		<row><td>change_</td><td>sdsu</td><td>CHANGE </td><td/><td>1</td><td/></row>
+		<row><td>change_1_change_wth_no_hybrid</td><td>giscen_1_gis_center</td><td>CHANGE~1|CHANGE WTH NO HYBRID</td><td/><td>1</td><td/></row>
+		<row><td>giscen_1_gis_center</td><td>ProgramMenuFolder</td><td>GISCEN~1|GIS Center</td><td/><td>1</td><td/></row>
 		<row><td>giscen_1_giscenter_sdsu</td><td>ProgramMenuFolder</td><td>GISCEN~1|GISCenter,SDSU</td><td/><td>1</td><td/></row>
 		<row><td>launch_1.1_launchchange0.1</td><td>giscen_1_giscenter_sdsu</td><td>LAUNCH~1.1|launchChange0.1</td><td/><td>1</td><td/></row>
 		<row><td>launch_1.1_launchchange0.11</td><td>sdsu</td><td>LAUNCH~1.1|launchChange0.1</td><td/><td>1</td><td/></row>
@@ -1866,7 +1866,6 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT</td></row>
-		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT1</td></row>
 		<row><td>AlwaysInstall</td><td>Lads_Forsce.exe</td></row>
 		<row><td>AlwaysInstall</td><td>vcredist_x86.exe</td></row>
 	</table>
@@ -1914,9 +1913,9 @@
 		<row><td>lads_forsce.pdb</td><td>ISX_DEFAULTCOMPONENT</td><td>LADS_F~1.PDB|Lads_Forsce.pdb</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\Lads_Forsce.pdb</td><td>1</td><td/></row>
 		<row><td>landtype.gis</td><td>ISX_DEFAULTCOMPONENT</td><td>landtype.gis</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\landtype.gis</td><td>1</td><td/></row>
 		<row><td>lcc.gis</td><td>ISX_DEFAULTCOMPONENT</td><td>lcc.gis</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\lcc.gis</td><td>1</td><td/></row>
-		<row><td>lcc.hdr</td><td>ISX_DEFAULTCOMPONENT</td><td>lcc.hdr</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\lcc.hdr</td><td>1</td><td/></row>
-		<row><td>logfile.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>logfile.txt</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\logfile.txt</td><td>1</td><td/></row>
+		<row><td>lcc.gis.lyr</td><td>ISX_DEFAULTCOMPONENT</td><td>LCCGIS~1.LYR|lcc.gis.lyr</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\lcc.gis.lyr</td><td>1</td><td/></row>
 		<row><td>management.gis</td><td>ISX_DEFAULTCOMPONENT</td><td>MANAGE~1.GIS|management.gis</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\management.gis</td><td>1</td><td/></row>
+		<row><td>ownership.gis</td><td>ISX_DEFAULTCOMPONENT</td><td>OWNERS~1.GIS|ownership.gis</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\ownership.gis</td><td>1</td><td/></row>
 		<row><td>prob0.gis</td><td>ISX_DEFAULTCOMPONENT</td><td>prob0.gis</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\prob0.gis</td><td>1</td><td/></row>
 		<row><td>prob1.gis</td><td>ISX_DEFAULTCOMPONENT</td><td>prob1.gis</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\prob1.gis</td><td>1</td><td/></row>
 		<row><td>prob10.gis</td><td>ISX_DEFAULTCOMPONENT</td><td>prob10.gis</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\prob10.gis</td><td>1</td><td/></row>
@@ -1937,7 +1936,9 @@
 		<row><td>test.in</td><td>ISX_DEFAULTCOMPONENT</td><td>test.in</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\test.in</td><td>1</td><td/></row>
 		<row><td>test.lcc</td><td>ISX_DEFAULTCOMPONENT</td><td>test.lcc</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\test.lcc</td><td>1</td><td/></row>
 		<row><td>test.lnd</td><td>ISX_DEFAULTCOMPONENT</td><td>test.lnd</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\test.lnd</td><td>1</td><td/></row>
+		<row><td>test.own</td><td>ISX_DEFAULTCOMPONENT</td><td>test.own</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\test.own</td><td>1</td><td/></row>
 		<row><td>test.prb</td><td>ISX_DEFAULTCOMPONENT</td><td>test.prb</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\test.prb</td><td>1</td><td/></row>
+		<row><td>test.pts</td><td>ISX_DEFAULTCOMPONENT</td><td>test.pts</td><td>0</td><td/><td/><td/><td>1</td><td>E:\FORESCE_LADS\Lads_Forsce_Project\Lads_Frsce\Lads_Forsce\Debug\test.pts</td><td>1</td><td/></row>
 		<row><td>vcredist_x86.exe</td><td>vcredist_x86.exe</td><td>VCREDI~1.EXE|vcredist_x86.exe</td><td>0</td><td/><td/><td/><td>1</td><td>C:\Users\aashis.lamsal\Downloads\vcredist_x86.exe</td><td>1</td><td/></row>
 	</table>
 
@@ -2196,8 +2197,7 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td/><td/><td>_2636F003_B76F_4F76_8942_E8A50B5366F5_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_EDAA0100_835C_4BCC_B9D7_1672EB67C097_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Lads_Forsce.exe</td><td/><td/><td>_EC66A210_7DD3_4EBA_BC99_C202465A8AFD_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Lads_Forsce.exe</td><td/><td/><td>_B0CE8447_4EDC_40E5_8229_954C28DC4019_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>vcredist_x86.exe</td><td/><td/><td>_3C6102AB_A66B_4267_8A7F_C8E7E0976EC2_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
@@ -2828,7 +2828,7 @@
 		<col def="I2">Encoded</col>
 		<col def="S0">Comment</col>
 		<col def="I4">TimeStamp</col>
-		<row><td>COMPANY_NAME</td><td>1033</td><td>SDSU</td><td>0</td><td/><td>1419871148</td></row>
+		<row><td>COMPANY_NAME</td><td>1033</td><td>GIS Center</td><td>0</td><td/><td>1839299276</td></row>
 		<row><td>DN_AlwaysInstall</td><td>1033</td><td>Always Install</td><td>0</td><td/><td>1931546859</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_COLOR</td><td>1033</td><td>The color settings of your system are not adequate for running [ProductName].</td><td>0</td><td/><td>1931546859</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_OS</td><td>1033</td><td>The operating system is not adequate for running [ProductName].</td><td>0</td><td/><td>1931546859</td></row>
@@ -3642,6 +3642,8 @@
 		<row><td>IDS_SHORTCUT_DISPLAY_NAME1</td><td>1033</td><td>LaunchCHANGE0.1.exe</td><td>0</td><td/><td>1931559307</td></row>
 		<row><td>IDS_SHORTCUT_DISPLAY_NAME10</td><td>1033</td><td>LAUNCH~1.EXE|Launch vcredist_x86.exe</td><td>0</td><td/><td>1419851500</td></row>
 		<row><td>IDS_SHORTCUT_DISPLAY_NAME11</td><td>1033</td><td>LAUNCH~1.EXE|Launch Lads_Forsce.exe</td><td>0</td><td/><td>1419851532</td></row>
+		<row><td>IDS_SHORTCUT_DISPLAY_NAME12</td><td>1033</td><td>LAUNCH~1.EXE|Launch Lads_Forsce.exe</td><td>0</td><td/><td>1839272140</td></row>
+		<row><td>IDS_SHORTCUT_DISPLAY_NAME13</td><td>1033</td><td>CHANGE.exe</td><td>0</td><td/><td>1839292748</td></row>
 		<row><td>IDS_SHORTCUT_DISPLAY_NAME2</td><td>1033</td><td>LAUNCH~1.EXE|Launch Lads_Forsce.exe</td><td>0</td><td/><td>-1960719151</td></row>
 		<row><td>IDS_SHORTCUT_DISPLAY_NAME3</td><td>1033</td><td>LAUNCH~1.EXE|Launch vcredist_x86.exe</td><td>0</td><td/><td>-1960716687</td></row>
 		<row><td>IDS_SHORTCUT_DISPLAY_NAME4</td><td>1033</td><td>LAUNCH~1.EXE|Launch Lads_Forsce.exe</td><td>0</td><td/><td>-1138641652</td></row>
@@ -3939,8 +3941,8 @@
 		<row><td>IDS__TargetReq_DESC_RAM</td><td>1033</td><td>The amount of RAM is not adequate for running [ProductName].</td><td>0</td><td/><td>1931546859</td></row>
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>1931546859</td></row>
 		<row><td>ID_STRING1</td><td>1033</td><td/><td>0</td><td/><td>1931548907</td></row>
-		<row><td>ID_STRING2</td><td>1033</td><td>http://www.SDSU.com</td><td>0</td><td/><td>1419871148</td></row>
-		<row><td>ID_STRING3</td><td>1033</td><td>SDSU</td><td>0</td><td/><td>1419871148</td></row>
+		<row><td>ID_STRING2</td><td>1033</td><td>http://www.GISCenter.com</td><td>0</td><td/><td>1839299276</td></row>
+		<row><td>ID_STRING3</td><td>1033</td><td>GIS Center</td><td>0</td><td/><td>1839299276</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>LaunchCHANGE0.1.exe</td><td>0</td><td/><td>1931573643</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>LAUNCH~1.EXE|Launch Lads_Forsce.exe</td><td>0</td><td/><td>-1960729007</td></row>
 		<row><td>ID_STRING6</td><td>1033</td><td>LAUNCH~1.EXE|Launch vcredist_x86.exe</td><td>0</td><td/><td>-1960718639</td></row>
@@ -4056,6 +4058,7 @@
 		<row><td>Lads_Forsce.exe1_513E91B3EBE64981B9E0D309DA0585CD.exe</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\OS Independent\GenericExe.ico</td><td>0</td></row>
 		<row><td>Lads_Forsce.exe_17740BBF1D6B4A428B11534C758E2A49.exe</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\OS Independent\GenericExe.ico</td><td>0</td></row>
 		<row><td>Lads_Forsce.exe_2512F253034E4EF497449B05B5F89EED.exe</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\OS Independent\GenericExe.ico</td><td>0</td></row>
+		<row><td>Lads_Forsce.exe_B9492D3B089842778CCAA5E6F78C2B24.exe</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\OS Independent\GenericExe.ico</td><td>0</td></row>
 		<row><td>vcredist_x86.exe1_85214382E5CF477E90C21AF6289C37B7.exe</td><td/><td>C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\redist\1033\vcredist_x86.exe</td><td>0</td></row>
 	</table>
 
@@ -4562,8 +4565,8 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>ProductCode</td><td>{F6C639FC-DCCC-4B36-8F8C-CBAF8C6BB0FB}</td><td/></row>
-		<row><td>ProductName</td><td>CHANGE </td><td/></row>
-		<row><td>ProductVersion</td><td>0.1.00.0000</td><td/></row>
+		<row><td>ProductName</td><td>CHANGE WTH NO HYBRID</td><td/></row>
+		<row><td>ProductVersion</td><td>1.0</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
@@ -4639,7 +4642,9 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<col def="L255">FileName</col>
 		<col def="s72">DirProperty</col>
 		<col def="i2">InstallMode</col>
-		<row><td>Lads_Forsce.exe</td><td>Lads_Forsce.exe</td><td/><td>change_</td><td>2</td></row>
+		<row><td>FileKey1</td><td>Lads_Forsce.exe</td><td/><td>giscen_1_gis_center</td><td>2</td></row>
+		<row><td>FileKey2</td><td>Lads_Forsce.exe</td><td/><td>change_1_change_wth_no_hybrid</td><td>2</td></row>
+		<row><td>Lads_Forsce.exe</td><td>Lads_Forsce.exe</td><td/><td>change_1_change_wth_no_hybrid</td><td>2</td></row>
 	</table>
 
 	<table name="RemoveIniFile">
@@ -4725,7 +4730,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<col def="S255">ISComments</col>
 		<col def="S255">ISShortcutName</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>Lads_Forsce.exe</td><td>change_</td><td>##IDS_SHORTCUT_DISPLAY_NAME11##</td><td>Lads_Forsce.exe</td><td>AlwaysInstall</td><td/><td/><td/><td>Lads_Forsce.exe_2512F253034E4EF497449B05B5F89EED.exe</td><td>0</td><td>1</td><td>INSTALLDIR</td><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>Lads_Forsce.exe</td><td>change_1_change_wth_no_hybrid</td><td>##IDS_SHORTCUT_DISPLAY_NAME13##</td><td>Lads_Forsce.exe</td><td>AlwaysInstall</td><td/><td/><td/><td>Lads_Forsce.exe_B9492D3B089842778CCAA5E6F78C2B24.exe</td><td>0</td><td>1</td><td>INSTALLDIR</td><td/><td/><td/><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="Signature">
