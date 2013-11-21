@@ -35,7 +35,7 @@ int max_value= 0; // Initialize maximum value to 0
 
 void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > & grid_value,float NumberOfFiles,float rows,float columns)
 {
-   FILE *f[20];
+   FILE *f[40];
     char FileName[120];  /* Plenty large for your file naming */
 	unsigned int err;
 
@@ -84,7 +84,7 @@ void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > 
 		max_value=0; //reset max value for another probability raster
     }
 
-	//Loop through all probability files and read their rows/columns into 3D vector named grid-value[][][].
+	//Loop through all probability files and read their rows/columns into 3D vector named grid_value[][][].
     for (unsigned int nof=0; nof<NumberOfFiles;nof++)
     {
         fseek ( f[nof], 128, SEEK_SET ); //Skip 128 byte *.GIS header byte to read acutal data from prob grid. 

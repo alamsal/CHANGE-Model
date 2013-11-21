@@ -73,9 +73,8 @@ void read_demandCsv(std::vector< std::vector<std::vector< int > > > & demmat,int
   
 		while (file.good())
 		{
-			getline ( file, value, ',' ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
-			cout<<value<<"\t"<<drow<<"\t"<<dcol<<endl;
-			if (value.find('\n') != string::npos) 
+			getline ( file, value, ',' ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/			
+			if (value.find("\n") != string::npos) 
 			{
 					split_line(value, "\n",dfile,demmat);
 			} 
@@ -85,6 +84,7 @@ void read_demandCsv(std::vector< std::vector<std::vector< int > > > & demmat,int
 				demmat[dfile][drow][dcol]=stoi(value);
 				dcol++;
 			}
+			
 		}
 
 		//cout<<demand_matrix.size()<<endl;

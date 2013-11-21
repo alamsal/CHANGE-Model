@@ -31,6 +31,7 @@ short int *stategrid;	// successional stage grid
 char *comgrid;			// community type grid
 char *lccgrid;			// lcc type grid
 char *ownergrid;		//ownership type grid
+char *hnigrid;			//Human natural interface grid
 short int *timeinstage;	// time in current successional stage grid
 short int *dem;			// elevation grid
 short int *age;		    // patch age grid
@@ -181,6 +182,11 @@ float transitionThreshold[40];   // probsufaces trasition for each class
 unsigned int numOwnership;				// Number of ownership types
 unsigned int ownershipCode[40];			// ID code for ownership types
 unsigned int ownershipRestriction[40];			// Ownership restriction flag (1= Non-developable, 0=Developable)
+//Human-natural paramters
+int numHni;    //Number of HNI types
+int hniCode[40];	//Code for HNI types
+int hniRestriction[40];	// Simulation restriction on HNI - Need to think more..
+
 //demand paramters
 int numDemand;				//number of demand files
 int rowDemand;              //number of demand rows
@@ -200,8 +206,8 @@ double hiburnarea[40];		// stand-replacement area burned summary array
 double totburncount[40];	// total number of fires summary array
 
 // Probabilty surfaces container
-std::vector< std::vector<std::vector< float > > > probability_surfaces(12,std::vector<std::vector<float>>(1000,std::vector<float>(1500))); //Holds the probability surfaces rasters as 3D vector
-std::vector< std::vector<std::vector< int > > > demand_matrix(20,std::vector<std::vector<int>>(20,std::vector<int>(20))); // Holds the demand csv files
+std::vector< std::vector<std::vector< float > > > probability_surfaces; //Holds the probability surfaces rasters as 3D vector
+std::vector< std::vector<std::vector< int > > > demand_matrix; // Holds the demand csv files
 
 //temp grid to hold vegetation trasition flag (0- ready for trasition & 1- already changed & no trasnition)
 std::vector <int> tempgridFlag;
@@ -224,6 +230,7 @@ int main( int argc, char *argv[] ) {
 	char dmdfilename[80];	// input demand parameters file (FORESCE demands )
 	char ptsizefilename[80]; // input patch size parameters file
 	char ownwershipfilename[80]; // input ownwership paramters file
+	char hnifilename[80]; // input hni paramters filename
 	char yearstr[10];       // current year
 
 	int init_state[40];		// default initial state for each community type
@@ -307,6 +314,7 @@ int main( int argc, char *argv[] ) {
 	struct image_header dem_head;		// ERDAS file header for dem grid
 	struct image_header com_head;       // ERDAS file head for age grid
 	struct image_header lcc_head;		// ERDAS file head for lcc grid
+	struct image_header hni_head;		// ERDAS file head for hni grid
 	struct image_header owner_head;		// ERDAS file head for owner grid
 	struct image_header state_head;		// ERDAS file header for successional stage grid
 	struct image_header bioage_head;    // ERDAS file head for bioage grid
@@ -334,10 +342,17 @@ int main( int argc, char *argv[] ) {
 	strcat(prbfilename,".prb");		// Probability parameters file
 	strcpy(dmdfilename,runname);
 	strcat(dmdfilename,".dmd");		// Demand paramters file
+	
 	strcpy(ptsizefilename,runname);
 	strcat(ptsizefilename,".pts");  // Patch size distribution paraters file
+	
 	strcpy(ownwershipfilename,runname); //Ownership parameters file
 	strcat(ownwershipfilename,".own");
+
+	strcpy(hnifilename,runname);
+	strcat(hnifilename,".hni");
+
+
 
 	//Check parameter files existance
 	input_error_flag=0; //Check file input error if flag=1
@@ -367,6 +382,7 @@ int main( int argc, char *argv[] ) {
 	ifstream indmdfile;
 	ifstream inptsizefile;
 	ifstream inownershipfile;
+	ifstream inhnifile;
 
 	// Read main input file
 	infile >> cellsize; infile.ignore(100, '\n');
@@ -602,6 +618,20 @@ int main( int argc, char *argv[] ) {
 	}
 	inownershipfile.close();
 
+	//Read Human-nature interface parameter file
+	inhnifile.open(hnifilename);
+	inhnifile>>numHni; inhnifile.ignore(100,'\n');
+	std::cout<< "Total # of HNI layers: "<<numHni<<endl;
+	inhnifile.ignore(100,'\n');// Skip to the new line
+	std::cout<<"Code \t Restricion"<<endl;
+	for(unsigned int nnhi=0;nnhi<numHni; nnhi++)
+	{
+		inhnifile>>hniCode[nnhi]>>hniRestriction[nnhi];inhnifile.ignore(100,'\n');
+		std::cout<<hniCode[nnhi]<<"\t"<< hniRestriction[nnhi]<<endl; 
+
+	}
+	inhnifile.close();
+
 	//Read probability sufrace paramter file
 	inprbfile.open(prbfilename);
 	inprbfile>>numProbsurface;inprbfile.ignore(100,'\n');
@@ -617,6 +647,16 @@ int main( int argc, char *argv[] ) {
 
 	inprbfile.close();
 
+	// Crreate or resize  the probability surface vector size to make dynamic  size
+	probability_surfaces.resize(numProbsurface);
+	for(unsigned int i=0;i<numProbsurface;i++)
+	{
+		probability_surfaces[i].resize(probRows);
+		for(unsigned int j=0;j<probRows;j++)
+		{
+			probability_surfaces[i][j].resize(probColumns);
+		}
+	}
 	// Read probability surfaces raster files
 	read_probabilitySurfaces(probability_surfaces,numProbsurface,probRows,probColumns);
 	probability_surfaces;
@@ -734,6 +774,7 @@ int main( int argc, char *argv[] ) {
 	comgrid = new char[size];
 	lccgrid= new char[size];
 	ownergrid= new char[size];
+	hnigrid=new char[size];
 	timeinstage = new short int[size];
 	age = new short int[size];
 	tsfire = new short int[size];
@@ -829,6 +870,8 @@ int main( int argc, char *argv[] ) {
 		}
 		//Read grid ownership.gis
 		owner_head=read_grid("ownership",ownergrid);
+		//Read grid hni.gis
+		hni_head=read_grid("inithni",hnigrid);
 		// Read grid community.gis
 		com_head = read_grid("community", comgrid);  
 		//Compare # of class in community grid with runname.ctp file
@@ -1015,6 +1058,18 @@ int main( int argc, char *argv[] ) {
 	endy = 0;
 	//gen_forescesnapshot(runname, 50, buffer_head, snapsum, 0);
 	//Integrating buffer with LCC type added by Ashis 12/18/2012
+	
+	// Create or resize  the demand matrix grid to make dynamic  size
+	demand_matrix.resize(numDemand);
+	for(unsigned int i=0;i<numDemand;i++)
+	{
+		demand_matrix[i].resize(rowDemand);
+		for(unsigned int j=0;j<rowDemand;j++)
+		{
+			demand_matrix[i][j].resize(colDemand);
+		}
+	}
+	cout<<"Reading demand matrix csvs..."<<endl;
 	read_demandCsv(demand_matrix,numDemand,rowDemand,colDemand);
 	demand_matrix;	
 
