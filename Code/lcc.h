@@ -20,6 +20,7 @@ extern char *lccgrid;           // lcc classes grid
 extern char *buffer;			// fire buffer zone grid
 extern char *comgrid;			// community type grid
 extern char *ownergrid;			// ownership type grid
+extern char *hnigrid;
 extern short int *stategrid;	//successional state
 //Patch Size parameters
 extern unsigned int pts_distanceLag[40];	 // Input patch distance lag
@@ -52,6 +53,7 @@ extern int numProbsurface; // Number of probability surfaces
 extern float transitionThreshold[40]; // Trasitin threshold for each probability class
 extern ofstream writelog; //log file	
 
+extern 
 // Hold filtered raster cells
 struct lccCells
 {
@@ -64,24 +66,27 @@ extern std::vector< std::vector<std::vector< int > > > demand_matrix;  //Contain
 extern std::vector< std::vector<std::vector< float > > >probability_surfaces; //Holds the probability surfaces rasters as 3D vector
 
 extern std::vector<int> tempgridFlag;		//temp grid to hold vegetation trasition flag (0- ready for trasition & 1- already changed & no trasnition)
-
+extern std::vector<int>hnitempgridFlag;     //temp grid to hold hni trasition flag (0- ready for trasition & 1- already changed & no trasnition)
 //Function prototypes
 void merg_lccBuffer();	//Merging original buffer with LCC.
 void merg_lccSnapshot(); // Merging lcc class into output grid snapshot.
-void extract_changeCells(int demperiod);//Extract LCC cells goint to change
+void extract_lcccells(int demperiod);//Extract LCC cells goint to change
+//Extract and allocte HNI
+void extract_hnicells(int demperiod);
 
-
-
+bool cellTrasition(int cellindex, int lcccode, bool hni_trasition);
 
 void allocate_lccCells(int demandperiod); //allocate  LCC cells
 
-void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand,unsigned int lag);// Allocate space in lcc grid as well as change the community type
+void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand,unsigned int lag,bool ishni_transition);// Allocate space in lcc grid as well as change the community type
 
 void reclassify_lclu(unsigned int stateout[],unsigned int lclustate[],unsigned int statecounter);
 
-std::vector<lccCells> fillEightNeighborhood(std::vector<lccCells> vecobj, int row, int col,int lcccode,int prob_index,int &demand, int &patch_size); // Recursive function to change the landscape's transition
+std::vector<lccCells> fillEightNeighborhood(std::vector<lccCells> vecobj, int row, int col,int lcccode,int prob_index,int &demand, int &patch_size,bool ishni); // Recursive function to change the landscape's transition
 
-//std::vector <lccCells> ext_Cells(char *lccgridname); //Extract vector of cells from LLC
+
+//Get all eligible trasition cells into a vector; vector stores row & columns of all LCC classes including LCC to hni
+std::vector<std::map<int,vector<lccCells> > > getextractedCells(std::vector<std::map<int,vector<lccCells> > > &temp_lcc);
 
 std::map <int,std::vector <lccCells> > extract_LandCoverCells(int lccCode); // Extract LCC cells based upon lcccode
 

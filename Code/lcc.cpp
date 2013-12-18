@@ -9,29 +9,31 @@
 //#include <boost/array.hpp>			//Got this error after VS & Java udpate but not sure which one casue this one need to figure out for parallel threads.
 //#include <boost/lambda/lambda.hpp>
 
-#include <iostream>
-#include <map>
-#include <vector>
-#include <cstdlib>
-#include <string>
-#include <algorithm>
-#include <fstream>
 #include "ladsio.h"
 #include "lcc.h"
+#include "lads.h"
 #include "randnum.h"
 #include "celllist.h"
 #include "probSurface.h"
 #include "demand.h"
 #include "lccGrow.h"
-# define NO_OF_ITERATION 10000
+#include "hni.h"
+#include <iostream>
+#include <vector>
+#include <map>
+#include <cstdlib>
+#include <string>
+#include <algorithm>
+#include <fstream>
+
+# define NO_OF_ITERATION 10
 
 using namespace std;
 
 
 std::vector<lccCells> neighborVecObjList, neighbourVecCells;// vector to hold 8 neighborhing cells from all eligible cells temporaily
-
-
-
+//std::map<int,vector<lccCells> > extracted_lcc[50]; // Extracted  cells from LCC
+std::vector<std::map<int,vector<lccCells> > > extracted_lcc;
 
 // Merge buffer cells and Non Vegetated areas (with LCC flag 0) with buffer to prevent them from burning during LADS simulation.
 void merg_lccBuffer()
@@ -111,7 +113,7 @@ bool getNeighbour(int row,int col,int lcccode)
 	}
 
 }
-//
+//LCC neighbour lag
 bool getNeighbourLag(int row,int col,int lcccode,int lagdistance)
 {
 	int rwlag=-lagdistance;
@@ -153,72 +155,113 @@ bool getNeighbourLag(int row,int col,int lcccode,int lagdistance)
 		}
 	}
 }
-bool cellTrasition(int cellindex, int lcccode)
+bool cellTrasition(int cellindex, int lcccode, bool hni_trasition)
 {
-	int cellValue= (int)lccgrid[cellindex];
-	bool toHuman=true;
-	for( unsigned int i=0; i<numlcc;i++)
+	//Allow broad LCLU classes transitions only on hni cells
+	//HNI Cells can either go to Natural or Human
+	//In both cases HNI no longer exist in HNI cell and hnigrid[index]=0 and lccgrid[index]=lcccode along with other veg and non veg parameters to look around.
+	int nohnicode=1;
+	if(hni_trasition)  // Trasitions to/from hni to broader lcc
 	{
-		//Trasition from Human dominted to Nature and Human dominated to Human
-		if((cellValue==inlcccode[i]) && (lcc_flag[i]==0))
+		bool natural=false;
+		for(unsigned int l=0;l<numlcc;l++)
 		{
-			for(unsigned int j=0; j<numlcc;j++)
+			if(hnitempgridFlag[cellindex]==0)
 			{
-				if((lcccode==inlcccode[j])&&(lcc_flag[j]==1))
+				if((lcccode==inlcccode[l])&&(lcc_flag[l]==1)) //Natrual trasition flag 1=Nat, 0=human
 				{
-					stategrid[cellindex]=1;			// When forsce simulate veg to veg/ non-veg to veg the successional stage= 1;timeinstage =0; age=0; time since fire=0. 
-					// When forsce simulate non-veg to non-veg * veg to non-veg the buffer is  set to 0, which will handle by "merg_lccBuffer()" after the completion this demand allocation look at lads.cpp.
-					timeinstage[cellindex]=1;		// time in current successional stage grid
-					age[cellindex]=1;				// patch age grid
-					lccgrid[cellindex]=inlcccode[j];
-					tsfire[cellindex]=1;			// time since last fire grid
-					buffer[cellindex]=1;			//Active simulation
-					tempgridFlag[cellindex]=1;		// To prevent from further trasition of the same cell
-					toHuman=false;
+					hnigrid[cellindex]=nohnicode; // All succession states, regimes,lcc code and parameters  already out there. Just flip to hni or non hni.
+					hnitempgridFlag[cellindex]=1;
+					return true;
+					break;
+				}
+				else
+				{
+					hnitempgridFlag[cellindex]=1;
+					hnigrid[cellindex]=nohnicode;
+					lccgrid[cellindex]=lcccode;     // Assign new LCC class
+					buffer[cellindex]=0;			//Prevent from simulation human dominated cell
 					return true;
 					break;
 				}
 			}
-			if(toHuman)
-			{
-				lccgrid[cellindex]=lcccode; 
-				buffer[cellindex]=0;			//Prevent from simulation human dominated cell
-				tempgridFlag[cellindex]=1;		// To prevent from further trasition of the same cell
-				return true;
-
-			}
-
-
+			return false;
 		}
-		//Trasition from Nature to Nature (No pixel transition-just for reference) and Nature to Human
-		else
-		{
-			if((cellValue==inlcccode[i]) && (lcc_flag[i]==1))
+
+	}
+	//Allow broad LCLU classes transitions only on non hni cells
+	else
+	{
+		if((int)hnigrid[cellindex]==nohnicode)
+		{	
+			int cellValue= (int)lccgrid[cellindex];
+			bool toHuman=true;
+
+			for( unsigned int i=0; i<numlcc;i++)
 			{
-				for(unsigned int k=0;k<numlcc;k++)
+				//Trasition from Human dominted to Nature and Human dominated to Human
+				if((cellValue==inlcccode[i]) && (lcc_flag[i]==0))
 				{
-					if((lcccode==inlcccode[k])&&(lcc_flag[k]==1))
+					for(unsigned int j=0; j<numlcc;j++)
 					{
-						return false;
-						break;
+						if((lcccode==inlcccode[j])&&(lcc_flag[j]==1))
+						{
+							stategrid[cellindex]=1;			// When forsce simulate veg to veg/ non-veg to veg the successional stage= 1;timeinstage =0; age=0; time since fire=0. 
+							// When forsce simulate non-veg to non-veg * veg to non-veg the buffer is  set to 0, which will handle by "merg_lccBuffer()" after the completion this demand allocation look at lads.cpp.
+							timeinstage[cellindex]=1;		// time in current successional stage grid
+							age[cellindex]=1;				// patch age grid
+							lccgrid[cellindex]=inlcccode[j];
+							tsfire[cellindex]=1;			// time since last fire grid
+							buffer[cellindex]=1;			//Active simulation
+							tempgridFlag[cellindex]=1;		// To prevent from further trasition of the same cell
+							toHuman=false;
+							return true;
+							break;
+						}
 					}
-					else
+					if(toHuman)
 					{
 						lccgrid[cellindex]=lcccode; 
 						buffer[cellindex]=0;			//Prevent from simulation human dominated cell
 						tempgridFlag[cellindex]=1;		// To prevent from further trasition of the same cell
 						return true;
+
 					}
+
+
+				}
+				//Trasition from Nature to Nature (No pixel transition-just for reference) and Nature to Human
+				else
+				{
+					if((cellValue==inlcccode[i]) && (lcc_flag[i]==1))
+					{
+						for(unsigned int k=0;k<numlcc;k++)
+						{
+							if((lcccode==inlcccode[k])&&(lcc_flag[k]==1))
+							{
+								return false;
+								break;
+							}
+							else
+							{
+								lccgrid[cellindex]=lcccode; 
+								buffer[cellindex]=0;			//Prevent from simulation human dominated cell
+								tempgridFlag[cellindex]=1;		// To prevent from further trasition of the same cell
+								return true;
+							}
+						}
+
+					}
+
 				}
 
 			}
-
 		}
-
+		else
+		{
+			return false;
+		}
 	}
-
-
-
 
 }
 
@@ -339,7 +382,7 @@ std::vector<lccCells> fillEightNeighborhood(std::vector<lccCells> vecobj, int ir
 	return(neighborVecObj);
 }
 //Find neighbourhood based on lag distance
-std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int lcccode,int prob_index,int &demand, int &patch_size, int dlag)
+std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int lcccode,int prob_index,int &demand, int &patch_size, int dlag,bool hni_trasition)
 {
 	std::vector<lccCells> neighborVecObj; // vector to hold 8 neighborhing cells temporaily
 	int initdem=demand;
@@ -388,64 +431,78 @@ std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, i
 							{
 								if(demand>0 && patch_size<meanpatchSize)
 								{
-									if((index1==index2) && (tempgridFlag[index1]==0) && (tempLaggrid[index1]==0))  
-										//if((index1==index2) && (tempgridFlag[index1]==0))  
-									{ 
-										tempCells.lccCol=ilcccol2;
-										tempCells.lccRow=ilccrow2;
-										neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
-										tempLaggrid[index1]=1;
-										/*
-										if(lccgrid[index1]!=lcccode)
-										{
-										while((iterationflag) && (iteration_count3<NO_OF_ITERATION))
-										{
-										//Get the transitional probability value;
-										trans_probaility=(double)(probability_surfaces[prob_index][ilccrow2][ilcccol2]);
-										//Generate a uniform random variable;
-										irand=u0_1();
-										if(irand<trans_probaility)
-										{
-
-										//			int index_value= (int)(lccgrid[index1]);
-										//			//If FORSCE change the cell transition form non-veg to vegetated; we must assign succesational stage [index]==1 to start future successional stages.
-										//			if(((index_value==11)||(index_value==12)||(index_value==20)||(index_value==30)||(index_value==81)||(index_value==82)||(index_value==41)||(index_value==42)||(index_value==43)||(index_value==52)||(index_value==71))&&((lcccode==41)||(lcccode==42)||(lcccode==52)||(lcccode==71)))	
-										//			{												//Put the smallest value from state,initage,and tsfire grids
-										//				stategrid[index1]=1; // When forsce simulate veg to veg/ non-veg to veg the successional stage= 1;timeinstage =0; age=0; time since fire=0. 
-										//										// When forsce simulate non-veg to non-veg * veg to non-veg the buffer is  set to 0, which will handle by "merg_lccBuffer()" after the completion this demand allocation look at lads.cpp.
-										//				timeinstage[index1]=1;	// time in current successional stage grid
-										//				age[index1]=5;		    // patch age grid
-										//				lccgrid[index1]=lcccode;
-										//				tsfire[index1]=1;      // time since last fire grid
-										//				buffer[index1]=1;		//Active simulation
-										//				tempgridFlag[index1]=1;		// To prevent from further trasition of the same cell
-										//
-										//			}
-										//			else
-										//			{
-										//				lccgrid[index1]=lcccode; 
-										//				buffer[index1]=0;			//Prevent from simulation human dominated cell
-										//				tempgridFlag[index1]=1;		// To prevent from further trasition of the same cell
-										//			}
-
-
-										bool transFlag=cellTrasition(index1,lcccode);
-
-										if(transFlag)
-										{
-										demand--;
-										patch_size++;
-										iterationflag=false;
-										iteration_count3++;
-										writelog<< "Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<endl; 
+									if(hni_trasition)
+									{
+										if((index1==index2) && (tempgridFlag[index1]==0) && (tempLaggrid[index1]==0) && (hnitempgridFlag[index1]==0))  
+											 
+										{ 
+											tempCells.lccCol=ilcccol2;
+											tempCells.lccRow=ilccrow2;
+											neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
+											tempLaggrid[index1]=1;
+										
 										}
-
-										}
-										}
-
-										} */
 									}
+									else
+									{
+										if((index1==index2) && (tempgridFlag[index1]==0) && (tempLaggrid[index1]==0))  
+											//if((index1==index2) && (tempgridFlag[index1]==0))  
+										{ 
+											tempCells.lccCol=ilcccol2;
+											tempCells.lccRow=ilccrow2;
+											neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
+											tempLaggrid[index1]=1;
+											/*
+											if(lccgrid[index1]!=lcccode)
+											{
+											while((iterationflag) && (iteration_count3<NO_OF_ITERATION))
+											{
+											//Get the transitional probability value;
+											trans_probaility=(double)(probability_surfaces[prob_index][ilccrow2][ilcccol2]);
+											//Generate a uniform random variable;
+											irand=u0_1();
+											if(irand<trans_probaility)
+											{
 
+											//			int index_value= (int)(lccgrid[index1]);
+											//			//If FORSCE change the cell transition form non-veg to vegetated; we must assign succesational stage [index]==1 to start future successional stages.
+											//			if(((index_value==11)||(index_value==12)||(index_value==20)||(index_value==30)||(index_value==81)||(index_value==82)||(index_value==41)||(index_value==42)||(index_value==43)||(index_value==52)||(index_value==71))&&((lcccode==41)||(lcccode==42)||(lcccode==52)||(lcccode==71)))	
+											//			{												//Put the smallest value from state,initage,and tsfire grids
+											//				stategrid[index1]=1; // When forsce simulate veg to veg/ non-veg to veg the successional stage= 1;timeinstage =0; age=0; time since fire=0. 
+											//										// When forsce simulate non-veg to non-veg * veg to non-veg the buffer is  set to 0, which will handle by "merg_lccBuffer()" after the completion this demand allocation look at lads.cpp.
+											//				timeinstage[index1]=1;	// time in current successional stage grid
+											//				age[index1]=5;		    // patch age grid
+											//				lccgrid[index1]=lcccode;
+											//				tsfire[index1]=1;      // time since last fire grid
+											//				buffer[index1]=1;		//Active simulation
+											//				tempgridFlag[index1]=1;		// To prevent from further trasition of the same cell
+											//
+											//			}
+											//			else
+											//			{
+											//				lccgrid[index1]=lcccode; 
+											//				buffer[index1]=0;			//Prevent from simulation human dominated cell
+											//				tempgridFlag[index1]=1;		// To prevent from further trasition of the same cell
+											//			}
+
+
+											bool transFlag=cellTrasition(index1,lcccode);
+
+											if(transFlag)
+											{
+											demand--;
+											patch_size++;
+											iterationflag=false;
+											iteration_count3++;
+											writelog<< "Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<endl; 
+											}
+
+											}
+											}
+
+											} */
+										}
+									}
 								}
 							}
 
@@ -469,7 +526,7 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(int lccCode)
 {
 	unsigned int index; // array index
 	unsigned int node_counter=0; //Counter to track the lenght of forest list.
-
+		
 	lccCells tempLcc; // Struct object to store row and columns of a raster cell.
 
 	std::map<int,vector<lccCells> > ext_lcc_vector;	// Map of vectors containing sturcuture to hold all extracted values based upon probability surfaces, LCC, and ownership.
@@ -483,15 +540,13 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(int lccCode)
 		for(unsigned int col=0; col<maxcol; col++) 
 		{
 			index=row*maxcol + col;			
-
-			if(lccgrid[index]==lccCode) //Extract LCC class based upon lcc code 
+			if((lccgrid[index]==lccCode)&&(hnigrid[index]==1)) //Extract LCC class based upon lcc code and cells that are not in HNI grid
 			{
 				//filter Lcc based on owenership type and development restriction
 				for (unsigned int olayer=0;olayer<numOwnership;olayer++)
 				{
 					if((ownergrid[index]==ownershipCode[olayer]) &&	(ownershipRestriction[olayer]==0))
 					{
-
 						/*
 						if((probability_surfaces[0][row][col])>0.95)			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
 						{
@@ -557,11 +612,12 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(int lccCode)
 						*/
 						for (unsigned int i=0;i<numProbsurface;i++)
 						{
-							if((probability_surfaces[i][row][col])>transitionThreshold[i])			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
+							if((probability_surfaces[i][row][col])>(transitionThreshold[i]))			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
 							{
 								tempLcc.lccRow=row;
 								tempLcc.lccCol=col;
 								ext_lcc_vector[i].push_back(tempLcc);
+
 							}
 
 						}
@@ -572,25 +628,44 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(int lccCode)
 
 			}
 		}
-	}		
+	}	
+	
+	
 
 	return ext_lcc_vector;
 }
-
-
-//Make a list of cells that are going to change
-void extract_changeCells(int demperiod)
+//Extract and allocte HNI
+void extract_hnicells(int demperiod)
 {
+	extract_allocate_lcc2hni(demperiod);
+	allocate_hni2lcc(demperiod);
+	
+}
+
+
+//Extract and allocate borader LCC
+void extract_lcccells(int demperiod)
+{	
 	allocate_lccCells(demperiod);
 }
+
+//Get all eligible trasition cells into a vector; vector stores row & columns of all LCC classes including LCC to hni
+std::vector<std::map<int,vector<lccCells> > > getextractedCells(std::vector<std::map<int,vector<lccCells> > > &temp_lcc)
+{
+	temp_lcc.clear();
+	for (unsigned int i=0;i<numlcc;i++)
+	{
+		extract_LandCoverCells(inlcccode[i]);
+		temp_lcc.push_back(extract_LandCoverCells(inlcccode[i]));
+	}
+	return temp_lcc;
+}
+
 
 
 //Spatial allocation of Demands
 void allocate_lccCells(int demperiod)
 {
-
-	// Extracted  cells from LCC
-	std::map<int,vector<lccCells> > extracted_lcc[50];
 	/*
 	extracted_lcc[0]=extract_LandCoverCells(11); // Extract water cells from LCC
 	extracted_lcc[1]=extract_LandCoverCells(12); // Extract ice/snow cells from LCC
@@ -605,21 +680,19 @@ void allocate_lccCells(int demperiod)
 	extracted_lcc[10]=extract_LandCoverCells(90); // Extract cropland cells from LCC
 	extracted_lcc[11]=extract_LandCoverCells(95); // Extract cropland cells from LCC
 	*/
-	for (unsigned int i=0;i<numlcc;i++)
-	{
-		extracted_lcc[i]=extract_LandCoverCells(inlcccode[i]);
-	}
+		
+	getextractedCells(extracted_lcc);
 
 	std::map<int,vector<lccCells> > lcc_cells;
 	std::vector<lccCells> vec_lcc_cells;
 
 	//Read demand file in row/column order
-	for(unsigned int i=0; i<rowDemand;i++)	// Total
+	for(unsigned int row=0; row<numlcc;row++)	// Total rows upto LCC number notup to demand file to prevent HNI simulation here
 	{
-		for (unsigned int j=0; j<colDemand; j++)
+		for (unsigned int col=0; col<numlcc; col++)// Total columns  upto LCC number notup to demand file to prevent HNI simulation here
 		{
-			//cout<<"("<<i<<","<<j<<")"<<demand_matrix[i][j]<<"\t";
-			if(i==j)		//No demand allocation diagonally 
+			//cout<<"("<<row<<","<<col<<")"<<demand_matrix[row][col]<<"\t";
+			if(row==col)		//No demand allocation diagonally 
 			{
 				cout<<"No demand allocation"<<endl;
 
@@ -627,19 +700,17 @@ void allocate_lccCells(int demperiod)
 			else
 			{
 				//demand value comes from here..
-				//int demand=(int)demand_matrix[i][j][dfile];	//Convert from string type to integer.
-				int demand=(int)demand_matrix[demperiod][i][j];
-				lcc_cells=extracted_lcc[i];
+				//int demand=(int)demand_matrix[row][col][dfile];	//Convert from string type to integer.
+				int demand=(int)demand_matrix[demperiod][row][col];
+				lcc_cells=extracted_lcc[row];
 
-				vec_lcc_cells=lcc_cells[j];
+				vec_lcc_cells=lcc_cells[col];
+				
+				cout<<"Eligible cell#:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<" To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand<<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_pathSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col] <<endl;
+				writelog<<"Eligible cell#:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<"To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand <<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_pathSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col]<<endl;
 
-				//Generate mean patch size from normal distribution
-				meanpatchSize=genLCCPatchSize(pts_pathSize[j],pts_stdDeviation[j]);
-				cout<<"Eligible cell#:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[i]<<" To:"<<inlcccode[j] <<" Psurface#: "<<j <<" Demand#:"<<demand<<" Lag#" <<pts_distanceLag[j]<<" Psize#" << pts_pathSize[j]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[j] <<endl;
-				writelog<<"Eligible cell#:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[i]<<"To:"<<inlcccode[j] <<" Psurface#: "<<j <<" Demand#:"<<demand <<" Lag#" <<pts_distanceLag[j]<<" Psize#" << pts_pathSize[j]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[j]<<endl;
-
-				//Feed for spatial allocation
-				space_allocation(vec_lcc_cells,inlcccode[j],j,demand,pts_distanceLag[j]);
+				//Feed for spatial allocation of broader LCC classes only ( No hni simulation- ishni_trasition=false)
+				space_allocation(vec_lcc_cells,inlcccode[col],col,demand,pts_distanceLag[col],false);
 			}
 
 		}
@@ -656,7 +727,7 @@ Parameters: Extracted LCLU cell vectors to change, lcccode to be assigned after 
 
 Returns:	
 ****************************************************************************/
-void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand, unsigned int dlag)
+void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand, unsigned int dlag, bool ishni_transition)
 {
 	unsigned int lag=dlag;
 	int rand_forestrow;
@@ -671,8 +742,8 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 	int neighdemand=0;
 	bool fillNeighbour=false;	//flag to enable  neighbouring pixel  to fill
 	bool afterIteraiton=false;  //flag to enable setting pixel change on not adjacent neighbourig cells after preset total no# iteration accomplished . To prevent from infinite loop during demand allocation
-
-	if(((demand>0) && (vecobj.size()>0)) && (demand<=vecobj.size())) //if(((demand>0) && (vecobj.size()>0)))	
+	int patchcol=prob_index;	// column value to generate patch from index
+	if(((demand>0) && (vecobj.size()>0)) && (demand<=vecobj.size())) 
 	{
 		//cout<< "Start Demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Transition prob pixel #::" <<vecobj.size() << endl;
 
@@ -680,6 +751,10 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 		{
 			olddemand=demand;
 			patch_size=0;
+			
+			//Generate mean patch size from normal distribution
+			meanpatchSize=genLCCPatchSize(pts_pathSize[patchcol],pts_stdDeviation[patchcol]);
+			
 			neighborVecObjList.clear();
 			neighbourVecCells.clear();
 			//Generare a random integer between 1 and cell length.
@@ -705,7 +780,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 					if(((lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) ))
 					{
 
-						bool transFlag=cellTrasition(cell_index,lcccode);
+						bool transFlag=cellTrasition(cell_index,lcccode,ishni_transition);
 
 						if(transFlag)
 						{
@@ -719,7 +794,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 								vecobj.begin(); 
 							}
 							//neighbourVecCells=fillEightNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size); // Works under 8 neighbourhoood
-							neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,lag);// Works under distance lag
+							neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,lag,ishni_transition);// Works under distance lag
 							fillNeighbour=true;
 							writelog<< "Code:3-Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter1<< endl; 
 						}					
@@ -728,11 +803,11 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 				case false:
 					//if(((getNeighbour(rand_forestrow,rand_forestcol,lcccode)) && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )) //Prevnet model to put seed pixel randomly on the landscape :enforce adjacency
 					//if((lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0)) //Folloing Mike's comment to put seed pixel randomly on the landscape
-					if((getNeighbourLag(rand_forestrow,rand_forestcol,lcccode,lag))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0)) //Prevnet model to put seed pixel randomly on the landscape :enfore lag distance
+					if((getNeighbourLag(rand_forestrow,rand_forestcol,lcccode,lag))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0)) //Prevnet model to put seed pixel randomly on the landscape :enforce lag distance
 
 					{
 
-						bool transFlag=cellTrasition(cell_index,lcccode);
+						bool transFlag=cellTrasition(cell_index,lcccode,ishni_transition);
 
 						if(transFlag)
 						{
@@ -746,7 +821,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 								vecobj.begin(); 
 							}
 							//neighbourVecCells=fillEightNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size); // Works under 8 neighbourhoood
-							neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,lag); //Works under distance lago neighbourhood
+							neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,lag,ishni_transition); //Works under distance lago neighbourhood
 							fillNeighbour=true;
 							writelog<< "Code:1-Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter1<< endl; 
 						}					
@@ -809,7 +884,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 							if((getNeighbourLag(neighrow,neighcol,lcccode,lag))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )  //Enforce distance lag while cell transtion
 							{
 
-								bool transFlag=cellTrasition(cell_index,lcccode);
+								bool transFlag=cellTrasition(cell_index,lcccode,ishni_transition);
 
 								if(transFlag)
 								{
@@ -825,7 +900,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 									}
 
 									//neighborVecObjList=fillEightNeighborhood(vecobj,neighrow,neighcol,lcccode,prob_index,demand,patch_size); // Works under 8 neighbourhoood
-									neighborVecObjList=fillNeighborhood(vecobj,neighrow,neighcol,lcccode,prob_index,demand,patch_size,lag); //Works under distance lag neighbourhood
+									neighborVecObjList=fillNeighborhood(vecobj,neighrow,neighcol,lcccode,prob_index,demand,patch_size,lag,ishni_transition); //Works under distance lag neighbourhood
 									neighbourVecCells.insert(neighbourVecCells.end(),neighborVecObjList.begin(),neighborVecObjList.end());
 
 									writelog<< "Code:2-Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter2<< endl; 

@@ -95,7 +95,7 @@ void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > 
             {
               unsigned int tvar = (unsigned int) fgetc(f[nof]);
               grid_value[nof][row][col]=(float)tvar/(probabilitymax[nof]);
-             // cout<<"("<<nof<<","<<col+1<<","<<row+1<<")"<<grid_value[nof][row][col]<<"\t";
+             //cout<<"("<<nof<<","<<col+1<<","<<row+1<<")"<<grid_value[nof][row][col]<<"\t";
 			  if(grid_value[nof][row][col]<0)
 			  {
 				  cout<<"Hit the -ve Value !! in the Probability GIS file. Program is Ready to quit...."<<endl;

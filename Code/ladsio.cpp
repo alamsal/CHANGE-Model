@@ -689,3 +689,34 @@ void gen_forescesnapshot( char *runname, int year, struct image_header out_head,
 
     return;
 }
+void gen_hnisnapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum )
+{
+	int row;                // row counter
+    int col;                // column counter
+    int index;              // array index
+    short int struc;        // forest structure index
+    char yearstr[10];       // current summary year
+    char outfilename[30];   // output file name
+
+    // open output file
+    strcpy(outfilename, runname);
+    itoa(year, yearstr, 10);
+    strcat(outfilename, yearstr);
+    strcat(outfilename, ".gis");
+
+    // write grids to output files
+    if (snapsum > 0) {
+	    unsigned char* hni;
+		hni=reinterpret_cast<unsigned char*>(hnigrid);
+		write_grid(outfilename, hni, out_head);
+		
+
+		
+    }
+
+    return;
+}
+void gen_asciioutput()
+{
+
+}

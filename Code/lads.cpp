@@ -7,10 +7,6 @@
 // Modified: Aashis Lamsal
 // Last Update:	1/4/2008
 //----------------------------------------------------------------------------
-#include <iostream>
-#include <string.h>
-#include <vector>
-#include "stdafx.h"
 #include "lads.h"
 #include "ladsio.h"
 #include "randnum.h"
@@ -22,6 +18,12 @@
 #include "probSurface.h"
 #include "errorCheck.h"
 #include "demand.h"
+#include "hni.h"
+
+#include <iostream>
+#include <string.h>
+#include <vector>
+#include "stdafx.h"
 
 using namespace std;
 
@@ -210,7 +212,7 @@ std::vector< std::vector<std::vector< float > > > probability_surfaces; //Holds 
 std::vector< std::vector<std::vector< int > > > demand_matrix; // Holds the demand csv files
 
 //temp grid to hold vegetation trasition flag (0- ready for trasition & 1- already changed & no trasnition)
-std::vector <int> tempgridFlag;
+std::vector <int> tempgridFlag,hnitempgridFlag;
 //log file
 ofstream writelog("logfile.txt",fstream::out|fstream::app);
 
@@ -1081,9 +1083,14 @@ int main( int argc, char *argv[] ) {
 		//cout<<strlen((char*)tempGridFlag)<<endl;
 		tempgridFlag.clear();
 		tempgridFlag.resize(size,0);
-
+		
+		hnitempgridFlag.clear();         // holds hni trasition flags temporarily
+		hnitempgridFlag.resize(size,0);  // memory allocation 
+		//Implement HNI algorithm
+		extract_hnicells(demperiod);
+		gen_hnisnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
 		// Implement fORSCE algorithm
-		extract_changeCells(demperiod); 
+		extract_lcccells(demperiod); 
 		//gen_forescesnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
 		merg_lccBuffer(); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
 		//gen_forescesnapshot(runname, 60+demperiod, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.

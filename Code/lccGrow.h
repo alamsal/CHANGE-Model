@@ -6,6 +6,8 @@
 //----------------------------------------------------------------------------
 #ifndef lccGrowH
 #define lccGrowH
+
+using namespace std;
 //Generate LCC patch size from patch mean and patch standard deviation - Normal distribution
  int genLCCPatchSize(int meanpatch, int stddev);
 
