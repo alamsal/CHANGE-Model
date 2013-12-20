@@ -16,9 +16,10 @@
 #include <string>
 
 # define  hnicode 2
-
+# define NO_OF_ITERATIONHNI 10
 using namespace std;
 
+std::vector<lccCells> hni_neighborVecObjList, hni_neighbourVecCells;// vector to hold 8 neighborhing cells from all eligible cells temporaily
 //extract eligible cells from hni to LCC
 //ext_hni2lcc_vector - Map of vectors containing sturcuture to hold all extracted values based upon probability surfaces, LCC, and ownership.
 
@@ -32,8 +33,8 @@ void extract_hni2lcc(std::map<int,vector<lccCells> > &ext_hni2lcc_vector)
 		for(unsigned int hcol=0;hcol<maxcol;hcol++)
 		{
 			hindex=hrow*maxcol+hcol;
-			//Extracting hni cells only 2 are hni grid
-			if((int)hnigrid[hindex]==2)
+			//Extracting hni cells only 2 are hni grid and evergreen
+			if((int)hnigrid[hindex]==2 && (lccgrid[hindex]==42))
 			{
 				//filter Lcc based on owenership type and development restriction
 				for (unsigned int olayer=0;olayer<numOwnership;olayer++)
@@ -56,6 +57,38 @@ void extract_hni2lcc(std::map<int,vector<lccCells> > &ext_hni2lcc_vector)
 		}
 	}
 }
+
+//Allocate cells from hni to developed
+void allocate_hni2lcc(int demperiod)
+{
+	int hnidemand;
+	std::map<int,vector<lccCells> > hni2lcc_cells; // A big group of cells changing to lcc in map object
+	std::vector<lccCells>hni2lcc_vec;       //subset of map object in vecor
+	extract_hni2lcc(hni2lcc_cells);
+	
+	//Reading demands for cell going from hni to developed - hni2lcc
+	for(unsigned int drow=numlcc;drow<numProbsurface;drow++)
+	{
+		for (unsigned int dcol=0;dcol<numlcc;dcol++)
+		{
+			hnidemand=(int)demand_matrix[demperiod][drow][dcol]; // hni demand
+			
+			
+			hni2lcc_vec=hni2lcc_cells[dcol];
+
+			cout<<"Eligible cell#:"<<hni2lcc_vec.size()<<" From: hni"<<inlcccode[drow]<<" To:"<<inlcccode[dcol] <<" Psurface#: "<<dcol <<" Demand#:"<<hnidemand<<" Lag#" <<pts_distanceLag[dcol]<<" Psize#" << pts_pathSize[dcol]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[dcol] <<endl;
+			if((hnidemand>0) && (hni2lcc_vec.size()>0))
+			{
+				//Spatial allocation of hni2lcc
+				space_allocation(hni2lcc_vec,inlcccode[dcol],dcol,hnidemand,pts_distanceLag[dcol],true);
+				cout<<hnidemand<<endl;
+			}
+		}
+	}
+
+
+}
+
 //Determine HNI neighbour lag
 bool getHnilag(int row,int col,int hcode,int lagdistance)
 {
@@ -98,6 +131,73 @@ bool getHnilag(int row,int col,int hcode,int lagdistance)
 		}
 	}
 }
+
+//Find hni neighbourhood distance
+std::vector<lccCells> hni_fillNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int prob_index,int &demand, int &patch_size, int dlag)
+{
+	std::vector<lccCells> neighborVecObj; // vector to hold 8 neighborhing cells temporaily
+	int initdem=demand;
+	int veclen=vecobj.size();
+	bool iterationflag= true;
+
+	int distanceLag=dlag;
+	std::vector<int>tempLaggrid; // Container to store status of cell already existed in neighbourhood vector or not
+	tempLaggrid.resize(size);		//Resize vetor to landscape size
+	std::fill(tempLaggrid.begin(),tempLaggrid.end(),0); // Filling vector with 0s
+
+	if((demand>0) && (veclen>0))
+	{	
+		int ilcccol2;
+		int ilccrow2;
+		int index1;
+		int index2;
+
+		lccCells tempCells;
+		for (int dlag=0;dlag<distanceLag;dlag++)
+		{
+			for(int j=-1-dlag;j<=1+dlag;j++)
+			{
+				for (int k=-1-dlag;k<=1+dlag;k++)
+				{
+					if(j!=0||k!=0)
+					{
+						irow=irow+j;
+						icol=icol+k;
+
+						index1=irow*maxcol+icol;
+
+						for(unsigned int i=0;i<veclen;i++)
+						{
+							ilcccol2=vecobj.at(i).lccCol;
+							ilccrow2=vecobj.at(i).lccRow;	
+							index2=ilccrow2*maxcol+ilcccol2;
+
+							if((((icol>=0) && (icol<=maxcol)) && ((ilcccol2>=0) && (ilcccol2<=maxcol))) && (((irow>=0) && (irow<=maxrow)) && ((ilccrow2>=0) && (ilccrow2<=maxrow))))
+							{
+								if(demand>0 && patch_size<meanpatchSize)
+								{
+										if((index1==index2) && (tempLaggrid[index1]==0) && (hnitempgridFlag[index1]==0) && hnigrid[index1]==1)  
+											 
+										{ 
+											tempCells.lccCol=ilcccol2;
+											tempCells.lccRow=ilccrow2;
+											neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
+											tempLaggrid[index1]=1;
+										
+										}
+								}
+							}
+
+						}							
+					}						
+				}
+			}
+		}
+	}
+	tempLaggrid.clear();
+	return(neighborVecObj);
+}
+
 //Extract elibigle cells from LCC to hni
 void extract_allocate_lcc2hni(int demperiod)
 {
@@ -143,7 +243,7 @@ void extract_allocate_lcc2hni(int demperiod)
 			{
 				hnidemand=(int)demand_matrix[demperiod][row][col];
 				cout<<"Demand:"<<hnidemand<<endl;
-				allocate_lcc2hni(vegetated_vec_lcc2hnicells,col,hnidemand,hnicode,50);
+				allocate_lcc2hni(vegetated_vec_lcc2hnicells,col,hnidemand,hnicode,2);
 				vegetated_vec_lcc2hnicells.clear();
 			}
 		}
@@ -159,84 +259,171 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 	unsigned int rand_lccindex,hni_index;
 	double trans_prob;
 	double irand;
-	bool lag;
+	bool islag_distance;
+	int hni_patch,hni_meanpatchsize=10;
+	bool hni_fillNeighbour=false; //flag to enable to neighbouring pixel to fill
+	bool afterIteraiton =false; //flag to enable setting pixel change on not adjacent neighbourig cells after preset total no# iteration accomplished . To prevent from infinite loop during demand allocation 
+	int hni_neighdemand=0;
+	double hni_tras_probability;
+	int counter1=0,counter2=0;
+	int olddemand=0;
+
+
 
 	if(((demand>0) && (lcc2hni_vec.size()>0)) &&(demand<=lcc2hni_vec.size()))
 	{
 		while((lcc2hni_vec.size()>0) && (demand>0))
 		{
+			olddemand=demand;
+			hni_patch=0;
 			//Generate a random integer between 1 and eligible cell size
 			rand_lccindex=(unsigned int)rand_int(lcc2hni_vec.size());
 			//Retrive random index from vector
 			rand_lccrow=lcc2hni_vec.at(rand_lccindex-1).lccRow;
-			rand_lcccol=lcc2hni_vec.at(rand_lccindex-1).lccCol;
-
-			hni_index= rand_lccrow*maxcol+rand_lcccol;
+			rand_lcccol=lcc2hni_vec.at(rand_lccindex-1).lccCol;			
 			//Transition probability value
 			trans_prob=(double)	probability_surfaces[prob_index][rand_lccrow][rand_lcccol];
 			//Generate a uniform random variable for the forest cell
 			irand=u0_1();
 			if(irand<trans_prob)
 			{
-				lag=getHnilag(rand_lccrow,rand_lcccol,hcode,hnilag);
-				if(lag)
+				hni_index= rand_lccrow*maxcol+rand_lcccol;
+				// No lag constrain for seed placement
+				if(afterIteraiton)
 				{
-					cout <<"HNI demand: "<<demand<<"Eligible cells: "<<lcc2hni_vec.size()<<endl;
-					/////////////////////////////////
-					hnigrid[hni_index]=hcode;// Need to change the file provided by Zhiua because 255 does not read the system properly- it converted into -1. Therefore I put -1 just for testing purpose
-					hnitempgridFlag[hni_index]=1;
-
-				
-					
-					//spatail allocation
-					//can use fill neighbour
-					//find lag
-					//or similar concepts to apply
-					//Need to add algorithm to break out of loop to change the HNI
-					/////////////////////////////////////
-					demand--;
-					
-					lcc2hni_vec.erase(lcc2hni_vec.begin()+rand_lccindex-1); 
-					if(lcc2hni_vec.size()!=0)
+					if(hnitempgridFlag[hni_index]==0 ) // we can put natural vegetation class as well for filtering
 					{
-						lcc2hni_vec.begin();
+						cout <<"HNI demand: "<<demand<<"Eligible cells: "<<lcc2hni_vec.size()<<endl;
+					
+						hnigrid[hni_index]=hcode;// 0 background, 1 non hni, 2 hni
+						hnitempgridFlag[hni_index]=1;
+					
+						hni_patch++;
+						demand--;
+					
+						lcc2hni_vec.erase(lcc2hni_vec.begin()+rand_lccindex-1); 
+						if(lcc2hni_vec.size()!=0)
+						{
+							lcc2hni_vec.begin();
+						}
+						hni_fillNeighbour=true;
+						hni_neighbourVecCells=hni_fillNeighborhood( lcc2hni_vec, rand_lccrow, rand_lcccol,prob_index, demand,hni_patch,hnilag);// Works under hni distance lag
 					}
-				
+
 				}
+
+				// lag constraion for seed palcement
+				else
+				{
+					islag_distance=getHnilag(rand_lccrow,rand_lcccol,hcode,hnilag);
+					if((islag_distance) &&( hnitempgridFlag[hni_index]==0))
+					{
+						cout <<"HNI demand: "<<demand<<"Eligible cells: "<<lcc2hni_vec.size()<<endl;
+					
+						hnigrid[hni_index]=hcode;// 0 background, 1 non hni, 2 hni
+						hnitempgridFlag[hni_index]=1;
+					
+						hni_patch++;
+						demand--;
+					
+						lcc2hni_vec.erase(lcc2hni_vec.begin()+rand_lccindex-1); 
+						if(lcc2hni_vec.size()!=0)
+						{
+							lcc2hni_vec.begin();
+						}
+						hni_fillNeighbour=true;
+						hni_neighbourVecCells=hni_fillNeighborhood( lcc2hni_vec, rand_lccrow, rand_lcccol,prob_index, demand,hni_patch,hnilag);// Works under hni distance lag
+					
+					}
+				}
+
+
 			}
-		}
-	
-	}
-	
-}
-
-//Allocate cells from hni to LCC
-void allocate_hni2lcc(int demperiod)
-{
-	int hnidemand;
-	std::map<int,vector<lccCells> > hni2lcc_cells; // A big group of cells changing to lcc in map object
-	std::vector<lccCells>hni2lcc_vec;       //subset of map object in vecor
-	extract_hni2lcc(hni2lcc_cells);
-	
-	//Reading demands for cell going from hni to lcc- hni2lcc
-	for(unsigned int drow=numlcc;drow<numProbsurface;drow++)
-	{
-		for (unsigned int dcol=0;dcol<numlcc;dcol++)
-		{
-			hnidemand=(int)demand_matrix[demperiod][drow][dcol]; // hni demand
-			
-			
-			hni2lcc_vec=hni2lcc_cells[dcol];
-
-			cout<<"Eligible cell#:"<<hni2lcc_vec.size()<<" From: hni"<<inlcccode[drow]<<" To:"<<inlcccode[dcol] <<" Psurface#: "<<dcol <<" Demand#:"<<hnidemand<<" Lag#" <<pts_distanceLag[dcol]<<" Psize#" << pts_pathSize[dcol]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[dcol] <<endl;
-			if((hnidemand>0) && (hni2lcc_vec.size()>0))
+			// Program enter here after seed selection
+			while((hni_neighbourVecCells.size()>0) && (demand>0) && (hni_patch<hni_meanpatchsize) && (hni_fillNeighbour))
 			{
-				//Spatial allocation of hni2lcc
-				space_allocation(hni2lcc_vec,inlcccode[dcol],dcol,hnidemand,pts_distanceLag[dcol],true);
-				cout<<hnidemand<<endl;
+				hni_neighdemand=demand;
+
+				for( unsigned int i=0;i<hni_neighbourVecCells.size();i++)
+				{ 
+					if((demand>0) && (hni_patch < hni_meanpatchsize))
+					{
+						int neighrow=hni_neighbourVecCells.at(i).lccRow;
+						int neighcol=hni_neighbourVecCells.at(i).lccCol;
+
+
+						////Transition probability value
+						hni_tras_probability=(double)(probability_surfaces[prob_index][neighrow][neighcol]);		//(1/255*probability_surfaces[1][rand_forestrow][rand_forestcol])
+
+						////Generate a uniform random variable for the forest cell
+						irand=u0_1();
+						if(irand<hni_tras_probability)
+						{
+							hni_index=neighrow*maxcol + neighcol;
+							//if(((getNeighbour(neighrow,neighcol,lcccode)) &&(lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )) //Enforce adjaceny while cell transition
+							if((getHnilag(rand_lccrow,rand_lcccol,hcode,hnilag)) && (hnitempgridFlag[hni_index]==0) )  //Enforce distance lag while cell transtion
+							{
+
+								hnigrid[hni_index]=hcode;// Need to change the file provided by Zhiua because 255 does not read the system properly- it converted into -1. Therefore I put -1 just for testing purpose
+								hnitempgridFlag[hni_index]=1;
+								demand--;
+								hni_patch++;
+								counter2=0;
+								cout<< "Rem demand: "<<demand<<"\t Eligible cells in NeigbourHood List: "<< hni_neighbourVecCells.size()<<endl;
+								//writelog<< "Rem demand: "<<demand<<"\t Eligible cells in NeigbourHood List: "<< hni_neighbourVecCells.size()<<endl;
+								hni_neighbourVecCells.erase(hni_neighbourVecCells.begin()+i);
+								if(hni_neighbourVecCells.size()!=0)
+								{
+									hni_neighbourVecCells.begin(); 
+								}
+
+								hni_neighborVecObjList=hni_fillNeighborhood(lcc2hni_vec,neighrow,neighcol,prob_index,demand,hni_patch,hnilag); //Works under distance lag neighbourhood
+								hni_neighbourVecCells.insert(hni_neighbourVecCells.end(),hni_neighborVecObjList.begin(),hni_neighborVecObjList.end());
+
+								cout<< "Code:2-Rem. to accomp demand::"<<demand <<"\t Rem. trans. prob pixel #::" <<lcc2hni_vec.size() <<"counter" <<counter2<< endl; 
+										
+
+							}
+
+						}
+					}
+
+				} //end for loop
+
+				if(hni_neighdemand==demand && counter2>NO_OF_ITERATIONHNI*(hni_neighbourVecCells.size()))
+				{
+
+					hni_fillNeighbour=false;
+					break;
+
+				}
+				counter2++;
+			} // end 2nd while
+
+			if(olddemand==demand && counter1>NO_OF_ITERATIONHNI*(lcc2hni_vec.size()))
+			{
+
+				//vecobj.erase(vecobj.begin()+rand_index-1);
+				//if(vecobj.size()!=0)
+				//{
+				//	vecobj.begin(); 
+				//}
+				afterIteraiton=true;
+				counter1=0;
 			}
-		}
+			counter1++;
+
+		} // end 1st while
+	
+	}// end if
+	else
+	{
+		cout<< "Demand ::"<<demand <<"\t transition prob pixel size ::"<<lcc2hni_vec.size()<< endl;
 	}
-
-
+	
 }
+
+
+
+
+

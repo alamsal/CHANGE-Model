@@ -637,8 +637,9 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(int lccCode)
 //Extract and allocte HNI
 void extract_hnicells(int demperiod)
 {
-	extract_allocate_lcc2hni(demperiod);
 	allocate_hni2lcc(demperiod);
+	extract_allocate_lcc2hni(demperiod);
+	
 	
 }
 
@@ -774,62 +775,66 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 			if(irand<tras_probability)
 			{
 				cell_index=rand_forestrow*maxcol + rand_forestcol;
-				switch (afterIteraiton)
-				{
-				case true:
-					if(((lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) ))
+				//No lag constraion for seed placement
+					if(afterIteraiton)
 					{
-
-						bool transFlag=cellTrasition(cell_index,lcccode,ishni_transition);
-
-						if(transFlag)
+						if(((lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) ))
 						{
-							demand--;
-							patch_size++;
-							counter1=0;
-							cout<< "Rem demand: "<<demand<<"\t Eligible cells: "<< vecobj.size()<<endl;
-							vecobj.erase(vecobj.begin()+rand_index-1);
-							if(vecobj.size()!=0)
+
+							bool transFlag=cellTrasition(cell_index,lcccode,ishni_transition);
+
+							if(transFlag)
 							{
-								vecobj.begin(); 
-							}
-							//neighbourVecCells=fillEightNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size); // Works under 8 neighbourhoood
-							neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,lag,ishni_transition);// Works under distance lag
-							fillNeighbour=true;
-							writelog<< "Code:3-Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter1<< endl; 
-						}					
+								demand--;
+								patch_size++;
+								counter1=0;
+								cout<< "Rem demand: "<<demand<<"\t Eligible cells: "<< vecobj.size()<<endl;
+								vecobj.erase(vecobj.begin()+rand_index-1);
+								if(vecobj.size()!=0)
+								{
+									vecobj.begin(); 
+								}
+								//neighbourVecCells=fillEightNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size); // Works under 8 neighbourhoood
+								neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,lag,ishni_transition);// Works under distance lag
+								fillNeighbour=true;
+								writelog<< "Code:3-Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter1<< endl; 
+							}					
 
+						}
 					}
-				case false:
-					//if(((getNeighbour(rand_forestrow,rand_forestcol,lcccode)) && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )) //Prevnet model to put seed pixel randomly on the landscape :enforce adjacency
-					//if((lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0)) //Folloing Mike's comment to put seed pixel randomly on the landscape
-					if((getNeighbourLag(rand_forestrow,rand_forestcol,lcccode,lag))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0)) //Prevnet model to put seed pixel randomly on the landscape :enforce lag distance
-
+					else
 					{
+						//if(((getNeighbour(rand_forestrow,rand_forestcol,lcccode)) && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )) //Prevnet model to put seed pixel randomly on the landscape :enforce adjacency
+						//if((lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0)) //Following Mike's comment to put seed pixel randomly on the landscape
+						
 
-						bool transFlag=cellTrasition(cell_index,lcccode,ishni_transition);
+						//Lag constraion for seed placement
+						if((getNeighbourLag(rand_forestrow,rand_forestcol,lcccode,lag))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0)) //Prevnet model to put seed pixel randomly on the landscape :enforce lag distance
 
-						if(transFlag)
 						{
-							demand--;
-							patch_size++;
-							counter1=0;
-							cout<< "Rem demand: "<<demand<<"\t Eligible cells: "<< vecobj.size()<<endl;
-							vecobj.erase(vecobj.begin()+rand_index-1);
-							if(vecobj.size()!=0)
-							{
-								vecobj.begin(); 
-							}
-							//neighbourVecCells=fillEightNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size); // Works under 8 neighbourhoood
-							neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,lag,ishni_transition); //Works under distance lago neighbourhood
-							fillNeighbour=true;
-							writelog<< "Code:1-Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter1<< endl; 
-						}					
 
+							bool transFlag=cellTrasition(cell_index,lcccode,ishni_transition);
+
+							if(transFlag)
+							{
+								demand--;
+								patch_size++;
+								counter1=0;
+								cout<< "Rem demand: "<<demand<<"\t Eligible cells: "<< vecobj.size()<<endl;
+								vecobj.erase(vecobj.begin()+rand_index-1);
+								if(vecobj.size()!=0)
+								{
+									vecobj.begin(); 
+								}
+								//neighbourVecCells=fillEightNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size); // Works under 8 neighbourhoood
+								neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,lag,ishni_transition); //Works under distance lago neighbourhood
+								fillNeighbour=true;
+								writelog<< "Code:1-Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter1<< endl; 
+							}					
+
+						}
 					}
-				default:
-					break;
-				}
+
 
 			}
 
@@ -860,7 +865,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 			}
 
 			*/
-			while(neighbourVecCells.size()>0 && demand>0 && patch_size<meanpatchSize && fillNeighbour)
+			while((neighbourVecCells.size()>0) && (demand>0) && (patch_size<meanpatchSize) && (fillNeighbour))
 			{
 				neighdemand=demand;
 
