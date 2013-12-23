@@ -171,9 +171,10 @@ unsigned int inlcccode[40];			//Input lcc code works upto 40 different LCC types
 unsigned int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
 unsigned int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
 //Patch Size parameters
-unsigned int pts_distanceLag[40];	 // Input patch distance lag
-unsigned int pts_pathSize[40];		 // Input mean patch size 
+int pts_distanceLag[40];	 // Input patch distance lag
+unsigned int pts_patchSize[40];		 // Input mean patch size 
 unsigned int pts_stdDeviation[40];	 // Input patch standard deviation
+unsigned int pts_patchLag[40];        // Input patch lag to structure patch shape
 //probability surface paramters
 int prbcnt;						// counts number of prob surfaces
 int numProbsurface;				// no of prob surfaces
@@ -595,17 +596,7 @@ int main( int argc, char *argv[] ) {
 	indmdfile>>colDemand;indmdfile.ignore(100,'\n');
 	indmdfile.close();
 
-	//Read patch size paramter file
-	inptsizefile.open(ptsizefilename);
-	inptsizefile.ignore(100,'\n'); //Skip to the new line
-	std::cout<<"Distance Lag \t Mean Patch Size \t SDT Deviation"<<endl;
-	for(lcccnt=0;lcccnt<numlcc;lcccnt++)
-	{
-		inptsizefile>>pts_distanceLag[lcccnt]>>pts_pathSize[lcccnt]>>pts_stdDeviation[lcccnt];inptsizefile.ignore(100,'\n');			
-		std::cout<<pts_distanceLag[lcccnt]<<"\t"<< pts_pathSize[lcccnt]<<"\t"<<pts_stdDeviation[lcccnt] <<endl; 
 
-	}
-	inptsizefile.close();
 	//Read ownwership paramter file
 	inownershipfile.open(ownwershipfilename);
 	inownershipfile>>numOwnership; inownershipfile.ignore(100,'\n');
@@ -648,6 +639,18 @@ int main( int argc, char *argv[] ) {
 	}
 
 	inprbfile.close();
+	
+	//Read patch size paramter file
+	inptsizefile.open(ptsizefilename);
+	inptsizefile.ignore(100,'\n'); //Skip to the new line
+	std::cout<<"Patch lag\ Distance Lag \t Mean Patch Size \t SDT Deviation"<<endl;
+	for(lcccnt=0;lcccnt<numProbsurface;lcccnt++)
+	{
+		inptsizefile>>pts_patchLag[lcccnt]>>pts_distanceLag[lcccnt]>>pts_patchSize[lcccnt]>>pts_stdDeviation[lcccnt];inptsizefile.ignore(100,'\n');			
+		std::cout<<pts_patchLag[lcccnt]<<"\t"<<pts_distanceLag[lcccnt]<<"\t"<< pts_patchSize[lcccnt]<<"\t"<<pts_stdDeviation[lcccnt] <<endl; 
+
+	}
+	inptsizefile.close();
 
 	// Crreate or resize  the probability surface vector size to make dynamic  size
 	probability_surfaces.resize(numProbsurface);

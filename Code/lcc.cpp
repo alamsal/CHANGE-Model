@@ -707,11 +707,11 @@ void allocate_lccCells(int demperiod)
 
 				vec_lcc_cells=lcc_cells[col];
 				
-				cout<<"Eligible cell#:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<" To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand<<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_pathSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col] <<endl;
-				writelog<<"Eligible cell#:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<"To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand <<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_pathSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col]<<endl;
+				cout<<"Eligible cell#:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<" To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand<<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_patchSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col] <<endl;
+				writelog<<"Eligible cell#:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<"To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand <<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_patchSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col]<<endl;
 
 				//Feed for spatial allocation of broader LCC classes only ( No hni simulation- ishni_trasition=false)
-				space_allocation(vec_lcc_cells,inlcccode[col],col,demand,pts_distanceLag[col],false);
+				space_allocation(vec_lcc_cells,inlcccode[col],col,demand,pts_distanceLag[col], pts_patchLag[col],false);
 			}
 
 		}
@@ -728,9 +728,9 @@ Parameters: Extracted LCLU cell vectors to change, lcccode to be assigned after 
 
 Returns:	
 ****************************************************************************/
-void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand, unsigned int dlag, bool ishni_transition)
+void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand, int dlag, unsigned int plag, bool ishni_transition)
 {
-	unsigned int lag=dlag;
+	int lag=dlag;
 	int rand_forestrow;
 	int rand_forestcol;
 	double tras_probability;
@@ -754,7 +754,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 			patch_size=0;
 			
 			//Generate mean patch size from normal distribution
-			meanpatchSize=genLCCPatchSize(pts_pathSize[patchcol],pts_stdDeviation[patchcol]);
+			meanpatchSize=genLCCPatchSize(pts_patchSize[patchcol],pts_stdDeviation[patchcol]);
 			
 			neighborVecObjList.clear();
 			neighbourVecCells.clear();
@@ -776,7 +776,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 			{
 				cell_index=rand_forestrow*maxcol + rand_forestcol;
 				//No lag constraion for seed placement
-					if(afterIteraiton)
+					if((afterIteraiton) || (lag==-9) )
 					{
 						if(((lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) ))
 						{
@@ -795,7 +795,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 									vecobj.begin(); 
 								}
 								//neighbourVecCells=fillEightNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size); // Works under 8 neighbourhoood
-								neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,lag,ishni_transition);// Works under distance lag
+								neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,plag,ishni_transition);// Works under patch lag
 								fillNeighbour=true;
 								writelog<< "Code:3-Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter1<< endl; 
 							}					
@@ -827,7 +827,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 									vecobj.begin(); 
 								}
 								//neighbourVecCells=fillEightNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size); // Works under 8 neighbourhoood
-								neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,lag,ishni_transition); //Works under distance lago neighbourhood
+								neighbourVecCells=fillNeighborhood( vecobj, rand_forestrow, rand_forestcol, lcccode, prob_index, demand,patch_size,plag,ishni_transition); //Works under distance lag neighbourhood
 								fillNeighbour=true;
 								writelog<< "Code:1-Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter1<< endl; 
 							}					
@@ -886,7 +886,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 						{
 							cell_index=neighrow*maxcol + neighcol;
 							//if(((getNeighbour(neighrow,neighcol,lcccode)) &&(lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )) //Enforce adjaceny while cell transition
-							if((getNeighbourLag(neighrow,neighcol,lcccode,lag))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )  //Enforce distance lag while cell transtion
+							if((getNeighbourLag(neighrow,neighcol,lcccode,plag))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )  //Enforce patch shape lag while cell transtion
 							{
 
 								bool transFlag=cellTrasition(cell_index,lcccode,ishni_transition);
@@ -905,7 +905,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 									}
 
 									//neighborVecObjList=fillEightNeighborhood(vecobj,neighrow,neighcol,lcccode,prob_index,demand,patch_size); // Works under 8 neighbourhoood
-									neighborVecObjList=fillNeighborhood(vecobj,neighrow,neighcol,lcccode,prob_index,demand,patch_size,lag,ishni_transition); //Works under distance lag neighbourhood
+									neighborVecObjList=fillNeighborhood(vecobj,neighrow,neighcol,lcccode,prob_index,demand,patch_size,plag,ishni_transition); //Works under patch lag neighbourhood
 									neighbourVecCells.insert(neighbourVecCells.end(),neighborVecObjList.begin(),neighborVecObjList.end());
 
 									writelog<< "Code:2-Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<"counter" <<counter2<< endl; 

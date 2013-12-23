@@ -34,9 +34,10 @@ extern char *hnigrid;	       //Human natural interface grid
 extern struct lccCells;//hold raster cells
 
 //Patch Size parameters
-extern unsigned int pts_distanceLag[40];	 // Input patch distance lag
-extern unsigned int pts_pathSize[40];		 // Input mean patch size 
+extern int pts_distanceLag[40];	 // Input patch distance lag
+extern unsigned int pts_patchSize[40];		 // Input mean patch size 
 extern unsigned int pts_stdDeviation[40];	 // Input patch standard deviation
+extern unsigned int pts_patchLag[40];        // Input patch lag for delinate patch shape
 
 extern std::vector< std::vector<std::vector< int > > > demand_matrix;  //Container to hold demand matrix
 extern std::vector< std::vector<std::vector< float > > >probability_surfaces; //Holds the probability surfaces rasters as 3D vector
@@ -46,7 +47,7 @@ extern std::vector<int>hnitempgridFlag;     //temp grid to hold hni trasition fl
 //Allocate cells from hni to LCC
 void allocate_hni2lcc(int demperiod);
 //Allocate cells from LCC to hni
-void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &demand,int hnicode,int hnilag);
+void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &demand,int hnicode,int hnilag,int hni_plag);
 //Extract elibigle cells from LCC to hni
 void extract_allocate_lcc2hni(int demperiod);
 //

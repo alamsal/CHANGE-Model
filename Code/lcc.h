@@ -23,10 +23,10 @@ extern char *ownergrid;			// ownership type grid
 extern char *hnigrid;
 extern short int *stategrid;	//successional state
 //Patch Size parameters
-extern unsigned int pts_distanceLag[40];	 // Input patch distance lag
-extern unsigned int pts_pathSize[40];		 // Input mean patch size 
+extern int pts_distanceLag[40];	 // Input patch distance lag
+extern unsigned int pts_patchSize[40];		 // Input mean patch size 
 extern unsigned int pts_stdDeviation[40];	 // Input patch standard deviation
-
+extern unsigned int pts_patchLag[40];        // Input patch lag for delinate patch shape
 extern short int *timeinstage;	// time in current successional stage grid
 extern short int *age;		    // patch age grid
 extern short int *tsfire;      // time since last fire grid
@@ -78,7 +78,7 @@ bool cellTrasition(int cellindex, int lcccode, bool hni_trasition);
 
 void allocate_lccCells(int demandperiod); //allocate  LCC cells
 
-void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand,unsigned int lag,bool ishni_transition);// Allocate space in lcc grid as well as change the community type
+void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index, int &demand,int lag,unsigned int plag,bool ishni_transition);// Allocate space in lcc grid as well as change the community type
 
 void reclassify_lclu(unsigned int stateout[],unsigned int lclustate[],unsigned int statecounter);
 
