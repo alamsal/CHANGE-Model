@@ -116,9 +116,9 @@ void ErrorCheck::check_fireRegim_param(int &_regnum,int &_shapetype,double &_w_d
 		}
 	}
 
-}void ErrorCheck::check_communityType_param(int &_numcom,int _comcode[],int _comnumstate[], int _init_state[], int _statecode[40][40],int _stateout[40][40],double _statefiremod[40][40],double _statefireinit[40][40],
-			double _statesev[40][40],double _statesev2[40][40],int _initage[40][40],int _suclag[40][40],int _suctrans[40][40],int _suclagreset[40][40],int _fireexlag[40][40],int _fireextrans[40][40],int _hsfiretrans[40][40],
-			int _hsfirereset[40][40], int _msfiretrans[40][40],int _msfirereset[40][40],int _lsfiretrans[40][40], int _lsfirereset[40][40], int _treatelig[40][40][5], int _treattrans[40][40][5],int _treatreset[40][40][5],double _distprob[40][40][5],int _disttrans[40][40][5],int _distreset[40][40][5],int &_distnum, int &_mgmtnum)
+}
+
+void ErrorCheck::check_communityType_param(int &_numcom,int _comcode[],int _comnumstate[], int _init_state[], int _statecode[40][40],int _stateout[40][40],double _statefiremod[40][40],double _statefireinit[40][40],double _statesev[40][40],double _statesev2[40][40],int _initage[40][40],int _suclag[40][40],int _suctrans[40][40],int _suclagreset[40][40],int _fireexlag[40][40],int _fireextrans[40][40],int _hsfiretrans[40][40],int _hsfirereset[40][40], int _msfiretrans[40][40],int _msfirereset[40][40],int _lsfiretrans[40][40], int _lsfirereset[40][40], int _treatelig[40][40][5], int _treattrans[40][40][5],int _treatreset[40][40][5],double _distprob[40][40][5],int _disttrans[40][40][5],int _distreset[40][40][5],int &_distnum, int &_mgmtnum)
 {
 	cout<< "Checking COMMUNITY FILE parameter variables"<<endl;
 	std::vector<int> community_param_flag;

@@ -43,18 +43,23 @@ extern std::vector< std::vector<std::vector< int > > > demand_matrix;  //Contain
 extern std::vector< std::vector<std::vector< float > > >probability_surfaces; //Holds the probability surfaces rasters as 3D vector
 
 extern std::vector<int>hnitempgridFlag;     //temp grid to hold hni trasition flag (0- ready for trasition & 1- already changed & no trasnition)
+//Function prototypes
+//Extract and allocate eligible cells from hni to LCC
+void extract_hni2lcc(std::map<int,vector<lccCells> > &ext_hni2lcc_vector);
 
 //Allocate cells from hni to LCC
 void allocate_hni2lcc(int demperiod);
-//Allocate cells from LCC to hni
-void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &demand,int hnicode,int hnilag,int hni_plag);
-//Extract elibigle cells from LCC to hni
-void extract_allocate_lcc2hni(int demperiod);
-//
-void extract_hni2lcc(std::map<int,vector<lccCells> > &ext_hni2lcc_vector);
 
 //Determine HNI neighbour lag
 bool getHnilag(int row,int col,int hcode,int lagdistance, bool iscompactNeighbour);
 
+//Find hni neighbourhood distance
+std::vector<lccCells> hni_fillNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int prob_index,int &demand, int &patch_size, int dlag);
+
+//Extract elibigle cells from LCC to hni
+void extract_allocate_lcc2hni(int demperiod);
+
+//Allocate cells from LCC to hni
+void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &demand,int hnicode,int hnilag,int hni_plag);
 
 #endif

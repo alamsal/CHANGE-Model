@@ -20,9 +20,9 @@
 using namespace std;
 
 std::vector<lccCells> hni_neighborVecObjList, hni_neighbourVecCells;// vector to hold 8 neighborhing cells from all eligible cells temporaily
-//extract eligible cells from hni to LCC
 //ext_hni2lcc_vector - Map of vectors containing sturcuture to hold all extracted values based upon probability surfaces, LCC, and ownership.
 
+//Extract and allocate eligible cells from hni to LCC
 void extract_hni2lcc(std::map<int,vector<lccCells> > &ext_hni2lcc_vector)
 {
 	lccCells hni2lcccells; //container to keep raster hni cell row columns
@@ -255,6 +255,7 @@ void extract_allocate_lcc2hni(int demperiod)
 	}
 
 }
+
 //Allocate cells from LCC to hni
 void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &demand,int hcode,int hni_lag, int hni_plag)
 {

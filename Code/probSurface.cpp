@@ -32,7 +32,7 @@ using namespace std;
 */
 std::vector<int> probabilitymax; // Holds porbability maximum value
 int max_value= 0; // Initialize maximum value to 0
-
+//Read probability surface files
 void read_probabilitySurfaces(std::vector< std::vector<std::vector< float > > > & grid_value,float NumberOfFiles,float rows,float columns)
 {
    FILE *f[40];

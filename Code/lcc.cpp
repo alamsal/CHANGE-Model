@@ -170,6 +170,7 @@ bool getNeighbourLag(int row,int col,int lcccode,int lagdistance, bool iscompact
 		}
 	}
 }
+//Allow broad LCLU classes & HNI transitions
 bool cellTrasition(int cellindex, int lcccode, bool hni_trasition)
 {
 	//Allow broad LCLU classes transitions only on hni cells
@@ -658,7 +659,6 @@ void extract_hnicells(int demperiod)
 	
 }
 
-
 //Extract and allocate borader LCC
 void extract_lcccells(int demperiod)
 {	
@@ -676,8 +676,6 @@ std::vector<std::map<int,vector<lccCells> > > getextractedCells(std::vector<std:
 	}
 	return temp_lcc;
 }
-
-
 
 //Spatial allocation of Demands
 void allocate_lccCells(int demperiod)
@@ -734,7 +732,6 @@ void allocate_lccCells(int demperiod)
 	}
 
 }
-
 
 /****************************************************************************
 //Spatial allocation of cells in the 2D grid
