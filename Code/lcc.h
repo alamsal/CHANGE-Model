@@ -83,9 +83,11 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 void reclassify_lclu(unsigned int stateout[],unsigned int lclustate[],unsigned int statecounter);
 
 std::vector<lccCells> fillEightNeighborhood(std::vector<lccCells> vecobj, int row, int col,int lcccode,int prob_index,int &demand, int &patch_size,bool ishni); // Recursive function to change the landscape's transition
-
+bool getNeighbourLag(int row,int col,int lcccode,int lagdistance, bool iscompactNeighbour);
+bool cellTrasition(int cellindex, int lcccode, bool hni_trasition);
 
 //Get all eligible trasition cells into a vector; vector stores row & columns of all LCC classes including LCC to hni
+std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int lcccode,int prob_index,int &demand, int &patch_size, int dlag,bool hni_trasition);
 std::vector<std::map<int,vector<lccCells> > > getextractedCells(std::vector<std::map<int,vector<lccCells> > > &temp_lcc);
 
 std::map <int,std::vector <lccCells> > extract_LandCoverCells(int lccCode); // Extract LCC cells based upon lcccode

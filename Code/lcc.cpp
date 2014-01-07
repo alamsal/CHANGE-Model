@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <fstream>
 
-# define NO_OF_ITERATION 10
+# define NO_OF_ITERATION 100
 
 using namespace std;
 
@@ -113,9 +113,10 @@ bool getNeighbour(int row,int col,int lcccode)
 	}
 
 }
-//LCC neighbour lag
-bool getNeighbourLag(int row,int col,int lcccode,int lagdistance)
+//LCC neighbour lag  iscompactNeighbour for compacting the neighbourhood cells
+bool getNeighbourLag(int row,int col,int lcccode,int lagdistance, bool iscompactNeighbour)
 {
+	int count_neighbour=0; // Neighbour member count
 	int rwlag=-lagdistance;
 	int cclag=-lagdistance;
 	bool isNeighboor=false;
@@ -134,8 +135,22 @@ bool getNeighbourLag(int row,int col,int lcccode,int lagdistance)
 						{
 							if((rlag!= 0)||(clag=!0))
 							{
-								isNeighboor=true;
-								return true;
+								if(iscompactNeighbour)
+								{
+									count_neighbour++;
+									if(count_neighbour>1) // Eligible cell should have more than 3 same neighbourhoods
+									{
+										isNeighboor=true;
+										count_neighbour=0;
+										return true;
+									}
+								}
+								else
+								{
+									isNeighboor=true;
+									return true;
+							
+								}
 							}
 						}
 
@@ -809,7 +824,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 						
 
 						//Lag constraion for seed placement
-						if((getNeighbourLag(rand_forestrow,rand_forestcol,lcccode,lag))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0)) //Prevnet model to put seed pixel randomly on the landscape :enforce lag distance
+						if((getNeighbourLag(rand_forestrow,rand_forestcol,lcccode,lag,false))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0)) //Prevnet model to put seed pixel randomly on the landscape :enforce lag distance
 
 						{
 
@@ -886,7 +901,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 						{
 							cell_index=neighrow*maxcol + neighcol;
 							//if(((getNeighbour(neighrow,neighcol,lcccode)) &&(lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )) //Enforce adjaceny while cell transition
-							if((getNeighbourLag(neighrow,neighcol,lcccode,plag))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )  //Enforce patch shape lag while cell transtion
+							if((getNeighbourLag(neighrow,neighcol,lcccode,plag,true))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )  //Enforce patch shape lag while cell transtion
 							{
 
 								bool transFlag=cellTrasition(cell_index,lcccode,ishni_transition);

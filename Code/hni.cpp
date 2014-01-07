@@ -16,7 +16,7 @@
 #include <string>
 
 # define  hnicode 2
-# define NO_OF_ITERATIONHNI 10
+# define NO_OF_ITERATIONHNI 100
 using namespace std;
 
 std::vector<lccCells> hni_neighborVecObjList, hni_neighbourVecCells;// vector to hold 8 neighborhing cells from all eligible cells temporaily
@@ -90,11 +90,12 @@ void allocate_hni2lcc(int demperiod)
 }
 
 //Determine HNI neighbour lag
-bool getHnilag(int row,int col,int hcode,int lagdistance)
+bool getHnilag(int row,int col,int hcode,int lagdistance, bool iscompactNeighbour)
 {
 	int rwlag=-lagdistance;
 	int cclag=-lagdistance;
 	bool isNeighboor=false;
+	int count_neighbour=0; // Neighbour member count
 	int cindex;
 	if(((row<maxrow) && (row>0)) && ((col<maxcol)&& (col>0)))
 	{
@@ -110,8 +111,22 @@ bool getHnilag(int row,int col,int hcode,int lagdistance)
 						{
 							if((rlag!= 0)||(clag=!0))
 							{
-								isNeighboor=true;
-								return true;
+								if(iscompactNeighbour)
+								{
+									count_neighbour++;
+									if(count_neighbour>0) // Eligible cell should have more than 3 same neighbourhoods
+									{
+										isNeighboor=true;
+										count_neighbour=0;
+										return true;
+									}
+								}
+								else
+								{
+									isNeighboor=true;
+									return true;
+							
+								}
 							}
 						}
 
@@ -306,7 +321,7 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 				// lag constraion for seed palcement
 				else
 				{
-					islag_distance=getHnilag(rand_lccrow,rand_lcccol,hcode,hni_lag);
+					islag_distance=getHnilag(rand_lccrow,rand_lcccol,hcode,hni_lag,false);
 					if((islag_distance) &&( hnitempgridFlag[hni_index]==0))
 					{
 						cout <<"HNI demand: "<<demand<<"Eligible cells: "<<lcc2hni_vec.size()<<endl;
@@ -352,7 +367,7 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 						{
 							hni_index=neighrow*maxcol + neighcol;
 							//if(((getNeighbour(neighrow,neighcol,lcccode)) &&(lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )) //Enforce adjaceny while cell transition
-							if((getHnilag(rand_lccrow,rand_lcccol,hcode,hni_plag)) && (hnitempgridFlag[hni_index]==0) )  //Enforce patch lag while cell transtion
+							if((getHnilag(rand_lccrow,rand_lcccol,hcode,hni_plag,true)) && (hnitempgridFlag[hni_index]==0) )  //Enforce patch lag while cell transtion
 							{
 
 								hnigrid[hni_index]=hcode;// Need to change the file provided by Zhiua because 255 does not read the system properly- it converted into -1. Therefore I put -1 just for testing purpose

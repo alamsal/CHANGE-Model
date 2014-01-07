@@ -1090,8 +1090,11 @@ int main( int argc, char *argv[] ) {
 		hnitempgridFlag.clear();         // holds hni trasition flags temporarily
 		hnitempgridFlag.resize(size,0);  // memory allocation 
 		//Implement HNI algorithm
+		
+		
 		extract_hnicells(demperiod);
 		gen_hnisnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
+
 		// Implement fORSCE algorithm
 		extract_lcccells(demperiod); 
 		//gen_forescesnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
