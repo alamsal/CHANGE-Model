@@ -51,7 +51,7 @@ void extract_hni2lcc(std::map<int,vector<lccCells> > &ext_hni2lcc_vector);
 void allocate_hni2lcc(int demperiod);
 
 //Determine HNI neighbour lag
-bool getHnilag(int row,int col,int hcode,int lagdistance, bool iscompactNeighbour);
+bool getHnilag(int row,int col,int hcode,int lagdistance,int hni_patchSize, bool iscompactNeighbour);
 
 //Find hni neighbourhood distance
 std::vector<lccCells> hni_fillNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int prob_index,int &demand, int &patch_size, int dlag);

@@ -71,7 +71,7 @@ void merg_lccBuffer();
 
 //LCC neighbour lag  iscompactNeighbour for compacting the neighbourhood cells
 bool getNeighbour(int row,int col,int lcccode);
-bool getNeighbourLag(int row,int col,int lcccode,int lagdistance, bool iscompactNeighbour);
+bool getNeighbourLag(int row,int col,int lcccode,int lagdistance, int patch_size, bool iscompactNeighbour);
 
 //Allow broad LCLU classes & HNI transitions
 bool cellTrasition(int cellindex, int lcccode, bool hni_trasition);
