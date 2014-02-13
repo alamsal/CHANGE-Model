@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------
-// File:		errorCheckH.h
+// File:		errorCheckH.cpp
 // Author: 		Ashis Lamsal
 // Last Update:	1/16/2012
 // Decription:	This module is responsible for checking *.gis file's availability in the program's running path, comparing their unsigned integer value classes with paramater files,

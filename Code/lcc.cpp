@@ -2,7 +2,7 @@
 // File:		lcc.cpp
 // Author: 		Ashis Lamsal
 // Last Update:	12/18/2012
-// Decription:	The lcc.cpp module merge man made and non vegetated areas with buffer and prevent them from fire simulation.
+// Decription:	Mainly contains the functions to simulate human dominated land cover class change, and it merges human dominated and non-vegetated areas with buffer and prevents them from natural vegetation simulation
 // It also generates explicitly coded LCC output for landscape fire simulation snapshot results based on LCC classes provided in lcc.gis file.
 //----------------------------------------------------------------------------
 //#include <boost/thread.hpp>
@@ -189,7 +189,7 @@ bool cellTrasition(int cellindex, int lcccode, bool hni_trasition)
 	//HNI Cells can either go to Natural or Human
 	//In both cases HNI no longer exist in HNI cell and hnigrid[index]=0 and lccgrid[index]=lcccode along with other veg and non veg parameters to look around.
 	int nohnicode=1;
-	if(hni_trasition)  // Trasitions to/from hni to broader lcc
+	if(hni_trasition)  // Trasitions from hni to broader lcc
 	{
 		bool natural=false;
 		for(unsigned int l=0;l<numlcc;l++)
@@ -200,6 +200,7 @@ bool cellTrasition(int cellindex, int lcccode, bool hni_trasition)
 				{
 					hnigrid[cellindex]=nohnicode; // All succession states, regimes,lcc code and parameters  already out there. Just flip to hni or non hni.
 					hnitempgridFlag[cellindex]=1;
+					buffer[cellindex]=1;
 					return true;
 					break;
 				}

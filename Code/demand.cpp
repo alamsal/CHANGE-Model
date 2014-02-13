@@ -1,3 +1,12 @@
+//----------------------------------------------------------------------------
+// File:		demand.cpp
+// Author: 		Aashis Lamsal
+// Last Update: 2/3/2014
+// Decription:	Read the list of demand csv files into a demand vector
+//----------------------------------------------------------------------------
+
+
+
 #include <iostream>
 #include <fstream>
 #include <string>

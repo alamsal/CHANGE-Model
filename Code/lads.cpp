@@ -1,10 +1,10 @@
 // lads.cpp : Defines the entry point for the console application.
-//
+//Main entry point of the CHANGE model and keeps track of human-natural, human dominated, vegetation dominated simulation on every time stamp 
 
 //----------------------------------------------------------------------------
 // File:		lads.cpp  (version 4.6)
 // Author: 		Mike Wimberly
-// Modified: Aashis Lamsal
+// Modified:    Aashis Lamsal
 // Last Update:	1/4/2008
 //----------------------------------------------------------------------------
 #include "lads.h"
