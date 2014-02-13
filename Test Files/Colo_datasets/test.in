@@ -1,13 +1,13 @@
 90 Cell size
 2 Input map flag
-1000 Maxrow
-1500 Maxcol
+3228 Maxrow
+2540 Maxcol
 1 Simulate Fire
 0 Simulate Harvest
-20 Burn-in Period
-10 Simulation Length
-1 Run Step
-2 Summary Step
+0 Burn-in Period
+5 Simulation Length
+5 Run Step
+5 Summary Step
 1 Vegetation summary flag
 1 Fire summary flag
 0 Harvest summary flag

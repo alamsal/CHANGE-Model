@@ -1,0 +1,10 @@
+
+rename demand_A2_0with.hni.csv demand0.csv
+rename demand_A2_1with.hni.csv demand1.csv
+rename demand_A2_2with.hni.csv demand2.csv
+rename demand_A2_3with.hni.csv demand3.csv
+rename demand_A2_4with.hni.csv demand4.csv
+rename demand_A2_5with.hni.csv demand5.csv
+rename demand_A2_6with.hni.csv demand6.csv
+rename demand_A2_7with.hni.csv demand7.csv
+rename demand_A2_8with.hni.csv demand8.csv
