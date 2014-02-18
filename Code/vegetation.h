@@ -19,6 +19,7 @@ extern short int *management;
 extern unsigned long int *fsum1;       // summary grid for tallying fire occurence
 extern unsigned long int *fsum2;
 extern unsigned long int *fsum3;
+extern char *severitygrid;     // fire severity grid
 extern short int *bioagegrid;
 extern double *deadgrid;
 extern short int *timeinstage;
@@ -76,7 +77,7 @@ extern int treatelig[40][40][5];
 // FUNCTION PROTOTYPES
 short int get_struc( int index );
 void grow_veg( void );
-void disturb_veg( int landfiresum, int sevcnt, int firereg );
+void disturb_veg( int landfiresum, int sevcnt, int firereg);
 void nsdisturb_veg( int distnum );
 int gentreatment( short int treatmentunit, int treatmentclass );
 

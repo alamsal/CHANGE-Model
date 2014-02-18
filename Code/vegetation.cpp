@@ -7,14 +7,15 @@
 //              vegetation.
 //----------------------------------------------------------------------------
 
-#pragma hdrstop
+
+
 #include "fires.h"
 #include "vegetation.h"
 #include "randnum.h"
-#include "lads.h"
 #include "randnum.h"
 #include "biomass.h"
-
+#include "ladsio.h"
+#include "lads.h"
 //----------------------------------------------------------------------------
 // get_struc - looks up the successional stage code for a given cell
 //----------------------------------------------------------------------------
@@ -98,7 +99,7 @@ void grow_veg( void ) {
 //----------------------------------------------------------------------------
 // disturb_veg - determines fire effects on vegetation
 //----------------------------------------------------------------------------
-void disturb_veg( int landfiresum, int sevcnt, int firereg ) {
+void disturb_veg( int landfiresum, int sevcnt, int firereg) {
 
     int index;
     double modfiresev, modfiresev2, modfiresev3;
@@ -114,7 +115,7 @@ void disturb_veg( int landfiresum, int sevcnt, int firereg ) {
     double cumprob;
     int lastfiresev;
     int curstate, newstate, newreset;
-
+	
 	// Compute odds ratios from base fire severity probabilities
 	weathsevmod = cursevmod[firereg][sevcnt];
 	weathsevmod2 = cursevmod2[firereg][sevcnt];
@@ -201,6 +202,8 @@ void disturb_veg( int landfiresum, int sevcnt, int firereg ) {
                 if(regime[index] > 0 && buffer[index] == 1 && landfiresum == 1)  {
                     fsum2[index]++;
                 }
+				//populate the severity grid
+				severitygrid[index]=3;
             // "mixed-severity" fires
 			} else if (pathpick < modfiresev3) {
                 tsfire[index] = 0;
@@ -231,6 +234,8 @@ void disturb_veg( int landfiresum, int sevcnt, int firereg ) {
                 if(regime[index] > 0 && buffer[index] == 1 && landfiresum == 1)  {
                     fsum3[index]++;
                 }
+				//populate the severity grid
+				severitygrid[index]=2;
 
 			// Non-lethal fires
 			} else {
@@ -258,10 +263,14 @@ void disturb_veg( int landfiresum, int sevcnt, int firereg ) {
                     deadgrid[index] += oldbiomass * ms_mort[ regime[index] - 1 ];
                 }
 
-
+				//populate the severity grid
+				severitygrid[index]=1;
             }
+
         }  // end if cell is burned
     }
+	
+	//Write severity information into the file
 
     return;
 

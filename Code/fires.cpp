@@ -8,11 +8,11 @@
 //				based on odds ratios instead of the previous approach.
 //----------------------------------------------------------------------------
 
-#pragma hdrstop
 #include "lads.h"
 #include "fires.h"
 #include "randnum.h"
 #include "celllist.h"
+
 
 int fminrow;
 int fmaxrow;

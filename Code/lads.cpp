@@ -44,6 +44,7 @@ char *buffer;           // fire buffer zone grid
 char *landgrid;         // slope position
 char *fgrid1;           // fire simulation grid #1
 char *fgrid2;           // fire simulation grid #2
+char *severitygrid;    // fire severity grid
 int *specgrid;          // species metapopulation grid #1
 int *specgrid2;         // species metapopulation grid #2
 int *dispgrid;          // species dispersal grid
@@ -739,6 +740,7 @@ int main( int argc, char *argv[] ) {
 	// Basic raster computations - cell size and number of cells
 	cell_ha = pow((double)cellsize, 2) / 10000;
 	size = maxrow * maxcol;
+	
 
 
 	// Setup outputfiles
@@ -793,7 +795,10 @@ int main( int argc, char *argv[] ) {
 	temp = new unsigned char[size];
 	temp2 = new unsigned char[size];
 	fint = new float[size];
-
+	severitygrid= new char[size];
+	
+	//Fill severity grid with 0
+	//std::fill(severitygrid,severitygrid+size, static_cast<short int>(0));
 	if(landfiresum == 1) {
 		fsum1 = new unsigned long int[size];
 		fsum2 = new unsigned long int[size];
@@ -1047,6 +1052,7 @@ int main( int argc, char *argv[] ) {
 				}
 			}
 		}
+		severitygrid[index]=0;
 	}
 
 	// initialize summary arrays
@@ -1093,7 +1099,7 @@ int main( int argc, char *argv[] ) {
 		
 		
 		extract_hnicells(demperiod);
-		gen_hnisnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
+		gen_hnisnapshot("hni", demperiod, buffer_head, snapsum, 0);
 
 		// Implement fORSCE algorithm
 		extract_lcccells(demperiod); 
@@ -1215,6 +1221,8 @@ int main( int argc, char *argv[] ) {
 
 			// Fire disturbances
 			if( simfire_flag == 1) {
+				//Fill severity grid with 0
+				std::fill(severitygrid,severitygrid+size,0);
 
 				// Cycle through the fire loop
 				for(regcnt = 0; regcnt < regnum; regcnt ++) {
@@ -1248,7 +1256,8 @@ int main( int argc, char *argv[] ) {
 							printf("runname=%s year=%d size=%lf regime=%d %d\n", runname, year, fsize, regcnt + 1, is_bdin);							
 
 							// modify vegetation affected by fire
-							disturb_veg( landfiresum, sevcnt, regcnt );
+							disturb_veg( landfiresum, sevcnt, regcnt);					
+
 
 							// If past burn-in period, write fire information to file
 							if(is_bdin == 1) {
@@ -1274,6 +1283,12 @@ int main( int argc, char *argv[] ) {
 					}
 
 				} // end fires loop
+				
+				
+				//Gen fire severity
+				gen_severitysnapshot("severity", demperiod, buffer_head, snapsum, 0);
+
+
 			} // end if fireflag == 1
 
 			// If landscape structure summary is selected, increment structure
@@ -1293,9 +1308,9 @@ int main( int argc, char *argv[] ) {
 
 				// Output the landscape "snapshot"
 				if(snapsum >= 1) {
-					gen_snapshot(runname, demperiod, buffer_head, snapsum, 0);
+					gen_snapshot("state", demperiod, buffer_head, snapsum, 0);
 					reclassify_lclu(com_stateout,com_lclustate,com_counter-1);
-					gen_lccsnapshot(runname, demperiod+91, buffer_head, snapsum, 0); //Temporary intermediate snapshot  of lclugrid- just to make sure program is working.
+					gen_lccsnapshot("broader", demperiod, buffer_head, snapsum, 0); //Temporary intermediate snapshot  of lclugrid- just to make sure program is working.
 					writelog<<"END DEMAND PERIOD #"<<demperiod<<" ****************************************************************************************************************************"<<endl;
 				}
 				// or output age summaries
@@ -1416,16 +1431,6 @@ int main( int argc, char *argv[] ) {
 		if(landstrusum == 1) {
 			gen_strucsum(runname, largestnumstate, maxyear, buffer_head);
 		}
-
-
-
-
-
-
-
-
-
-
 
 	}
 

@@ -5,8 +5,6 @@
 // Decription:	Read the list of demand csv files into a demand vector
 //----------------------------------------------------------------------------
 
-
-
 #include <iostream>
 #include <fstream>
 #include <string>

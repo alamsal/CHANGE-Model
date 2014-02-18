@@ -28,6 +28,7 @@ extern short int *stategrid;
 extern char *comgrid;
 extern char *lccgrid;
 extern char *hnigrid;
+extern char *severitygrid;     // fire severity grid
 
 // OTHER GLOBAL VARIABLES
 extern int maxrow;         // max row and column address of grid
@@ -65,6 +66,7 @@ void gen_snapshot( char *runname, int year, struct image_header out_head,int sna
 void gen_lccsnapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum );
 void gen_forescesnapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum );
 void gen_hnisnapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum );
+void gen_severitysnapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum );
 void gen_agesum( char *runname, int year, struct image_header out_head, int timestep );
 void gen_biosum( char *runname, int year, struct image_header out_head );
 void write_grid( char *outfilename, unsigned char *gridname, struct image_header imagehd );
