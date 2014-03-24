@@ -51,10 +51,10 @@
     <ClCompile Include="..\..\Code\demand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Code\lccGrow.cpp">
+    <ClCompile Include="..\..\Code\hni.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Code\hni.cpp">
+    <ClCompile Include="..\..\Code\lccres.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,10 +98,10 @@
     <ClInclude Include="..\..\Code\demand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Code\lccGrow.h">
+    <ClInclude Include="..\..\Code\hni.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Code\hni.h">
+    <ClInclude Include="..\..\Code\lccres.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

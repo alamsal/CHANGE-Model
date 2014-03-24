@@ -7,7 +7,7 @@
 
 #include "hni.h"
 #include "lcc.h"
-#include "lccGrow.h"
+#include "lccres.h"
 #include "randnum.h"
 #include <iostream>
 #include <fstream>
@@ -33,26 +33,21 @@ void extract_hni2lcc(std::map<int,vector<lccCells> > &ext_hni2lcc_vector)
 		for(unsigned int hcol=0;hcol<maxcol;hcol++)
 		{
 			hindex=hrow*maxcol+hcol;
-			//Extracting hni cells only 2 are hni grid and evergreen
-			if((int)hnigrid[hindex]==2 && (lccgrid[hindex]==42))
+			//Extracting hni cells only;
+			//hni value:2  and extracting evergreen and decidious cells
+			int hni2Lcc=lccgrid[hindex];
+			if((int)hnigrid[hindex]==2 && ((hni2Lcc==42)||(hni2Lcc==41)))
 			{
-				//filter Lcc based on owenership type and development restriction
-				for (unsigned int olayer=0;olayer<numOwnership;olayer++)
+			 for(unsigned int nprbsrfce=0;nprbsrfce<numProbsurface-1;nprbsrfce++)   // The hni should always be in the last of the LCC type. Here numProbsurface-1 represents all LCC classes except hni
 				{
-					if((ownergrid[hindex]==ownershipCode[olayer]) &&	(ownershipRestriction[olayer]==0))
+					if(probability_surfaces[nprbsrfce][hrow][hcol]>transitionThreshold[nprbsrfce])
 					{
-
-						for(unsigned int nprbsrfce=0;nprbsrfce<numProbsurface-1;nprbsrfce++)   // The hni should always be in the last of the LCC type. Here numProbsurface-1 represents all LCC classes except hni
-						{
-							if(probability_surfaces[nprbsrfce][hrow][hcol]>transitionThreshold[nprbsrfce])
-							{
-								hni2lcccells.lccRow=hrow;
-								hni2lcccells.lccCol=hcol;
-								ext_hni2lcc_vector[nprbsrfce].push_back(hni2lcccells);
-							}
-						}
+						hni2lcccells.lccRow=hrow;
+						hni2lcccells.lccCol=hcol;
+						ext_hni2lcc_vector[nprbsrfce].push_back(hni2lcccells);
 					}
 				}
+				
 			}
 		}
 	}
@@ -63,7 +58,7 @@ void allocate_hni2lcc(int demperiod)
 {
 	int hnidemand;
 	std::map<int,vector<lccCells> > hni2lcc_cells; // A big group of cells changing to lcc in map object
-	std::vector<lccCells>hni2lcc_vec;       //subset of map object in vecor
+	std::vector<lccCells>hni2lcc_vec,eligible_hni2lcc_vec;       //subset of map object in vecor
 	extract_hni2lcc(hni2lcc_cells);
 	
 	//Reading demands for cell going from hni to developed - hni2lcc
@@ -75,15 +70,28 @@ void allocate_hni2lcc(int demperiod)
 			
 			
 			hni2lcc_vec=hni2lcc_cells[dcol];
+			//filter eligible cells
+			getEligibleCellsAfterOwnership(hni2lcc_vec,eligible_hni2lcc_vec,inlcccode[dcol]);
 
-			cout<<"Eligible cell#:"<<hni2lcc_vec.size()<<" From: hni"<<inlcccode[drow]<<" To:"<<inlcccode[dcol] <<" Psurface#: "<<dcol <<" Demand#:"<<hnidemand<<" Lag#" <<pts_distanceLag[dcol]<<" Psize#" << pts_patchSize[dcol]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[dcol] <<endl;
-			if((hnidemand>0) && (hni2lcc_vec.size()>0))
+			
+			cout<<"Eligible cell before ownership :"<<hni2lcc_vec.size()<<" From HNI: "<<inlcccode[drow]<<" To: "<<inlcccode[dcol] <<" Psurface#: "<<dcol <<" Demand#: "<<hnidemand<<" Lag#" <<pts_distanceLag[dcol]<<" Psize#" << pts_patchSize[dcol]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[dcol] <<endl;
+			cout<<"Eligible cell after ownership :"<<eligible_hni2lcc_vec.size()<<" From HNI: "<<inlcccode[drow]<<" To: "<<inlcccode[dcol] <<" Psurface#: "<<dcol <<" Demand#: "<<hnidemand<<" Lag#" <<pts_distanceLag[dcol]<<" Psize#" << pts_patchSize[dcol]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[dcol] <<endl;
+			
+			writelog<<"Eligible cell before ownership :"<<hni2lcc_vec.size()<<" From HNI: "<<inlcccode[drow]<<" To: "<<inlcccode[dcol] <<" Psurface#: "<<dcol <<" Demand#: "<<hnidemand<<" Lag#" <<pts_distanceLag[dcol]<<" Psize#" << pts_patchSize[dcol]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[dcol] <<endl;
+			writelog<<"Eligible cell after ownership :"<<eligible_hni2lcc_vec.size()<<" From HNI: "<<inlcccode[drow]<<" To: "<<inlcccode[dcol] <<" Psurface#: "<<dcol <<" Demand#: "<<hnidemand<<" Lag#" <<pts_distanceLag[dcol]<<" Psize#" << pts_patchSize[dcol]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[dcol] <<endl;
+
+			if((hnidemand>0) && (eligible_hni2lcc_vec.size()>0))
 			{
 				//Spatial allocation of hni2lcc
-				space_allocation(hni2lcc_vec,inlcccode[dcol],dcol,hnidemand,pts_distanceLag[dcol],pts_patchLag[dcol],true);
+				space_allocation(eligible_hni2lcc_vec,inlcccode[dcol],dcol,hnidemand,pts_distanceLag[dcol],pts_patchLag[dcol],true);
 				cout<<hnidemand<<endl;
 			}
+
+			//clean up the vectors	
+			hni2lcc_vec.clear();
+			eligible_hni2lcc_vec.clear();
 		}
+
 	}
 
 
@@ -232,30 +240,44 @@ void extract_allocate_lcc2hni(int demperiod)
 	
 	// container setup to store cells eligible from lcc to WUI
 	std::map<int,vector<lccCells> > lcc2hni_cells;
-	std::vector<lccCells> vec_lcc2hni_cells, vegetated_vec_lcc2hnicells;
+	std::vector<lccCells> vec_lcc2hni_cells, eligible_vec_lcc2hni_cells;
 	
 	//Read eligible lcc2hni cells
 	for(unsigned int row=0; row<numlcc;row++)	
 	{
 		lcc2hni_cells=extracted_lcc2hni[row];
-		//extracting eligible lcc2hnicells
+		//extracting eligible lcc2hnicells based upon probability
 		vec_lcc2hni_cells=lcc2hni_cells[numlcc];
 
-		//selecting only natrual vegetated cell goes to hni [ Becareful while selecting the hni demands the program doesn't have any restriction to Nat veg convert into hni if there sufficient eligible cells and demand no matter wetland, herb, shurb, evergreen or deci]
-		if((vec_lcc2hni_cells.size()>0) && (lcc_flag[row]==1))
+		//filter lcc2hnni eligible cells based upon ownership restriction
+		cout<<"Eligible cells before ownership restriction, LCC2HNI: "<< vec_lcc2hni_cells.size() <<endl;
+		getEligibleCellsAfterOwnership(vec_lcc2hni_cells,eligible_vec_lcc2hni_cells,999);
+
+		
+		cout<<"Eligible cells after ownership restriction, LCC2HNI: " << eligible_vec_lcc2hni_cells.size()<<endl;
+
+		writelog<<"Eligible cells before ownership restriction, LCC2HNI: "<< vec_lcc2hni_cells.size() <<endl;
+		writelog<<"Eligible cells after ownership restriction, LCC2HNI: " << eligible_vec_lcc2hni_cells.size()<<endl;
+
+		//selecting only natrual vegetated cell goes to hni [ Becareful while selecting the hni demands the program doesn't have any restriction to Nat veg convert into hni if are there sufficient eligible cells and demands. No matter wetland, herb, shurb, evergreen or deci can goes to hni]
+		if((eligible_vec_lcc2hni_cells.size()>0) && (lcc_flag[row]==1))
 		{
 			for(unsigned int col=numlcc;col<numProbsurface;col++)
 			{
 				hnidemand=(int)demand_matrix[demperiod][row][col];
-				cout<<"Demand:"<<hnidemand<<endl;
+				cout<<"Demand LCC2HNI:"<<hnidemand<<endl;
 				if(hnidemand>0)
 				{
-					allocate_lcc2hni(vec_lcc2hni_cells,col,hnidemand,hnicode,pts_distanceLag[numlcc],pts_patchLag[numlcc]);
-					vec_lcc2hni_cells.clear();
+					allocate_lcc2hni(eligible_vec_lcc2hni_cells,col,hnidemand,hnicode,pts_distanceLag[numlcc],pts_patchLag[numlcc]);
+					eligible_vec_lcc2hni_cells.clear();
 					break;
 				}
 			}
 		}
+
+		//clean up the vectors
+		vec_lcc2hni_cells.clear();
+		eligible_vec_lcc2hni_cells.clear();
 			
 	}
 
@@ -303,7 +325,7 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 				// No lag constrain for seed placement
 				if((afterIteraiton) || (hni_lag==-9))
 				{
-					if(hnitempgridFlag[hni_index]==0 ) // we can put natural vegetation class as well for filtering
+					if(hnitempgridFlag[hni_index]==0)  // we can put natural vegetation class as well for filtering
 					{
 						cout <<"HNI demand: "<<demand<<"Eligible cells: "<<lcc2hni_vec.size()<<endl;
 					
@@ -373,7 +395,7 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 						{
 							hni_index=neighrow*maxcol + neighcol;
 							//if(((getNeighbour(neighrow,neighcol,lcccode)) &&(lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )) //Enforce adjaceny while cell transition
-							if((getHnilag(rand_lccrow,rand_lcccol,hcode,hni_plag,hni_patch,true)) && (hnitempgridFlag[hni_index]==0) )  //Enforce patch lag while cell transtion
+							if((getHnilag(rand_lccrow,rand_lcccol,hcode,hni_plag,hni_patch,true)) && (hnitempgridFlag[hni_index]==0))  //Enforce patch lag while cell transtion
 							{
 
 								hnigrid[hni_index]=hcode;// Need to change the file provided by Zhiua because 255 does not read the system properly- it converted into -1. Therefore I put -1 just for testing purpose
@@ -382,7 +404,7 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 								hni_patch++;
 								counter2=0;
 								cout<< "Rem demand: "<<demand<<"\t Eligible cells in NeigbourHood List: "<< hni_neighbourVecCells.size()<<endl;
-								//writelog<< "Rem demand: "<<demand<<"\t Eligible cells in NeigbourHood List: "<< hni_neighbourVecCells.size()<<endl;
+								writelog<< "Rem demand: "<<demand<<"\t Eligible cells in NeigbourHood List: "<< hni_neighbourVecCells.size()<<endl;
 								hni_neighbourVecCells.erase(hni_neighbourVecCells.begin()+i);
 								if(hni_neighbourVecCells.size()!=0)
 								{
@@ -393,6 +415,7 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 								hni_neighbourVecCells.insert(hni_neighbourVecCells.end(),hni_neighborVecObjList.begin(),hni_neighborVecObjList.end());
 
 								cout<< "Code:2-Rem. to accomp demand::"<<demand <<"\t Rem. trans. prob pixel #::" <<lcc2hni_vec.size() <<"counter" <<counter2<< endl; 
+								writelog<< "Code:2-Rem. to accomp demand::"<<demand <<"\t Rem. trans. prob pixel #::" <<lcc2hni_vec.size() <<"counter" <<counter2<< endl; 
 										
 
 							}

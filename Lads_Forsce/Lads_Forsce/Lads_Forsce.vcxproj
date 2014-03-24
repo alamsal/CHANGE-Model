@@ -85,7 +85,7 @@
     <ClCompile Include="..\..\Code\lads.cpp" />
     <ClCompile Include="..\..\Code\ladsio.cpp" />
     <ClCompile Include="..\..\Code\lcc.cpp" />
-    <ClCompile Include="..\..\Code\lccGrow.cpp" />
+    <ClCompile Include="..\..\Code\lccres.cpp" />
     <ClCompile Include="..\..\Code\probSurface.cpp" />
     <ClCompile Include="..\..\Code\randnum.cpp" />
     <ClCompile Include="..\..\Code\demand.cpp" />
@@ -101,7 +101,7 @@
     <ClInclude Include="..\..\Code\lads.h" />
     <ClInclude Include="..\..\Code\ladsio.h" />
     <ClInclude Include="..\..\Code\lcc.h" />
-    <ClInclude Include="..\..\Code\lccGrow.h" />
+    <ClInclude Include="..\..\Code\lccres.h" />
     <ClInclude Include="..\..\Code\probSurface.h" />
     <ClInclude Include="..\..\Code\randnum.h" />
     <ClInclude Include="..\..\Code\demand.h" />

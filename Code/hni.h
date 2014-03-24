@@ -38,7 +38,7 @@ extern int pts_distanceLag[40];	 // Input patch distance lag
 extern unsigned int pts_patchSize[40];		 // Input mean patch size 
 extern unsigned int pts_stdDeviation[40];	 // Input patch standard deviation
 extern unsigned int pts_patchLag[40];        // Input patch lag for delinate patch shape
-
+extern string ownershipNotAllow[40];                 //Destination LCLU class(es) that not allowed to chage in restricted area
 extern std::vector< std::vector<std::vector< int > > > demand_matrix;  //Container to hold demand matrix
 extern std::vector< std::vector<std::vector< float > > >probability_surfaces; //Holds the probability surfaces rasters as 3D vector
 

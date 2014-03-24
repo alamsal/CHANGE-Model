@@ -49,6 +49,7 @@ void split_line(string& line, string delim, int dfile,std::vector< std::vector<s
 //std::vector<std::vector<string> > read_demandCsv()
 void read_demandCsv(std::vector< std::vector<std::vector< int > > > & demmat,int NumberOfFiles,int rows,int columns)
 {
+    // cout<< "Reading demand files......."<<endl;
 
 	for(unsigned int dfile=0;dfile<NumberOfFiles;dfile++)
 	{
@@ -103,19 +104,19 @@ void read_demandCsv(std::vector< std::vector<std::vector< int > > > & demmat,int
 	}
 
 	
-	
-	for(unsigned int file=0;file<NumberOfFiles;file++)
-	{
-		cout<<"Demand variable from file#" <<"\t" <<file<<endl;
-		for(int i =0; i<rows;i++)
-		{
-			for (int j=0; j<columns; j++)
-			{
-				cout<<"("<<i<<","<<j<<")"<<demmat[file][i][j]<<"\t";
-			}
-		} 
-	
-	}
+	//
+	//for(unsigned int file=0;file<NumberOfFiles;file++)
+	//{
+	//	cout<<"Demand variable from file#" <<"\t" <<file<<endl;
+	//	for(int i =0; i<rows;i++)
+	//	{
+	//		for (int j=0; j<columns; j++)
+	//		{
+	//			cout<<"("<<i<<","<<j<<")"<<demmat[file][i][j]<<"\t";
+	//		}
+	//	} 
+	//
+	//}
 
 
 

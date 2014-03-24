@@ -39,7 +39,7 @@ extern int maxcol;
 extern int rowDemand;		//Total no of rows in demand file
 extern int colDemand;		//Total no of columns in demand file
 extern int numDemand;		//Total no of demand file
-
+extern int hni_flag;
 extern int numlcc;					//Number of lcc types
 extern unsigned int inlcccode[40];			//Input lcc code works upto 40 different LCC types.
 extern unsigned int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
@@ -47,14 +47,14 @@ extern unsigned int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
 extern unsigned int numOwnership;				// Number of ownership types
 extern unsigned int ownershipCode[40];			// ID code for ownership types
 extern unsigned int ownershipRestriction[40];			// Ownership restriction flag (1= Non-developable, 0=Developable)
-
+extern string ownershipNotAllow[40];                 //Destination LCLU class(es) that not allowed to chage in restricted area
 extern int meanpatchSize;			//Mean output patch size
 extern int numProbsurface; // Number of probability surfaces
 extern float transitionThreshold[40]; // Trasitin threshold for each probability class
 extern ofstream writelog; //log file	
 
 // Hold filtered raster cells
-extern struct lccCells
+struct lccCells
 {
 	int lccRow;
 	int lccCol;

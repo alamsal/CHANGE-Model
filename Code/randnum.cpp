@@ -111,8 +111,11 @@ double u0_1(void)
     //y = RAND_MAX + 2;
 
     //newnum = (double)(x)/(double)(y);
-    newnum = genrand();
-	return( newnum );
+    
+		
+	newnum = genrand();
+		
+	return (newnum);
 
 }
 

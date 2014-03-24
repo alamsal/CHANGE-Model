@@ -16,7 +16,7 @@
 #include "celllist.h"
 #include "probSurface.h"
 #include "demand.h"
-#include "lccGrow.h"
+#include "lccres.h"
 #include "hni.h"
 #include <iostream>
 #include <vector>
@@ -218,11 +218,87 @@ bool cellTrasition(int cellindex, int lcccode, bool hni_trasition)
 		}
 
 	}
-	//Allow broad LCLU classes transitions only on non hni cells
+	
+	//Allow broad LCLU classes transitions only on non hni cells 
 	else
 	{
-		if((int)hnigrid[cellindex]==nohnicode)
-		{	
+		if(hni_flag==1)
+		{
+			if((int)hnigrid[cellindex]==nohnicode)
+			{	
+				int cellValue= (int)lccgrid[cellindex];
+				bool toHuman=true;
+
+				for( unsigned int i=0; i<numlcc;i++)
+				{
+					//Trasition from Human dominted to Nature and Human dominated to Human
+					if((cellValue==inlcccode[i]) && (lcc_flag[i]==0))
+					{
+						for(unsigned int j=0; j<numlcc;j++)
+						{
+							if((lcccode==inlcccode[j])&&(lcc_flag[j]==1))
+							{
+								stategrid[cellindex]=1;			// When forsce simulate veg to veg/ non-veg to veg the successional stage= 1;timeinstage =0; age=0; time since fire=0. 
+								// When forsce simulate non-veg to non-veg * veg to non-veg the buffer is  set to 0, which will handle by "merg_lccBuffer()" after the completion this demand allocation look at lads.cpp.
+								timeinstage[cellindex]=1;		// time in current successional stage grid
+								age[cellindex]=1;				// patch age grid
+								lccgrid[cellindex]=inlcccode[j];
+								tsfire[cellindex]=1;			// time since last fire grid
+								buffer[cellindex]=1;			//Active simulation
+								tempgridFlag[cellindex]=1;		// To prevent from further trasition of the same cell
+								toHuman=false;
+								return true;
+								break;
+							}
+						}
+						if(toHuman)
+						{
+							lccgrid[cellindex]=lcccode; 
+							buffer[cellindex]=0;			//Prevent from simulation human dominated cell
+							tempgridFlag[cellindex]=1;		// To prevent from further trasition of the same cell
+							return true;
+
+						}
+
+
+					}
+					//Trasition from Nature to Nature (No pixel transition-just for reference) and Nature to Human
+					else
+					{
+						if((cellValue==inlcccode[i]) && (lcc_flag[i]==1))
+						{
+							for(unsigned int k=0;k<numlcc;k++)
+							{
+								if((lcccode==inlcccode[k])&&(lcc_flag[k]==1))
+								{
+									buffer[cellindex]=1;			//Prevent from simulation human dominated cell
+									return false;
+									break;
+								}
+								else
+								{
+									lccgrid[cellindex]=lcccode; 
+									buffer[cellindex]=0;			//Prevent from simulation human dominated cell
+									tempgridFlag[cellindex]=1;		// To prevent from further trasition of the same cell
+									return true;
+								}
+							}
+
+						}
+
+					}
+
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		// Shutting down the HNI simulation temporarily, hni_flag=0
+		else
+		{
 			int cellValue= (int)lccgrid[cellindex];
 			bool toHuman=true;
 
@@ -268,6 +344,7 @@ bool cellTrasition(int cellindex, int lcccode, bool hni_trasition)
 						{
 							if((lcccode==inlcccode[k])&&(lcc_flag[k]==1))
 							{
+								buffer[cellindex]=1;			//Prevent from simulation human dominated cell
 								return false;
 								break;
 							}
@@ -286,10 +363,8 @@ bool cellTrasition(int cellindex, int lcccode, bool hni_trasition)
 
 			}
 		}
-		else
-		{
-			return false;
-		}
+
+		
 	}
 
 }
@@ -562,102 +637,187 @@ std::map<int,vector<lccCells> > extract_LandCoverCells(int lccCode)
 	ext_lcc_vector.clear();
 
 	unsigned int count=0; //Cell counter for each class of LCC.
-
-	// Read LCC grid and extract forest cell into a separate linked list, named forest_list. 
-	for(unsigned int row=0; row<maxrow; row++) 
+	if(hni_flag==1)
 	{
-		for(unsigned int col=0; col<maxcol; col++) 
+		// Read LCC grid and extract forest cell into a separate list, named forest_list. 
+		for(unsigned int row=0; row<maxrow; row++) 
 		{
-			index=row*maxcol + col;			
-			if((lccgrid[index]==lccCode)&&(hnigrid[index]==1)) //Extract LCC class based upon lcc code and cells that are not in HNI grid
+			for(unsigned int col=0; col<maxcol; col++) 
 			{
-				//filter Lcc based on owenership type and development restriction
-				for (unsigned int olayer=0;olayer<numOwnership;olayer++)
+				index=row*maxcol + col;			
+				if((lccgrid[index]==lccCode)&&(hnigrid[index]==1)) //Extract LCC class based upon lcc code and cells that are not in HNI grid
 				{
-					if((ownergrid[index]==ownershipCode[olayer]) &&	(ownershipRestriction[olayer]==0))
-					{
-						/*
-						if((probability_surfaces[0][row][col])>0.95)			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
-						{
-						tempLcc.lccRow=row;
-						tempLcc.lccCol=col;
-						ext_lcc_vector[0].push_back(tempLcc);
-						}
-						if((probability_surfaces[1][row][col])>0.95)			//Extract cells having  ice transition prob threshold >95% i.e 0.95 ( to ice)
-						{
-						tempLcc.lccRow=row;
-						tempLcc.lccCol=col;
-						ext_lcc_vector[1].push_back(tempLcc);
-						}
-						if((probability_surfaces[2][row][col])>0.93)			//Extract cells having transition prob threshold>93% ie. 0.93 (to urban)
-						{
-						tempLcc.lccRow=row;
-						tempLcc.lccCol=col;
-						ext_lcc_vector[2].push_back(tempLcc);
-						}
-						if((probability_surfaces[3][row][col])>0.85)			//Extract cells having trasnition prob threshold>85 ie. 0.84 ( to barren)
-						{
-						tempLcc.lccRow=row;
-						tempLcc.lccCol=col;
-						ext_lcc_vector[3].push_back(tempLcc);
-						}
-						if((probability_surfaces[4][row][col])>0.85)			//to decdidous forest
-						{
-						tempLcc.lccRow=row;
-						tempLcc.lccCol=col;
-						ext_lcc_vector[4].push_back(tempLcc);
-
-						}
-						if((probability_surfaces[5][row][col])>0.85)			//to evergreen forest
-						{
-						tempLcc.lccRow=row;
-						tempLcc.lccCol=col;
-						ext_lcc_vector[5].push_back(tempLcc);
-						}
-						if((probability_surfaces[6][row][col])>0.85)			//to shrubland
-						{
-						tempLcc.lccRow=row;
-						tempLcc.lccCol=col;
-						ext_lcc_vector[6].push_back(tempLcc);
-						}
-						if((probability_surfaces[7][row][col])>0.85)			//to grassland
-						{
-						tempLcc.lccRow=row;
-						tempLcc.lccCol=col;
-						ext_lcc_vector[7].push_back(tempLcc);
-						}
-						if((probability_surfaces[8][row][col])>0.90)			//to hay/pasture
-						{
-						tempLcc.lccRow=row;
-						tempLcc.lccCol=col;
-						ext_lcc_vector[8].push_back(tempLcc);
-						}
-						if((probability_surfaces[9][row][col])>0.85)			//to crops
-						{
-						tempLcc.lccRow=row;
-						tempLcc.lccCol=col;
-						ext_lcc_vector[9].push_back(tempLcc);
-						}
-						*/
-						for (unsigned int i=0;i<numProbsurface;i++)
-						{
-							if((probability_surfaces[i][row][col])>(transitionThreshold[i]))			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
+							/*
+							if((probability_surfaces[0][row][col])>0.95)			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
 							{
-								tempLcc.lccRow=row;
-								tempLcc.lccCol=col;
-								ext_lcc_vector[i].push_back(tempLcc);
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[0].push_back(tempLcc);
+							}
+							if((probability_surfaces[1][row][col])>0.95)			//Extract cells having  ice transition prob threshold >95% i.e 0.95 ( to ice)
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[1].push_back(tempLcc);
+							}
+							if((probability_surfaces[2][row][col])>0.93)			//Extract cells having transition prob threshold>93% ie. 0.93 (to urban)
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[2].push_back(tempLcc);
+							}
+							if((probability_surfaces[3][row][col])>0.85)			//Extract cells having trasnition prob threshold>85 ie. 0.84 ( to barren)
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[3].push_back(tempLcc);
+							}
+							if((probability_surfaces[4][row][col])>0.85)			//to decdidous forest
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[4].push_back(tempLcc);
+
+							}
+							if((probability_surfaces[5][row][col])>0.85)			//to evergreen forest
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[5].push_back(tempLcc);
+							}
+							if((probability_surfaces[6][row][col])>0.85)			//to shrubland
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[6].push_back(tempLcc);
+							}
+							if((probability_surfaces[7][row][col])>0.85)			//to grassland
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[7].push_back(tempLcc);
+							}
+							if((probability_surfaces[8][row][col])>0.90)			//to hay/pasture
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[8].push_back(tempLcc);
+							}
+							if((probability_surfaces[9][row][col])>0.85)			//to crops
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[9].push_back(tempLcc);
+							}
+							*/
+							for (unsigned int i=0;i<numProbsurface;i++)
+							{
+								if((probability_surfaces[i][row][col])>(transitionThreshold[i]))			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
+								{
+									tempLcc.lccRow=row;
+									tempLcc.lccCol=col;
+									ext_lcc_vector[i].push_back(tempLcc);
+
+								}
 
 							}
 
-						}
+							count++;
 
-						count++;
-					}
 				}
-
 			}
 		}
-	}	
+	}
+	else
+	{
+		// Read LCC grid and extract forest cell into a separate linked list, named forest_list. 
+		for(unsigned int row=0; row<maxrow; row++) 
+		{
+			for(unsigned int col=0; col<maxcol; col++) 
+			{
+				index=row*maxcol + col;			
+				if(lccgrid[index]==lccCode) //Extract LCC class based upon lcc code and without considering the HNI 
+				{
+							/*
+							if((probability_surfaces[0][row][col])>0.95)			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[0].push_back(tempLcc);
+							}
+							if((probability_surfaces[1][row][col])>0.95)			//Extract cells having  ice transition prob threshold >95% i.e 0.95 ( to ice)
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[1].push_back(tempLcc);
+							}
+							if((probability_surfaces[2][row][col])>0.93)			//Extract cells having transition prob threshold>93% ie. 0.93 (to urban)
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[2].push_back(tempLcc);
+							}
+							if((probability_surfaces[3][row][col])>0.85)			//Extract cells having trasnition prob threshold>85 ie. 0.84 ( to barren)
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[3].push_back(tempLcc);
+							}
+							if((probability_surfaces[4][row][col])>0.85)			//to decdidous forest
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[4].push_back(tempLcc);
+
+							}
+							if((probability_surfaces[5][row][col])>0.85)			//to evergreen forest
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[5].push_back(tempLcc);
+							}
+							if((probability_surfaces[6][row][col])>0.85)			//to shrubland
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[6].push_back(tempLcc);
+							}
+							if((probability_surfaces[7][row][col])>0.85)			//to grassland
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[7].push_back(tempLcc);
+							}
+							if((probability_surfaces[8][row][col])>0.90)			//to hay/pasture
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[8].push_back(tempLcc);
+							}
+							if((probability_surfaces[9][row][col])>0.85)			//to crops
+							{
+							tempLcc.lccRow=row;
+							tempLcc.lccCol=col;
+							ext_lcc_vector[9].push_back(tempLcc);
+							}
+							*/
+							for (unsigned int i=0;i<numlcc;i++)
+							{
+								if((probability_surfaces[i][row][col])>(transitionThreshold[i]))			//Extract cells having  water transition prob threshold >95% i.e 0.95 ( to water)
+								{
+									tempLcc.lccRow=row;
+									tempLcc.lccCol=col;
+									ext_lcc_vector[i].push_back(tempLcc);
+
+								}
+
+							}
+
+							count++;
+				}
+			}
+		}
+	}
 	
 	
 
@@ -711,7 +871,9 @@ void allocate_lccCells(int demperiod)
 	getextractedCells(extracted_lcc);
 
 	std::map<int,vector<lccCells> > lcc_cells;
-	std::vector<lccCells> vec_lcc_cells;
+	std::vector<lccCells> vec_lcc_cells,eligible_vec_lcc_cells;
+
+
 
 	//Read demand file in row/column order
 	for(unsigned int row=0; row<numlcc;row++)	// Total rows upto LCC number notup to demand file to prevent HNI simulation here
@@ -721,7 +883,7 @@ void allocate_lccCells(int demperiod)
 			//cout<<"("<<row<<","<<col<<")"<<demand_matrix[row][col]<<"\t";
 			if(row==col)		//No demand allocation diagonally 
 			{
-				cout<<"No demand allocation"<<endl;
+				cout<<"No demand allocation"<<endl<<flush;
 
 			}
 			else
@@ -731,13 +893,25 @@ void allocate_lccCells(int demperiod)
 				int demand=(int)demand_matrix[demperiod][row][col];
 				lcc_cells=extracted_lcc[row];
 
+				//List of eligible cells based on probability surfaces
+
 				vec_lcc_cells=lcc_cells[col];
+			
+				getEligibleCellsAfterOwnership(vec_lcc_cells,eligible_vec_lcc_cells,inlcccode[col]);
+
+				cout<<"Eligible cell before restriction and ownership #:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<" To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand<<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_patchSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col] <<endl;
+				cout<<"Eligible cell after restriction and ownership #:"<<eligible_vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<" To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand<<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_patchSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col] <<endl;
 				
-				cout<<"Eligible cell#:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<" To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand<<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_patchSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col] <<endl;
-				writelog<<"Eligible cell#:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<"To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand <<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_patchSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col]<<endl;
+				writelog<<"Eligible cell before restriction and ownership #:"<<vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<" To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand<<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_patchSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col] <<endl;
+				writelog<<"Eligible cell after restriction and ownership #:"<<eligible_vec_lcc_cells.size()<<" From:"<<inlcccode[row]<<" To:"<<inlcccode[col] <<" Psurface#: "<<col <<" Demand#:"<<demand<<" Lag#" <<pts_distanceLag[col]<<" Psize#" << pts_patchSize[col]<<" Mpsize#"<<meanpatchSize<<" Std#" << pts_stdDeviation[col] <<endl;
 
 				//Feed for spatial allocation of broader LCC classes only ( No hni simulation- ishni_trasition=false)
-				space_allocation(vec_lcc_cells,inlcccode[col],col,demand,pts_distanceLag[col], pts_patchLag[col],false);
+				space_allocation(eligible_vec_lcc_cells,inlcccode[col],col,demand,pts_distanceLag[col], pts_patchLag[col],false);	
+				
+				
+				//clean up vectors
+				vec_lcc_cells.clear();
+				eligible_vec_lcc_cells.clear();
 			}
 
 		}
@@ -803,7 +977,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 				//No lag constraion for seed placement
 					if((afterIteraiton) || (lag==-9) )
 					{
-						if(((lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) ))
+						if((lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0)) 
 						{
 
 							bool transFlag=cellTrasition(cell_index,lcccode,ishni_transition);
@@ -911,7 +1085,7 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 						{
 							cell_index=neighrow*maxcol + neighcol;
 							//if(((getNeighbour(neighrow,neighcol,lcccode)) &&(lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )) //Enforce adjaceny while cell transition
-							if((getNeighbourLag(neighrow,neighcol,lcccode,plag,patch_size,true))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )  //Enforce patch shape lag while cell transtion
+							if((getNeighbourLag(neighrow,neighcol,lcccode,plag,patch_size,true))  && (lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0)  )  //Enforce patch shape lag while cell transtion
 							{
 
 								bool transFlag=cellTrasition(cell_index,lcccode,ishni_transition);

@@ -19,6 +19,7 @@
 #include "errorCheck.h"
 #include "demand.h"
 #include "hni.h"
+#include "lccres.h"
 
 #include <iostream>
 #include <string.h>
@@ -83,7 +84,7 @@ int tsumtype;		// flag for treatment output summary
 int read_map;       // read external map or generate simulated landscape
 int torus;			// indicates whether fires wrap around simulation landscape edges
 int mintsfire;		// number of years after burnining at which a cell can reburn
-
+int hni_flag;		// flag - indicates whether HNI will be simulated
 
 
 // Community Type/Successional Stage Parameters
@@ -186,6 +187,7 @@ float transitionThreshold[40];   // probsufaces trasition for each class
 unsigned int numOwnership;				// Number of ownership types
 unsigned int ownershipCode[40];			// ID code for ownership types
 unsigned int ownershipRestriction[40];			// Ownership restriction flag (1= Non-developable, 0=Developable)
+string ownershipNotAllow[40];                 //Destination LCLU class(es) that not allowed to chage in restricted area
 //Human-natural paramters
 int numHni;    //Number of HNI types
 int hniCode[40];	//Code for HNI types
@@ -215,11 +217,14 @@ std::vector< std::vector<std::vector< int > > > demand_matrix; // Holds the dema
 
 //temp grid to hold vegetation trasition flag (0- ready for trasition & 1- already changed & no trasnition)
 std::vector <int> tempgridFlag,hnitempgridFlag;
+
 //log file
-ofstream writelog("logfile.txt",fstream::out|fstream::app);
+ofstream writelog;
+
+
 
 int main( int argc, char *argv[] ) {
-
+	
 	char runname[80];       // run name
 	char infilename[80];    // main input file name
 	char landfilename[80];  // landtype input file name
@@ -280,7 +285,9 @@ int main( int argc, char *argv[] ) {
 	int unitcounter[5];		// treatment unit counter
 	int unitcnt;			// counts number of units treated
 	int lcccnt;				// counts number of lcc types
-	int nowner;				//counts number of ownwership types
+	int nowner;				// counts number of ownwership types
+	
+
 	// 9-21-2012: Code updated to allow up to 40 fire regimes
 	double fsize;           // fire size
 	double nfr[40][10];         // natural fire rotation
@@ -326,7 +333,9 @@ int main( int argc, char *argv[] ) {
 	struct image_header manage_head;	// ERDAS file header for management unit grid
 	struct image_header age_head;		// ERDAS file header for forest age grid
 	struct image_header tsfire_head;	// ERDAS file header for time since fire grid
-
+	
+	//Check log exists
+	checkLogExists("log.txt");
 	// Read input file name from the command line
 	strcpy(runname, argv[1]);
 	strcpy(infilename, argv[1]);
@@ -386,7 +395,6 @@ int main( int argc, char *argv[] ) {
 	ifstream indmdfile;
 	ifstream inptsizefile;
 	ifstream inownershipfile;
-	ifstream inhnifile;
 
 	// Read main input file
 	infile >> cellsize; infile.ignore(100, '\n');
@@ -408,6 +416,7 @@ int main( int argc, char *argv[] ) {
 	infile >> biom_flag; infile.ignore(100, '\n');	 //Biomass flag
 	infile >> distnum; infile.ignore(100, '\n');	//# of non spatial disturbances
 	infile >> mgmtnum; infile.ignore(100, '\n');	//# of treatments
+	infile>> hni_flag;infile.ignore(100,'\n');
 	infile.close();
 
 	//Check input file parameters
@@ -578,10 +587,10 @@ int main( int argc, char *argv[] ) {
 
 	// Read lcc inputfile -Modified by Ashis 12/12/2012
 	inlccfile.open(lccfilename);
-	inlccfile.ignore(100,'\n'); //Skip to the new line
+	//inlccfile.ignore(100,'\n'); //Skip to the new line
 	inlccfile>>numlcc; inlccfile.ignore(100,'\n');
 	cout<<"Total # of LCC class descriptionin parameter file: "<<numlcc<<endl;
-	inlccfile.ignore(100,'\n'); //Skip to the new line
+	//inlccfile.ignore(100,'\n'); //Skip to the new line
 	std::cout<<"Input LCC class Code \t Output LCC class code \t Simulation Flag"<<endl;
 	for(lcccnt=0;lcccnt<numlcc;lcccnt++)
 	{
@@ -603,34 +612,21 @@ int main( int argc, char *argv[] ) {
 	inownershipfile>>numOwnership; inownershipfile.ignore(100,'\n');
 	std::cout<< "Total # of ownership layers: "<<numOwnership<<endl;
 	inownershipfile.ignore(100,'\n');// Skip to the new line
-	std::cout<<"Code \t Restricion"<<endl;
+	std::cout<<"Code \t Restricion \t Allowed Class(es)"<<endl;
 	for(unsigned int nowner=0;nowner<numOwnership; nowner++)
 	{
-		inownershipfile>>ownershipCode[nowner]>>ownershipRestriction[nowner];inownershipfile.ignore(100,'\n');
-		std::cout<<ownershipCode[nowner]<<"\t"<< ownershipRestriction[nowner]<<endl; 
+		inownershipfile>>ownershipCode[nowner]>>ownershipRestriction[nowner]>>ownershipNotAllow[nowner];inownershipfile.ignore(100,'\n');
+		std::cout<<ownershipCode[nowner]<<"\t"<< ownershipRestriction[nowner]<<"\t"<<ownershipNotAllow[nowner]<<endl; 
 
 	}
 	inownershipfile.close();
 
-	//Read Human-nature interface parameter file
-	inhnifile.open(hnifilename);
-	inhnifile>>numHni; inhnifile.ignore(100,'\n');
-	std::cout<< "Total # of HNI layers: "<<numHni<<endl;
-	inhnifile.ignore(100,'\n');// Skip to the new line
-	std::cout<<"Code \t Restricion"<<endl;
-	for(unsigned int nnhi=0;nnhi<numHni; nnhi++)
-	{
-		inhnifile>>hniCode[nnhi]>>hniRestriction[nnhi];inhnifile.ignore(100,'\n');
-		std::cout<<hniCode[nnhi]<<"\t"<< hniRestriction[nnhi]<<endl; 
-
-	}
-	inhnifile.close();
 
 	//Read probability sufrace paramter file
 	inprbfile.open(prbfilename);
 	inprbfile>>numProbsurface;inprbfile.ignore(100,'\n');
-	inprbfile>>probRows;inprbfile.ignore(100,'\n');
-	inprbfile>>probColumns;inprbfile.ignore(100,'\n');
+	probRows=maxrow;
+	probColumns=maxcol;
 
 
 	for(prbcnt=0;prbcnt<numProbsurface;prbcnt++)
@@ -643,7 +639,7 @@ int main( int argc, char *argv[] ) {
 	
 	//Read patch size paramter file
 	inptsizefile.open(ptsizefilename);
-	inptsizefile.ignore(100,'\n'); //Skip to the new line
+	//inptsizefile.ignore(100,'\n'); //Skip to the new line
 	std::cout<<"Patch lag\ Distance Lag \t Mean Patch Size \t SDT Deviation"<<endl;
 	for(lcccnt=0;lcccnt<numProbsurface;lcccnt++)
 	{
@@ -665,7 +661,7 @@ int main( int argc, char *argv[] ) {
 	}
 	// Read probability surfaces raster files
 	read_probabilitySurfaces(probability_surfaces,numProbsurface,probRows,probColumns);
-	probability_surfaces;
+	//probability_surfaces;
 
 
 	// Only read wood biomass intput file if we're simulating biomass
@@ -880,10 +876,16 @@ int main( int argc, char *argv[] ) {
 		}
 		//Read grid ownership.gis
 		owner_head=read_grid("ownership",ownergrid);
+		
 		//Read grid hni.gis
-		hni_head=read_grid("inithni",hnigrid);
+		if(hni_flag==1)
+		{
+			hni_head=read_grid("inithni",hnigrid);
+		}
+		
 		// Read grid community.gis
 		com_head = read_grid("community", comgrid);  
+		
 		//Compare # of class in community grid with runname.ctp file
 		if(input_error_flag==1)
 		{
@@ -1080,7 +1082,7 @@ int main( int argc, char *argv[] ) {
 			demand_matrix[i][j].resize(colDemand);
 		}
 	}
-	cout<<"Reading demand matrix csvs..."<<endl;
+	cout<<"Reading demand files (csvs)..."<<endl;
 	read_demandCsv(demand_matrix,numDemand,rowDemand,colDemand);
 	demand_matrix;	
 
@@ -1093,15 +1095,18 @@ int main( int argc, char *argv[] ) {
 		tempgridFlag.clear();
 		tempgridFlag.resize(size,0);
 		
-		hnitempgridFlag.clear();         // holds hni trasition flags temporarily
-		hnitempgridFlag.resize(size,0);  // memory allocation 
 		//Implement HNI algorithm
+		if(hni_flag==1)
+		{
+			hnitempgridFlag.clear();         // holds hni trasition flags temporarily
+			hnitempgridFlag.resize(size,0);  // memory allocation 
+			
 		
-		
-		extract_hnicells(demperiod);
-		gen_hnisnapshot("hni", demperiod, buffer_head, snapsum, 0);
+			extract_hnicells(demperiod);
+			gen_hnisnapshot("hni", demperiod, buffer_head, snapsum, 0);
+		}
 
-		// Implement fORSCE algorithm
+		// Implement fORSCE (demand-allocation) algorithm
 		extract_lcccells(demperiod); 
 		//gen_forescesnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
 		merg_lccBuffer(); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
@@ -1221,9 +1226,7 @@ int main( int argc, char *argv[] ) {
 
 			// Fire disturbances
 			if( simfire_flag == 1) {
-				//Fill severity grid with 0
-				std::fill(severitygrid,severitygrid+size,0);
-
+				
 				// Cycle through the fire loop
 				for(regcnt = 0; regcnt < regnum; regcnt ++) {
 					for(sevcnt = 0; sevcnt < 2; sevcnt ++ ) {
@@ -1287,7 +1290,8 @@ int main( int argc, char *argv[] ) {
 				
 				//Gen fire severity
 				gen_severitysnapshot("severity", demperiod, buffer_head, snapsum, 0);
-
+				//Reset severity grid with 0
+				std::fill(severitygrid,severitygrid+size,0);
 
 			} // end if fireflag == 1
 
