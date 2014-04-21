@@ -64,7 +64,7 @@ bool getOwnershipStatus( int lccCode, int ownerIndex)
 
 }
 
-// Retrun eligible cells after applying the ownership restriction
+// Get eligible cells after applying the ownership restriction
 void getEligibleCellsAfterOwnership (const std::vector<lccCells> &tobe_check_vec_lcc_cells, std::vector<lccCells> &temp_vec_lcc_cells, int lcccode)
 {
 	int tempCol,tempRow,tempIndex;  // Temp variables to filter eligibility
@@ -83,5 +83,41 @@ void getEligibleCellsAfterOwnership (const std::vector<lccCells> &tobe_check_vec
 	}
 
 }
+
+//Get eligible cells to harvest
+void getEligibleHarvestCells( short int treatmentunit, int treatmentclass, std::vector<lccCells> & harvestEligibleCells )
+{
+
+	int index, curstate, curcom, newstate, eligiblecells;
+	lccCells egCells;
+	eligiblecells = 0;
+	harvestEligibleCells.clear();
+	for(unsigned int row=0; row<maxrow; row++) 
+	{
+			for(unsigned int col=0; col<maxcol; col++) 
+			{
+				index=row*maxcol + col;		
+
+				if(ownergrid[index] == treatmentunit) 
+				{
+
+					curstate = stategrid[index];
+					curcom = comgrid[index];
+			
+					if(treatelig[curcom - 1][curstate - 1][treatmentclass] == 1) 
+					{
+						egCells.lccRow=row;
+						egCells.lccCol=col;
+						harvestEligibleCells.push_back(egCells);
+						eligiblecells++;
+
+					}
+				}
+				
+			}
+	}
+}
+
+
 
 

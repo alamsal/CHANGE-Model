@@ -16,6 +16,7 @@
 using namespace std;
 
 //Global variables
+extern int NO_OF_ITERATION;
 extern char *lccgrid;           // lcc classes grid
 extern char *buffer;			// fire buffer zone grid
 extern char *comgrid;			// community type grid

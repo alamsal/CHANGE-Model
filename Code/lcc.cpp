@@ -26,8 +26,6 @@
 #include <algorithm>
 #include <fstream>
 
-# define NO_OF_ITERATION 10
-
 using namespace std;
 
 
@@ -486,7 +484,7 @@ std::vector<lccCells> fillEightNeighborhood(std::vector<lccCells> vecobj, int ir
 	return(neighborVecObj);
 }
 //Find neighbourhood based on lag distance
-std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int lcccode,int prob_index,int &demand, int &patch_size, int dlag,bool hni_trasition)
+std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int lcccode,int prob_index,int &demand, int &patch_size, int distlag,bool hni_trasition)
 {
 	std::vector<lccCells> neighborVecObj; // vector to hold 8 neighborhing cells temporaily
 	int initdem=demand;
@@ -496,7 +494,7 @@ std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, i
 	unsigned int iteration_count3=0;
 	bool iterationflag= true;
 
-	int distanceLag=dlag;
+	int distanceLag=distlag;
 	std::vector<int>tempLaggrid; // Container to store status of cell already existed in neighbourhood vector or not
 	tempLaggrid.resize(size);		//Resize vetor to landscape size
 	std::fill(tempLaggrid.begin(),tempLaggrid.end(),0); // Filling vector with 0s
@@ -1147,7 +1145,9 @@ void space_allocation( std::vector<lccCells> vecobj,int lcccode, int prob_index,
 	}  //end if
 	else
 	{
-		cout<< "Demand ::"<<demand <<"\t transition prob pixel size ::"<<vecobj.size()<< endl;
+		cout<< "Demand ::"<<demand <<"\t LCC eligiblecells::"<<vecobj.size()<< endl;
+		cout<< " Please make sure demands must me smaller than eligible cells"<<endl;
+		
 
 	}
 

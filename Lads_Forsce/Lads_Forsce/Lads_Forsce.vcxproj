@@ -82,6 +82,7 @@
     <ClCompile Include="..\..\Code\celllist.cpp" />
     <ClCompile Include="..\..\Code\errorCheck.cpp" />
     <ClCompile Include="..\..\Code\fires.cpp" />
+    <ClCompile Include="..\..\Code\harvest.cpp" />
     <ClCompile Include="..\..\Code\lads.cpp" />
     <ClCompile Include="..\..\Code\ladsio.cpp" />
     <ClCompile Include="..\..\Code\lcc.cpp" />
@@ -98,6 +99,7 @@
     <ClInclude Include="..\..\Code\celllist.h" />
     <ClInclude Include="..\..\Code\errorCheck.h" />
     <ClInclude Include="..\..\Code\fires.h" />
+    <ClInclude Include="..\..\Code\harvest.h" />
     <ClInclude Include="..\..\Code\lads.h" />
     <ClInclude Include="..\..\Code\ladsio.h" />
     <ClInclude Include="..\..\Code\lcc.h" />

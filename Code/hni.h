@@ -15,7 +15,7 @@
 
 using namespace std;
 //Global variables
-
+extern int NO_OF_ITERATION;
 extern int size;				// total # of cells in landscape (includes background)
 extern int maxrow;         // max row and column address of grid
 extern int maxcol;

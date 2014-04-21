@@ -28,6 +28,7 @@ extern unsigned int ownershipCode[40];			        // ID code for ownership types
 extern unsigned int ownershipRestriction[40];			// Ownership restriction flag (1= Non-developable, 0=Developable)
 extern string ownershipNotAllow[40];                       // Ownership  not allow
 extern char *ownergrid;									//ownership type grid
+extern int treatelig[40][40][5];                        
 
 //Generate LCC patch size from patch mean and patch standard deviation - Normal distribution
 int genLCCPatchSize(int meanpatch, int stddev);
@@ -40,5 +41,8 @@ bool getOwnershipStatus( int lccCode, int ownerIndex);
 
 //Model log file
 void checkLogExists( const char *name);
+
+//Get eligible cells to harvest
+void getEligibleHarvestCells( short int treatmentunit, int treatmentclass, std::vector<lccCells> & harvestEligibleCells );
 
 #endif

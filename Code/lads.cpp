@@ -2,10 +2,9 @@
 //Main entry point of the CHANGE model and keeps track of human-natural, human dominated, vegetation dominated simulation on every time stamp 
 
 //----------------------------------------------------------------------------
-// File:		lads.cpp  (version 4.6)
-// Author: 		Mike Wimberly
-// Modified:    Aashis Lamsal
-// Last Update:	1/4/2008
+// File:		lads.cpp  (CHANGE)
+// Author: 		Aashis Lamsal & Mike Wimberly
+// Last Update:	4/3/2014
 //----------------------------------------------------------------------------
 #include "lads.h"
 #include "ladsio.h"
@@ -20,9 +19,10 @@
 #include "demand.h"
 #include "hni.h"
 #include "lccres.h"
+#include "harvest.h"
 
 #include <iostream>
-#include <string.h>
+#include <string>
 #include <vector>
 #include "stdafx.h"
 
@@ -35,12 +35,12 @@ char *comgrid;			// community type grid
 char *lccgrid;			// lcc type grid
 char *ownergrid;		//ownership type grid
 char *hnigrid;			//Human natural interface grid
+char *harvestgrid;	// Harvest grid
 short int *timeinstage;	// time in current successional stage grid
 short int *dem;			// elevation grid
 short int *age;		    // patch age grid
 short int *tsfire;      // time since last fire grid
 char *regime;           // fire regime grid
-short int *management;	// management regime grid
 char *buffer;           // fire buffer zone grid
 char *landgrid;         // slope position
 char *fgrid1;           // fire simulation grid #1
@@ -127,8 +127,6 @@ int hsfirereset[40][40];		// Stand-replacement fire age reset flag
 double cursevmod[40][40];		// Weather modifier (stand replacement)
 double cursevmod2[40][40];		// Weather modifier (mixed severity)
 
-// Management treatment parameters
-int treatorder[65535][5];		// Stores stand priority order for management activities
 
 // Landtype Parameters
 // 9-21-2012: Code updated to allow up to 40 landtypes
@@ -172,22 +170,30 @@ int numlcc;					//Number of lcc types
 unsigned int inlcccode[40];			//Input lcc code works upto 40 different LCC types.
 unsigned int outlcccode[40];			//Output lcc code works upto 40 differtn LCC types
 unsigned int lcc_flag[40];			//LCC flag- 1 simulate LCC 0 no simulate LCC
+
 //Patch Size parameters
 int pts_distanceLag[40];	 // Input patch distance lag
 unsigned int pts_patchSize[40];		 // Input mean patch size 
 unsigned int pts_stdDeviation[40];	 // Input patch standard deviation
 unsigned int pts_patchLag[40];        // Input patch lag to structure patch shape
+
 //probability surface paramters
 int prbcnt;						// counts number of prob surfaces
 int numProbsurface;				// no of prob surfaces
 float probRows;					// no of prob rows
 float probColumns;				// no of prob columns
 float transitionThreshold[40];   // probsufaces trasition for each class	
+
 // ownership parameters
 unsigned int numOwnership;				// Number of ownership types
 unsigned int ownershipCode[40];			// ID code for ownership types
 unsigned int ownershipRestriction[40];			// Ownership restriction flag (1= Non-developable, 0=Developable)
 string ownershipNotAllow[40];                 //Destination LCLU class(es) that not allowed to chage in restricted area
+
+// management parameters
+unsigned int harvDemand[200][500][10];    // Harvest demand in each mgmt zone
+unsigned int harvmeanSize[200][500][10];      // Harvest patch size
+
 //Human-natural paramters
 int numHni;    //Number of HNI types
 int hniCode[40];	//Code for HNI types
@@ -211,12 +217,18 @@ double miburnarea[40];		// mixed-severity area burned summary array
 double hiburnarea[40];		// stand-replacement area burned summary array
 double totburncount[40];	// total number of fires summary array
 
+// Number of iteraiton 
+int NO_OF_ITERATION=3;
+
 // Probabilty surfaces container
 std::vector< std::vector<std::vector< float > > > probability_surfaces; //Holds the probability surfaces rasters as 3D vector
 std::vector< std::vector<std::vector< int > > > demand_matrix; // Holds the demand csv files
 
+//Harvest cells
+ std::vector<lccCells> harvestCells; //Holds the eligible harvest cells
+
 //temp grid to hold vegetation trasition flag (0- ready for trasition & 1- already changed & no trasnition)
-std::vector <int> tempgridFlag,hnitempgridFlag;
+std::vector <int> tempgridFlag,hnitempgridFlag,harvtempgridFlag;
 
 //log file
 ofstream writelog;
@@ -239,7 +251,8 @@ int main( int argc, char *argv[] ) {
 	char dmdfilename[80];	// input demand parameters file (FORESCE demands )
 	char ptsizefilename[80]; // input patch size parameters file
 	char ownwershipfilename[80]; // input ownwership paramters file
-	char hnifilename[80]; // input hni paramters filename
+	char mgmtfilename[80];   //input management parameters file
+	char hnifilename[80];   // input hni paramters filename
 	char yearstr[10];       // current year
 
 	int init_state[40];		// default initial state for each community type
@@ -285,8 +298,11 @@ int main( int argc, char *argv[] ) {
 	int unitcounter[5];		// treatment unit counter
 	int unitcnt;			// counts number of units treated
 	int lcccnt;				// counts number of lcc types
-	int nowner;				// counts number of ownwership types
-	
+	int demperiod;          // counts demand period
+	int harvperiod;           // coutns harvesting demand period
+	unsigned int nowner;	 // counts number of ownwership types
+	unsigned int harvzone;   //harvest zone counter
+	unsigned int harvtype;    //harvest type counter
 
 	// 9-21-2012: Code updated to allow up to 40 fire regimes
 	double fsize;           // fire size
@@ -330,7 +346,6 @@ int main( int argc, char *argv[] ) {
 	struct image_header state_head;		// ERDAS file header for successional stage grid
 	struct image_header bioage_head;    // ERDAS file head for bioage grid
 	struct image_header dead_head;      // ERDAS file head for dead grid
-	struct image_header manage_head;	// ERDAS file header for management unit grid
 	struct image_header age_head;		// ERDAS file header for forest age grid
 	struct image_header tsfire_head;	// ERDAS file header for time since fire grid
 	
@@ -346,25 +361,22 @@ int main( int argc, char *argv[] ) {
 	strcat(landfilename, ".lnd");	// Land type  paramters file
 	strcpy(firefilename, runname);
 	strcat(firefilename, ".fre");  // Fire paramters file
-	strcpy(harvfilename, runname);
-	strcat(harvfilename, ".hrv");	// Harves paramters file
-
 	strcpy(lccfilename, runname);
 	strcat(lccfilename, ".lcc");	// Land-cover paramters file
 	strcpy(prbfilename,runname);
 	strcat(prbfilename,".prb");		// Probability parameters file
 	strcpy(dmdfilename,runname);
 	strcat(dmdfilename,".dmd");		// Demand paramters file
-	
 	strcpy(ptsizefilename,runname);
 	strcat(ptsizefilename,".pts");  // Patch size distribution paraters file
-	
 	strcpy(ownwershipfilename,runname); //Ownership parameters file
 	strcat(ownwershipfilename,".own");
-
-	strcpy(hnifilename,runname);
+	
+	strcpy(hnifilename,runname);    //HNI parameter file
 	strcat(hnifilename,".hni");
-
+	
+	strcpy(mgmtfilename,runname);    //Mgmt parameter file
+	strcat(mgmtfilename,".mgmt");
 
 
 	//Check parameter files existance
@@ -395,6 +407,7 @@ int main( int argc, char *argv[] ) {
 	ifstream indmdfile;
 	ifstream inptsizefile;
 	ifstream inownershipfile;
+	ifstream inmgmtfile;
 
 	// Read main input file
 	infile >> cellsize; infile.ignore(100, '\n');
@@ -566,25 +579,6 @@ int main( int argc, char *argv[] ) {
 		}
 	}
 
-
-	// Only read harvest input file if we're simulating management
-	if(simharv_flag == 1) {
-		inharvfile.open(harvfilename);
-	}
-
-	// Read harvest intput file 
-	if( simharv_flag == 1 ) {
-
-		for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
-			inharvfile >> munitnum[treatcnt]; inharvfile.ignore(100, '\n');
-			inharvfile >> maxtreat[treatcnt]; inharvfile.ignore(100, '\n');
-			for(unitcnt = 0; unitcnt < munitnum[treatcnt]; unitcnt++) {
-				inharvfile >> treatorder[unitcnt][treatcnt]; inharvfile.ignore(100, '\n');
-			}
-		}
-		inharvfile.close();
-	}
-
 	// Read lcc inputfile -Modified by Ashis 12/12/2012
 	inlccfile.open(lccfilename);
 	//inlccfile.ignore(100,'\n'); //Skip to the new line
@@ -613,13 +607,44 @@ int main( int argc, char *argv[] ) {
 	std::cout<< "Total # of ownership layers: "<<numOwnership<<endl;
 	inownershipfile.ignore(100,'\n');// Skip to the new line
 	std::cout<<"Code \t Restricion \t Allowed Class(es)"<<endl;
-	for(unsigned int nowner=0;nowner<numOwnership; nowner++)
+	for(nowner=0;nowner<numOwnership; nowner++)
 	{
 		inownershipfile>>ownershipCode[nowner]>>ownershipRestriction[nowner]>>ownershipNotAllow[nowner];inownershipfile.ignore(100,'\n');
-		std::cout<<ownershipCode[nowner]<<"\t"<< ownershipRestriction[nowner]<<"\t"<<ownershipNotAllow[nowner]<<endl; 
-
+		std::cout<<ownershipCode[nowner]<<"\t"<< ownershipRestriction[nowner]<<"\t"<<ownershipNotAllow[nowner]<<endl; 		
 	}
 	inownershipfile.close();
+
+	//Read management/harvest parameters
+	inmgmtfile.open(mgmtfilename);
+
+	for(demperiod=0;demperiod<numDemand; demperiod++)
+	{   
+		inmgmtfile.ignore(100,'\n');
+		
+		for (harvzone=0;harvzone<numOwnership;harvzone++)
+		{
+			inmgmtfile.ignore(100,'\n');
+
+
+			for(harvtype=0;harvtype<mgmtnum;harvtype++)
+			{
+				 inmgmtfile>>harvmeanSize[demperiod][harvzone][harvtype];
+				 cout<< "Dem: "<<demperiod <<"\t"<<"Hzone: "<<harvzone <<"\t"<<"Htype: "<<harvtype <<"\t"<< "HSize" <<harvmeanSize[demperiod][harvzone][harvtype]<<endl;
+
+			}
+			inmgmtfile.ignore(100,'\n');
+
+			for(harvtype=0;harvtype<mgmtnum;harvtype++)
+			{
+				 inmgmtfile>>harvDemand[demperiod][harvzone][harvtype];
+				 cout<< "Dem: "<<demperiod <<"\t"<<"Hzone: "<<harvzone <<"\t"<<"Htype: "<<harvtype <<"\t"<<"HDemand"<<harvDemand[demperiod][harvzone][harvtype]<<endl;
+
+			}
+			inmgmtfile.ignore(100,'\n');
+		}
+	 
+	}
+	inmgmtfile.close();
 
 
 	//Read probability sufrace paramter file
@@ -761,16 +786,6 @@ int main( int argc, char *argv[] ) {
 		outsum.open("ladsout.sum", ios::app);
 	}
 
-	// Treatment summary output file
-	ofstream outtreat;
-	if(simharv_flag == 1) {
-		if(tsumtype == 2 || tsumtype == 4) {
-			outtreat.open("treatsum.trt", ios::app);
-		} else if(tsumtype == 1 || tsumtype == 3) {
-			outtreat.open(strcat(outfilename3, ".trt"));
-		}
-	}
-
 	// Allocate memory for arrays
 	dem = new short int[size];
 	stategrid = new short int[size];
@@ -782,7 +797,7 @@ int main( int argc, char *argv[] ) {
 	age = new short int[size];
 	tsfire = new short int[size];
 	regime = new char[size];
-	management = new short int[size];
+
 	buffer = new char[size];
 	fgrid1 = new char[size];
 	landgrid = new char[size];
@@ -792,7 +807,8 @@ int main( int argc, char *argv[] ) {
 	temp2 = new unsigned char[size];
 	fint = new float[size];
 	severitygrid= new char[size];
-	
+	harvestgrid=new char[size];
+
 	//Fill severity grid with 0
 	//std::fill(severitygrid,severitygrid+size, static_cast<short int>(0));
 	if(landfiresum == 1) {
@@ -849,9 +865,6 @@ int main( int argc, char *argv[] ) {
 					exit(1);
 				}
 			}
-		}
-		if( simharv_flag == 1 ) {
-			manage_head = read_16bit_grid("management", management);
 		}
 
 		// Read grid landtype.gis
@@ -948,12 +961,6 @@ int main( int argc, char *argv[] ) {
 		}
 	}
 
-	if( simharv_flag == 1) {
-		for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
-			unitcounter[treatcnt] = 0;
-		}
-
-	}
 
 	// Note that zsize contains the sizes of the communities - since these are the summary zones
 	for(zonecnt = 0; zonecnt < numcom; zonecnt ++) {
@@ -1055,6 +1062,7 @@ int main( int argc, char *argv[] ) {
 			}
 		}
 		severitygrid[index]=0;
+		harvestgrid[index]=0;
 	}
 
 	// initialize summary arrays
@@ -1086,12 +1094,14 @@ int main( int argc, char *argv[] ) {
 	read_demandCsv(demand_matrix,numDemand,rowDemand,colDemand);
 	demand_matrix;	
 
-	for(int demperiod=0;demperiod<numDemand;demperiod++)
+	for(demperiod=0;demperiod<numDemand;demperiod++)
 	{
+		harvtempgridFlag.clear();
+		harvtempgridFlag.resize(size,0);
 		writelog<<"START DEMAND PERIOD #"<<demperiod<<" ****************************************************************************************************************************"<<endl;
-		//tempGridFlag= new char[size];
-		//std::fill(tempGridFlag,tempGridFlag+size,0);	// Fill temp grid with 0 	
-		//cout<<strlen((char*)tempGridFlag)<<endl;
+	
+		
+
 		tempgridFlag.clear();
 		tempgridFlag.resize(size,0);
 		
@@ -1111,9 +1121,9 @@ int main( int argc, char *argv[] ) {
 		//gen_forescesnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
 		merg_lccBuffer(); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
 		//gen_forescesnapshot(runname, 60+demperiod, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.
-
-
-
+		
+			
+			
 		//BEYOND THIS POINT THE CONTROL HANDOVER TO LADS FOR FURTHER SIMULATION
 
 		// process the simulation step by step
@@ -1180,118 +1190,111 @@ int main( int argc, char *argv[] ) {
 			nsdisturb_veg(distnum);
 
 			// Forest management disturbances
-			if( simharv_flag == 1 ) {
+			if( simharv_flag == 1 ) 
+			{
+				for(harvperiod=0;harvperiod<numDemand; harvperiod++)
+				{   	
+					if(harvperiod==demperiod)
+						{
+							for (harvzone=0;harvzone<numOwnership;harvzone++)
+							{
+								for(harvtype=0;harvtype<mgmtnum;harvtype++)
+								{
 
-				for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
-					// Cycle through the management loop
-					cumtreat[treatcnt] = 0;
-					initindex = unitcounter[treatcnt];
-
-					// Start chugging through the treatment list
-					while (1) {
-						// Find the next unit in the treatment list
-						treatunit = treatorder[unitcounter[treatcnt]][treatcnt];
-						// Determine the total area treated within the unit
-						curtreat = gentreatment(treatunit, treatcnt);
-						// Tally the cumulative treatment area
-						cumtreat[treatcnt] += curtreat;
-						printf("runname=%s year=%d unit=%d treatsize=%d\n", runname, year, treatunit, curtreat);
-
-						unitcounter[treatcnt] ++;
-						if(curtreat > 0) {
-							if(tsumtype == 3) {
-								itoa(year, yearstr, 10);
-								outtreat << yearstr << " " << treatunit << " " << curtreat << endl;
-							} else if(tsumtype == 4) {
-								itoa(year, yearstr, 10);
-								outtreat << runname << " " << yearstr << " " << treatunit << " " << curtreat << endl;
-							}
-						}
-
-						// Loop to the beginning of the treatment unit list if necessary
-						if(unitcounter[treatcnt] >= munitnum[treatcnt]) {
-							unitcounter[treatcnt] = 0;
-						}
-						// Bail out of the loop if we've already gone through the entire treatment list
-						if(unitcounter[treatcnt] == initindex) {
-							break;
-						}
-						// Bail out of the loop if we've treated the max area for the run step
-						if(cumtreat[treatcnt] >= maxtreat[treatcnt]) {
-							break;
-						}
-					}
-				}
-			}
-
-			// Fire disturbances
-			if( simfire_flag == 1) {
+										cout<< "Dem: "<<harvperiod <<"\t"<<"Hzone: "<<harvzone <<"\t"<<"Htype: "<<harvtype <<"\t"<<harvDemand[harvperiod][harvzone][harvtype]<<endl;
+							
+										// Determine the total area treated within the unit
+										treatunit= ownershipCode[harvzone];   //treatment zone
+										getEligibleHarvestCells(treatunit, harvtype,harvestCells);
+										printf("runname=%s year=%d unit=%d treatsize=%d\n", runname, harvperiod, treatunit, harvestCells.size());
+							
+										//Allocate harvest with demand	
+										
+										allocateHarvest(harvestCells, harvDemand[harvperiod][harvzone][harvtype], harvmeanSize[harvperiod][harvzone][harvtype],treatunit,harvtype);
+										
+										
+										
+									}
+							
+								}
+				    	 }
+	 			
+			       }
+				//Output the harvest grid
 				
-				// Cycle through the fire loop
-				for(regcnt = 0; regcnt < regnum; regcnt ++) {
-					for(sevcnt = 0; sevcnt < 2; sevcnt ++ ) {
-						if( mff[regcnt][sevcnt] < 30) {
-							nfires = poisson_rv( mff[regcnt][sevcnt]);
-						} else {
-							nfires_f = normal_rv( mff[regcnt][sevcnt], sqrt(mff[regcnt][sevcnt]));
-							if (nfires_f < 0) {
-								nfires = 0;
+				get_harvestsnapshot("harvest",demperiod, buffer_head,snapsum,0 );
+				std::fill(harvestgrid,harvestgrid+size,0);
+
+			}
+			// Fire disturbances
+			int simfire;
+			int numsimfire=10;
+
+			if( simfire_flag == 1) 
+			{
+				//Repeat fire simulations - edited Ashis 4/21/2014
+				for (simfire=0; simfire<numsimfire;simfire++)
+				{	
+					//Reset severity grid with 0
+					std::fill(severitygrid,severitygrid+size,0);
+				
+					// Cycle through the fire loop
+					for(regcnt = 0; regcnt < regnum; regcnt ++) {
+						for(sevcnt = 0; sevcnt < 2; sevcnt ++ ) {
+							if( mff[regcnt][sevcnt] < 30) {
+								nfires = poisson_rv( mff[regcnt][sevcnt]);
 							} else {
-								nfires = floor(nfires_f + 0.5);
-							}
-						}
-						for( fire = 0;fire < nfires; fire++ ) {
-
-							totburncount[regcnt]++;		// Increment the fire counter
-							// Generate a maximum fire size
-							fsize = gen_firesize(mfsize[regcnt][sevcnt], sdfsize[regcnt][sevcnt], shapetype);
-							totburnarea[regcnt] += fsize;	// Increment the (potential) total area burned
-							// Figure out the base distribution of severities
-							curfiresev = gen_firesev(sevlow[regcnt][sevcnt], sevhigh[regcnt][sevcnt] );
-							curfiresev2 = gen_firesev(sev2low[regcnt][sevcnt], sev2high[regcnt][sevcnt] );
-							curmixedfire = curfiresev2 * (1 - curfiresev);
-							curlowfire = 1 - (curfiresev + curmixedfire);
-							// distribute fire across the landscape
-							printf("%d\t%d\n",regcnt,int(fsize));
-							firespread( regcnt, (int)fsize );
-							// Print fire information to screen							
-
-							printf("runname=%s year=%d size=%lf regime=%d %d\n", runname, year, fsize, regcnt + 1, is_bdin);							
-
-							// modify vegetation affected by fire
-							disturb_veg( landfiresum, sevcnt, regcnt);					
-
-
-							// If past burn-in period, write fire information to file
-							if(is_bdin == 1) {
-
-								// Output for individual-fire summary types
-								if(sumtype == 3) {
-									islands = fill_islands();
-									fperim = get_perim();
-									felong = get_elongation();
-									itoa(year, yearstr, 10);
-									outfire << yearstr << " " << fsize << " " << burned << " " << fperim << " "
-										<< islands << " " << felong << " " << (regcnt + 1) << endl;
-								} else if(sumtype == 4) {
-									islands = fill_islands();
-									fperim = get_perim();
-									felong = get_elongation();
-									itoa(year, yearstr, 10);
-									outfire << runname << " " << yearstr << " " << fsize << " " << burned << " "
-										<< fperim << " " << islands << " " << felong << " " << (regcnt + 1) << endl;
+								nfires_f = normal_rv( mff[regcnt][sevcnt], sqrt(mff[regcnt][sevcnt]));
+								if (nfires_f < 0) {
+									nfires = 0;
+								} else {
+									nfires = floor(nfires_f + 0.5);
 								}
 							}
-						}
-					}
 
-				} // end fires loop
-				
+							
+								for( fire = 0;fire < nfires; fire++ ) 
+								{
+									totburncount[regcnt]++;		// Increment the fire counter
+									// Generate a maximum fire size
+									fsize = gen_firesize(mfsize[regcnt][sevcnt], sdfsize[regcnt][sevcnt], shapetype);
+									totburnarea[regcnt] += fsize;	// Increment the (potential) total area burned
+									// Figure out the base distribution of severities
+									curfiresev = gen_firesev(sevlow[regcnt][sevcnt], sevhigh[regcnt][sevcnt] );
+									curfiresev2 = gen_firesev(sev2low[regcnt][sevcnt], sev2high[regcnt][sevcnt] );
+									curmixedfire = curfiresev2 * (1 - curfiresev);
+									curlowfire = 1 - (curfiresev + curmixedfire);
+									// distribute fire across the landscape
+									//printf("%d\t%d\n",regcnt,int(fsize));
+							
+									firespread( regcnt, (int)fsize );
+									// Print fire information to screen							
+
+									printf("runname=%s year=%d size=%lf regime=%d %d\n", runname, year, fsize, regcnt + 1, is_bdin);							
+
+									// modify vegetation affected by fire
+									if(simfire!=numsimfire-1)
+									{
+										disturb_veg( landfiresum, sevcnt, regcnt,false);					
+									}
+									else
+									{
+										disturb_veg( landfiresum, sevcnt, regcnt,true);	
+									}
+								}
+							
+						}
+
+					} // end fires loop
+
 				
 				//Gen fire severity
-				gen_severitysnapshot("severity", demperiod, buffer_head, snapsum, 0);
-				//Reset severity grid with 0
-				std::fill(severitygrid,severitygrid+size,0);
+				std::string str="severity";
+				str.append(to_string(demperiod));
+				gen_severitysnapshot(&str[0],simfire, buffer_head, snapsum, 0);
+
+				} //end simulatin loop
+
 
 			} // end if fireflag == 1
 
@@ -1364,25 +1367,6 @@ int main( int argc, char *argv[] ) {
 						hiburnarea[regcnt] = 0;
 					}
 					outfire << endl;
-				}
-
-				// Output harvest summary information
-				// A separate file for each model run
-				if(simharv_flag == 1 && tsumtype == 1) {
-					itoa(year, yearstr, 10);
-					outtreat << yearstr << " ";
-					for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
-						outtreat << cumtreat[treatcnt] << " ";
-					}
-					outtreat << endl;
-					// or all runs appended to a single file
-				} else if (simharv_flag == 1 && tsumtype == 2) {
-					itoa(year, yearstr, 10);
-					outtreat << runname << " " << yearstr << " ";
-					for(treatcnt = 0; treatcnt < mgmtnum; treatcnt++) {
-						outtreat << cumtreat[treatcnt] << " ";
-					}
-					outtreat << endl;
 				}
 
 

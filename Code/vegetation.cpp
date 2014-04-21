@@ -1,7 +1,8 @@
 //----------------------------------------------------------------------------
 // File:		vegetation.cpp
 // Author: 		Mike Wimberly
-// Last Update:	1/4/2007
+// Update:      Aashis Lamsal
+// Last Update:	4/3/2014
 // Decription:	Contains functions compute forest structure classes, model
 //              vegetative succession, and model disturbance effects on
 //              vegetation.
@@ -16,6 +17,11 @@
 #include "biomass.h"
 #include "ladsio.h"
 #include "lads.h"
+#include "lcc.h"
+#include <iostream>
+
+using namespace std;
+
 //----------------------------------------------------------------------------
 // get_struc - looks up the successional stage code for a given cell
 //----------------------------------------------------------------------------
@@ -99,7 +105,7 @@ void grow_veg( void ) {
 //----------------------------------------------------------------------------
 // disturb_veg - determines fire effects on vegetation
 //----------------------------------------------------------------------------
-void disturb_veg( int landfiresum, int sevcnt, int firereg) {
+void disturb_veg( int landfiresum, int sevcnt, int firereg, bool lastFire) {
 
     int index;
     double modfiresev, modfiresev2, modfiresev3;
@@ -173,98 +179,117 @@ void disturb_veg( int landfiresum, int sevcnt, int firereg) {
             curstate = stategrid[index];
 
 			// Stand-replacmenet fires
-			if(pathpick < modfiresev) {
-                age[index] = 0;
-                tsfire[index] = 0;
-				//totburnarea[regime[index] - 1]++;
-				hiburnarea[regime[index] - 1]++;
+			if(pathpick < modfiresev) 
+			{
+				//Added by Ashis: 4/21/2014 - to prevent veg succession update in every fire simulation step
+				if(lastFire)
+				{
+					age[index] = 0;
+					tsfire[index] = 0;
+					//totburnarea[regime[index] - 1]++;
+					hiburnarea[regime[index] - 1]++;
 				
-				newstate = hsfiretrans[comgrid[index] - 1][curstate - 1];
-				newreset = hsfirereset[comgrid[index] - 1][curstate - 1];
+					newstate = hsfiretrans[comgrid[index] - 1][curstate - 1];
+					newreset = hsfirereset[comgrid[index] - 1][curstate - 1];
 
-				stategrid[index] = newstate;
-				if(newreset == 0) {
-					if(timeinstage[index] > suclag[comgrid[index] - 1][newstate - 1]) {
-						timeinstage[index] = suclag[comgrid[index] - 1][newstate - 1];
+					stategrid[index] = newstate;
+					if(newreset == 0) {
+						if(timeinstage[index] > suclag[comgrid[index] - 1][newstate - 1]) {
+							timeinstage[index] = suclag[comgrid[index] - 1][newstate - 1];
+						}
+					} else {
+						timeinstage[index] = 0;
 					}
-				} else {
-					timeinstage[index] = 0;
-				}
 
-                if(biom_flag > 0) {
-                    newbiomass = oldbiomass * (1 - hs_mort[ regime[index] - 1 ]);
-                    bioagegrid[index] = (short int)calc_bio_age( newbiomass, index, 1 );
-                    deadgrid[index] = deadgrid[index] * (1 - hs_consume[ regime[index] - 1 ]);
-                    deadgrid[index] += oldbiomass * hs_mort[ regime[index] - 1 ];
-                }
-
-                // Increment fire severity summary
-                if(regime[index] > 0 && buffer[index] == 1 && landfiresum == 1)  {
-                    fsum2[index]++;
-                }
-				//populate the severity grid
-				severitygrid[index]=3;
-            // "mixed-severity" fires
-			} else if (pathpick < modfiresev3) {
-                tsfire[index] = 0;
-
-				//totburnarea[regime[index] - 1]++;
-				miburnarea[regime[index] - 1]++;
-				
-				newstate = msfiretrans[comgrid[index] - 1][curstate - 1];
-				newreset = msfirereset[comgrid[index] - 1][curstate - 1];
-				
-				stategrid[index] = newstate;
-
-				if(newreset == 0) {
-					if(timeinstage[index] > suclag[comgrid[index] - 1][newstate - 1]) {
-						timeinstage[index] = suclag[comgrid[index] - 1][newstate - 1];
+					if(biom_flag > 0) {
+						newbiomass = oldbiomass * (1 - hs_mort[ regime[index] - 1 ]);
+						bioagegrid[index] = (short int)calc_bio_age( newbiomass, index, 1 );
+						deadgrid[index] = deadgrid[index] * (1 - hs_consume[ regime[index] - 1 ]);
+						deadgrid[index] += oldbiomass * hs_mort[ regime[index] - 1 ];
 					}
-				} else {
-					timeinstage[index] = 0;
-				}
 
-                if(biom_flag > 0) {
-                    newbiomass = oldbiomass * (1 - ms_mort[ regime[index] - 1 ]);
-                    bioagegrid[index] = (short int)calc_bio_age( newbiomass, index, 2 );
-                    deadgrid[index] = deadgrid[index] * (1 - ms_consume[ regime[index] - 1 ]);
-                    deadgrid[index] += oldbiomass * ms_mort[ regime[index] - 1 ];
-                }
-                // Increment fire severity summary
-                if(regime[index] > 0 && buffer[index] == 1 && landfiresum == 1)  {
-                    fsum3[index]++;
-                }
+					// Increment fire severity summary
+					if(regime[index] > 0 && buffer[index] == 1 && landfiresum == 1)  {
+						fsum2[index]++;
+					}
+				}
 				//populate the severity grid
-				severitygrid[index]=2;
+				severitygrid[index]=3;   //Added by Ashis: 4/1/2014
+            
+			// "mixed-severity" fires
+			} 
+			else if (pathpick < modfiresev3) 
+			{
+				//Added by Ashis: 4/21/2014
+                if(lastFire)
+				{
+					tsfire[index] = 0;
+
+					//totburnarea[regime[index] - 1]++;
+					miburnarea[regime[index] - 1]++;
+				
+					newstate = msfiretrans[comgrid[index] - 1][curstate - 1];
+					newreset = msfirereset[comgrid[index] - 1][curstate - 1];
+				
+					stategrid[index] = newstate;
+
+					if(newreset == 0) {
+						if(timeinstage[index] > suclag[comgrid[index] - 1][newstate - 1]) {
+							timeinstage[index] = suclag[comgrid[index] - 1][newstate - 1];
+						}
+					} else {
+						timeinstage[index] = 0;
+					}
+
+					if(biom_flag > 0) {
+						newbiomass = oldbiomass * (1 - ms_mort[ regime[index] - 1 ]);
+						bioagegrid[index] = (short int)calc_bio_age( newbiomass, index, 2 );
+						deadgrid[index] = deadgrid[index] * (1 - ms_consume[ regime[index] - 1 ]);
+						deadgrid[index] += oldbiomass * ms_mort[ regime[index] - 1 ];
+					}
+					// Increment fire severity summary
+					if(regime[index] > 0 && buffer[index] == 1 && landfiresum == 1)  {
+						fsum3[index]++;
+					}
+
+				}
+				//populate the severity grid
+				severitygrid[index]=2; //Added by Ashis: 4/1/2014
 
 			// Non-lethal fires
-			} else {
-                tsfire[index] = 0;
+			}
+			else 
+			{
+				//Added by Ashis: 4/21/2014
+				if(lastFire)
+				{
+					tsfire[index] = 0;
 
-				//totburnarea[regime[index] - 1]++;
-				liburnarea[regime[index] - 1]++;
+					//totburnarea[regime[index] - 1]++;
+					liburnarea[regime[index] - 1]++;
 				
-				newstate = lsfiretrans[comgrid[index] - 1][curstate - 1];
-				newreset = lsfirereset[comgrid[index] - 1][curstate - 1];
+					newstate = lsfiretrans[comgrid[index] - 1][curstate - 1];
+					newreset = lsfirereset[comgrid[index] - 1][curstate - 1];
 				
-				stategrid[index] = newstate;
-				if(newreset == 0) {
-					if(timeinstage[index] > suclag[comgrid[index] - 1][newstate - 1]) {
-						timeinstage[index] = suclag[comgrid[index] - 1][newstate - 1];
+					stategrid[index] = newstate;
+					if(newreset == 0) {
+						if(timeinstage[index] > suclag[comgrid[index] - 1][newstate - 1]) {
+							timeinstage[index] = suclag[comgrid[index] - 1][newstate - 1];
+						}
+					} else {
+						timeinstage[index] = 0;
 					}
-				} else {
-					timeinstage[index] = 0;
+
+					if(biom_flag > 0) {
+						newbiomass = oldbiomass * (1 - ms_mort[ regime[index] - 1 ]);
+						bioagegrid[index] = (short int)calc_bio_age( newbiomass, index, 2 );
+						deadgrid[index] = deadgrid[index] * (1 - ms_consume[ regime[index] - 1 ]);
+						deadgrid[index] += oldbiomass * ms_mort[ regime[index] - 1 ];
+					}
 				}
 
-                if(biom_flag > 0) {
-                    newbiomass = oldbiomass * (1 - ms_mort[ regime[index] - 1 ]);
-                    bioagegrid[index] = (short int)calc_bio_age( newbiomass, index, 2 );
-                    deadgrid[index] = deadgrid[index] * (1 - ms_consume[ regime[index] - 1 ]);
-                    deadgrid[index] += oldbiomass * ms_mort[ regime[index] - 1 ];
-                }
-
 				//populate the severity grid
-				severitygrid[index]=1;
+				severitygrid[index]=1; //Added by Ashis: 4/1/2014
             }
 
         }  // end if cell is burned
@@ -312,35 +337,41 @@ void nsdisturb_veg( int distnum ) {
 //----------------------------------------------------------------------------
 // gentreatment - treatment effects on vegetation
 //----------------------------------------------------------------------------
-int gentreatment( short int treatmentunit, int treatmentclass ) {
+bool gentreatment( int index, short int treatmentunit, int treatmentclass )
+{
+	int curstate, curcom, newstate, treatedcells;
+	if(ownergrid[index] == treatmentunit) 
+	{
 
-	int index, curstate, curcom, newstate, treatedcells;
-	
-	treatedcells = 0;
-
-	for(index=0;index<size;index++) {
-
-		if(management[index] == treatmentunit) {
-
-			curstate = stategrid[index];
-			curcom = comgrid[index];
-
-			if(treatelig[curcom - 1][curstate - 1][treatmentclass] == 1) {
-
-				treatedcells++;
-				newstate = treattrans[comgrid[index] - 1][curstate - 1][treatmentclass];
-				stategrid[index] = newstate;
-				if(treatreset[curcom - 1][curstate - 1][treatmentclass] == 0) {
-					if(timeinstage[index] > suctrans[comgrid[index] - 1][newstate - 1]) {
-						timeinstage[index] = suctrans[comgrid[index] - 1][newstate - 1];
-					}
-				} else {
-					timeinstage[index] = 0;
+		curstate = stategrid[index];
+		curcom = comgrid[index];
+			
+		if(treatelig[curcom - 1][curstate - 1][treatmentclass] == 1) 
+		{
+			newstate = treattrans[comgrid[index] - 1][curstate - 1][treatmentclass];
+			stategrid[index] = newstate;
+				
+			if(treatreset[curcom - 1][curstate - 1][treatmentclass] == 0) 
+			{
+				if(timeinstage[index] > suctrans[comgrid[index] - 1][newstate - 1]) 
+				{
+					timeinstage[index] = suctrans[comgrid[index] - 1][newstate - 1];
 				}
+			} 
+			else 
+			{
+				timeinstage[index] = 0;
 			}
+			
+			return true;
 		}
-	} 
-
-	return(treatedcells);
-
+		else
+		{
+				return false;
+		}	
+	}
+	else
+	{
+		return false;
+	}
 }

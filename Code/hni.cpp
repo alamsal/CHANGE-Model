@@ -16,7 +16,7 @@
 #include <string>
 
 # define  hnicode 2
-# define NO_OF_ITERATIONHNI 10
+
 using namespace std;
 
 std::vector<lccCells> hni_neighborVecObjList, hni_neighbourVecCells;// vector to hold 8 neighborhing cells from all eligible cells temporaily
@@ -395,7 +395,7 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 						{
 							hni_index=neighrow*maxcol + neighcol;
 							//if(((getNeighbour(neighrow,neighcol,lcccode)) &&(lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )) //Enforce adjaceny while cell transition
-							if((getHnilag(rand_lccrow,rand_lcccol,hcode,hni_plag,hni_patch,true)) && (hnitempgridFlag[hni_index]==0))  //Enforce patch lag while cell transtion
+							if((getHnilag(neighrow,neighcol,hcode,hni_plag,hni_patch,true)) && (hnitempgridFlag[hni_index]==0))  //Enforce patch lag while cell transtion
 							{
 
 								hnigrid[hni_index]=hcode;// Need to change the file provided by Zhiua because 255 does not read the system properly- it converted into -1. Therefore I put -1 just for testing purpose
@@ -425,7 +425,7 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 
 				} //end for loop
 
-				if(hni_neighdemand==demand && counter2>NO_OF_ITERATIONHNI*(hni_neighbourVecCells.size()))
+				if(hni_neighdemand==demand && counter2>NO_OF_ITERATION*(hni_neighbourVecCells.size()))
 				{
 
 					hni_fillNeighbour=false;
@@ -435,7 +435,7 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 				counter2++;
 			} // end 2nd while
 
-			if(olddemand==demand && counter1>NO_OF_ITERATIONHNI*(lcc2hni_vec.size()))
+			if(olddemand==demand && counter1>NO_OF_ITERATION*(lcc2hni_vec.size()))
 			{
 
 				//vecobj.erase(vecobj.begin()+rand_index-1);
@@ -453,7 +453,9 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 	}// end if
 	else
 	{
-		cout<< "Demand ::"<<demand <<"\t transition prob pixel size ::"<<lcc2hni_vec.size()<< endl;
+		
+		cout<< "Demand ::"<<demand <<"\t HNI eligible cells ::"<<lcc2hni_vec.size()<< endl;
+		cout<< " Please make sure demands must me smaller than eligible cells"<<endl;
 	}
 	
 }
