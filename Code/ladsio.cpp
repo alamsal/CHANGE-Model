@@ -7,12 +7,18 @@
 //----------------------------------------------------------------------------
 
 #pragma hdrstop
+
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <string> 
 #include "ladsio.h"
 #include "lads.h"
 #include "biomass.h"
 #include "lcc.h"
-#include <iostream>
 using namespace std;
+
+
 //----------------------------------------------------------------------------
 // read_veg3_grid - reads in initial dead biomass grid
 //----------------------------------------------------------------------------
@@ -232,6 +238,19 @@ struct image_header gen_grid( int nrows, int ncols, int cellval, char *gridname 
 
 }
 
+//000 Padding number in the outputs..
+std::string ZeroPadNumber(int num)
+{
+    std::ostringstream ss;
+    ss << std::setw(3) << std::setfill('0') << num;
+    std::string result = ss.str();
+    if (result.length() > 3)
+    {
+        result.erase(0, result.length() - 3);
+    }
+
+    return (result);
+}
 
 //----------------------------------------------------------------------------
 // write_grid - writes output to a 8-bit ERDAS GIS file
@@ -394,7 +413,7 @@ void gen_sevsum( char *filename, int nsum, struct image_header out_head )
 //----------------------------------------------------------------------------
 // gen_snapshot - generate "snapshot" of landscape configuration at a single point in time
 //----------------------------------------------------------------------------
-void gen_snapshot( char *runname, int year, struct image_header out_head,
+void gen_snapshot( char *runname, string year, struct image_header out_head,
     int snapsum, int transsum )
 {
     int row;                // row counter
@@ -406,8 +425,7 @@ void gen_snapshot( char *runname, int year, struct image_header out_head,
 
     // open output file
     strcpy(outfilename, runname);
-    itoa(year, yearstr, 10);
-    strcat(outfilename, yearstr);
+    strcat(outfilename, year.c_str());
     strcat(outfilename, ".gis");
 
     // write grid cell information to temporary grids
@@ -637,19 +655,17 @@ void landscape_sum( int *classnum, int zonesum ) {
 //----------------------------------------------------------------------------
 // gen_snapshot - generate "LCC snapshot" of landscape configuration at a single point in time
 //----------------------------------------------------------------------------
-void gen_lccsnapshot( char *runname, int year, struct image_header out_head,  int snapsum, int transsum )
+void gen_lccsnapshot( char *runname, string year, struct image_header out_head,  int snapsum, int transsum )
 {
     int row;                // row counter
     int col;                // column counter
     int index;              // array index
     short int struc;        // forest structure index
-    char yearstr[10];       // current summary year
     char outfilename[30];   // output file name
 
     // open output file
     strcpy(outfilename, runname);
-    itoa(year, yearstr, 10);
-    strcat(outfilename, yearstr);
+    strcat(outfilename, year.c_str());
     strcat(outfilename, ".gis");
 	
     // write grids to output files
@@ -662,7 +678,7 @@ void gen_lccsnapshot( char *runname, int year, struct image_header out_head,  in
 }
 
 
-void gen_forescesnapshot( char *runname, int year, struct image_header out_head,  int snapsum, int transsum )
+void gen_forescesnapshot( char *runname, string year, struct image_header out_head,  int snapsum, int transsum )
 {
     int row;                // row counter
     int col;                // column counter
@@ -673,8 +689,8 @@ void gen_forescesnapshot( char *runname, int year, struct image_header out_head,
 
     // open output file
     strcpy(outfilename, runname);
-    itoa(year, yearstr, 10);
-    strcat(outfilename, yearstr);
+    
+    strcat(outfilename, year.c_str());
     strcat(outfilename, ".gis");
 
     // write grids to output files
@@ -689,7 +705,7 @@ void gen_forescesnapshot( char *runname, int year, struct image_header out_head,
 
     return;
 }
-void gen_hnisnapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum )
+void gen_hnisnapshot( char *runname, string year, struct image_header out_head,int snapsum, int transsum )
 {
 	int row;                // row counter
     int col;                // column counter
@@ -700,8 +716,8 @@ void gen_hnisnapshot( char *runname, int year, struct image_header out_head,int 
 
     // open output file
     strcpy(outfilename, runname);
-    itoa(year, yearstr, 10);
-    strcat(outfilename, yearstr);
+   
+    strcat(outfilename, year.c_str());
     strcat(outfilename, ".gis");
 
     // write grids to output files
@@ -717,19 +733,17 @@ void gen_hnisnapshot( char *runname, int year, struct image_header out_head,int 
     return;
 }
 
-void gen_severitysnapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum )
+void gen_severitysnapshot( char *runname, string year, struct image_header out_head,int snapsum, int transsum )
 {
 	int row;                // row counter
     int col;                // column counter
     int index;              // array index
     short int struc;        // forest structure index
-    char yearstr[10];       // current summary year
     char outfilename[30];   // output file name
 
     // open output file
     strcpy(outfilename, runname);
-    itoa(year, yearstr, 10);
-    strcat(outfilename, yearstr);
+    strcat(outfilename, year.c_str());
     strcat(outfilename, ".gis");
 
     // write grids to output files
@@ -743,7 +757,7 @@ void gen_severitysnapshot( char *runname, int year, struct image_header out_head
     return;
 }
 
-void get_harvestsnapshot(char *runname, int year, struct image_header out_head,int snapsum, int transsum )
+void get_harvestsnapshot(char *runname, string year, struct image_header out_head,int snapsum, int transsum )
 {
 
 	int row;                // row counter
@@ -755,8 +769,7 @@ void get_harvestsnapshot(char *runname, int year, struct image_header out_head,i
 
     // open output file
     strcpy(outfilename, runname);
-    itoa(year, yearstr, 10);
-    strcat(outfilename, yearstr);
+    strcat(outfilename, year.c_str());
     strcat(outfilename, ".gis");
 
     // write grids to output files
@@ -770,3 +783,4 @@ void get_harvestsnapshot(char *runname, int year, struct image_header out_head,i
     return;
 
 }
+

@@ -20,8 +20,8 @@
 #include "hni.h"
 #include "lccres.h"
 #include "harvest.h"
-
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 #include "stdafx.h"
@@ -303,6 +303,8 @@ int main( int argc, char *argv[] ) {
 	unsigned int nowner;	 // counts number of ownwership types
 	unsigned int harvzone;   //harvest zone counter
 	unsigned int harvtype;    //harvest type counter
+	int simfire;             // fire simulation counter
+	int numsimfire;          //No of fire simulation
 
 	// 9-21-2012: Code updated to allow up to 40 fire regimes
 	double fsize;           // fire size
@@ -430,6 +432,7 @@ int main( int argc, char *argv[] ) {
 	infile >> distnum; infile.ignore(100, '\n');	//# of non spatial disturbances
 	infile >> mgmtnum; infile.ignore(100, '\n');	//# of treatments
 	infile>> hni_flag;infile.ignore(100,'\n');
+	infile>>numsimfire;infile.ignore(100,'\n');
 	infile.close();
 
 	//Check input file parameters
@@ -1099,7 +1102,8 @@ int main( int argc, char *argv[] ) {
 		harvtempgridFlag.clear();
 		harvtempgridFlag.resize(size,0);
 		writelog<<"START DEMAND PERIOD #"<<demperiod<<" ****************************************************************************************************************************"<<endl;
-	
+		
+		
 		
 
 		tempgridFlag.clear();
@@ -1113,7 +1117,7 @@ int main( int argc, char *argv[] ) {
 			
 		
 			extract_hnicells(demperiod);
-			gen_hnisnapshot("hni", demperiod, buffer_head, snapsum, 0);
+			gen_hnisnapshot("hni", ZeroPadNumber(demperiod), buffer_head, snapsum, 0);
 		}
 
 		// Implement fORSCE (demand-allocation) algorithm
@@ -1190,6 +1194,7 @@ int main( int argc, char *argv[] ) {
 			nsdisturb_veg(distnum);
 
 			// Forest management disturbances
+			/*
 			if( simharv_flag == 1 ) 
 			{
 				for(harvperiod=0;harvperiod<numDemand; harvperiod++)
@@ -1226,10 +1231,8 @@ int main( int argc, char *argv[] ) {
 				std::fill(harvestgrid,harvestgrid+size,0);
 
 			}
+			*/
 			// Fire disturbances
-			int simfire;
-			int numsimfire=10;
-
 			if( simfire_flag == 1) 
 			{
 				//Repeat fire simulations - edited Ashis 4/21/2014
@@ -1290,8 +1293,10 @@ int main( int argc, char *argv[] ) {
 				
 				//Gen fire severity
 				std::string str="severity";
-				str.append(to_string(demperiod));
-				gen_severitysnapshot(&str[0],simfire, buffer_head, snapsum, 0);
+				
+
+				str.append(ZeroPadNumber(demperiod));
+				gen_severitysnapshot(&str[0],ZeroPadNumber(simfire), buffer_head, snapsum, 0);
 
 				} //end simulatin loop
 
@@ -1315,10 +1320,10 @@ int main( int argc, char *argv[] ) {
 
 				// Output the landscape "snapshot"
 				if(snapsum >= 1) {
-					gen_snapshot("state", demperiod, buffer_head, snapsum, 0);
+					gen_snapshot("state", ZeroPadNumber(demperiod), buffer_head, snapsum, 0);
 					reclassify_lclu(com_stateout,com_lclustate,com_counter-1);
-					gen_lccsnapshot("broader", demperiod, buffer_head, snapsum, 0); //Temporary intermediate snapshot  of lclugrid- just to make sure program is working.
-					writelog<<"END DEMAND PERIOD #"<<demperiod<<" ****************************************************************************************************************************"<<endl;
+					gen_lccsnapshot("broader", ZeroPadNumber(demperiod), buffer_head, snapsum, 0); //Temporary intermediate snapshot  of lclugrid- just to make sure program is working.
+					writelog<<"END DEMAND PERIOD #"<<ZeroPadNumber(demperiod)<<" ****************************************************************************************************************************"<<endl;
 				}
 				// or output age summaries
 				if(snapsum == 2) {
@@ -1444,6 +1449,8 @@ int main( int argc, char *argv[] ) {
 	delete(patchy);
 	delete(strucsum);
 	//delete(lccgrid); // Unable to delete lccgrid why?
+	writelog.clear();
+	writelog.close();
 	printf("Simulation is finished !!!");
 	cin.get();
 

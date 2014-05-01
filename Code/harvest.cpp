@@ -13,6 +13,7 @@
 #include <iostream>
 #include <random>
 #include <algorithm>
+#include <chrono>
 
 using namespace std;
 
@@ -21,62 +22,96 @@ std::vector<lccCells> harvneighborVecObjList, harvneighbourVecCells;// vector to
 //Get harvest neighbouring cell
 bool getHarvestNeighbour(int row, int col, int lagdistance, int harvest_patchSize,int trtclass ,bool iscompactNeighbour)
 {
-	int rwlag=-lagdistance;
-	int cclag=-lagdistance;
 	bool isNeighboor=false;
-	int count_neighbour=0; // Neighbour member count
-	int cindex;
+	int count_neighbour1=0; // Neighbour member count
+	int count_neighbour2=0;
+	int cindex1,cindex2;
+	
+	vector<int>harvCellIndex;
+
 	if(((row<maxrow) && (row>0)) && ((col<maxcol)&& (col>0)))
 	{
 		try{
-			for (int rlag=rwlag;rlag<lagdistance+1;rlag++)
-			{
-				for(int clag=cclag; clag<lagdistance+1;clag++ )
-				{					
-					cindex=((row-rlag)*maxcol+(col-clag));
-					if((cindex<size) && (cindex>-1))
+			for (int dlag=0;dlag<=lagdistance;dlag++)
+			{		
+				harvCellIndex.clear();	
+	
+				for (int rlag=-1-dlag;rlag<=1+dlag;rlag++)
+				{
+					for(int clag=-1-dlag;clag<=1+dlag;clag++)
+					{	
+
+							cindex1=((row-rlag)*maxcol+(col-clag));
+					
+							harvCellIndex.push_back(cindex1);
+
+			
+					}
+				}
+				while(harvCellIndex.size()!=0)
+				{
+					int tempharv=rand_int(harvCellIndex.size());
+					tempharv=tempharv-1;
+
+					cindex2=harvCellIndex[tempharv];
+					
+					if((cindex2<size) && (cindex2>-1))
 					{						
-						if((int)harvestgrid[cindex]==(1+trtclass))
+						if((int)harvestgrid[cindex2]==(1+trtclass))
 						{
-							
-							if((rlag!= 0)||(clag=!0))
-							{/*
-							
-								if((iscompactNeighbour) && (harvest_patchSize>3))
-								{
-									count_neighbour++;
-									if(count_neighbour>2) // Eligible cell should have more than 3 same neighborhoods 
-									{
-										isNeighboor=true;
-										count_neighbour=0;
-										return true;
-									}
-								}
-
-								else if((iscompactNeighbour) && ((harvest_patchSize> 1) && (harvest_patchSize <=3)))
-								{
-									count_neighbour++;
-									if(count_neighbour>1) // Eligible cell should have more than 2 same neighborhoods 
-									{
-										isNeighboor=true;
-										count_neighbour=0;
-										return true;
-									}
-								}
-
-								else
+							/*
+							if((iscompactNeighbour) && (harvest_patchSize>2))
+							{
+								count_neighbour1++;
+								if(count_neighbour1>2) // Eligible cell should have more than 3 same neighborhoods 
 								{
 									isNeighboor=true;
+									count_neighbour1=0;
+									count_neighbour2=0;
 									return true;
-							
-								}*/
-									isNeighboor=true;
-									return true;
+								}
 							}
+
+							else if((iscompactNeighbour) && ((harvest_patchSize> 0) && (harvest_patchSize <=2)))
+							{
+								count_neighbour2++;
+								if(count_neighbour2>1) // Eligible cell should have more than 2 same neighborhoods 
+								{
+									isNeighboor=true;
+									count_neighbour1=0; // Neighbour member count
+									count_neighbour2=0;
+									return true;
+								}
+							}
+
+							else
+							{
+								isNeighboor=true;
+								return true;
+								count_neighbour1=0; // Neighbour member count
+								count_neighbour2=0;
+							
+							}  
+							*/
+								
+								isNeighboor=true;
+								return true; 
+							
 						}
 
-					}					
+					}
+
+					harvCellIndex.erase(harvCellIndex.begin()+tempharv);
+					harvCellIndex.begin();
+
+
+
+
+
 				}
+
+
+
 			}
 			if(!isNeighboor)
 			{
@@ -94,7 +129,10 @@ bool getHarvestNeighbour(int row, int col, int lagdistance, int harvest_patchSiz
 //Fill harvest neighbour based on lag distance
 std::vector<lccCells> fillHarvestNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int &demand, int &patch_size, int distlag, int mpatchsize)
 {
-	std::vector<lccCells> neighborVecObj; // vector to hold 8 neighborhing cells temporaily
+	std::vector<lccCells> neighborVecObj, tempneighVecObj; // vector to hold 8 neighborhing cells temporaily
+	neighborVecObj.clear();
+	tempneighVecObj.clear();
+
 	int initdem=demand;
 	int veclen=vecobj.size();
 	unsigned int iteration_count1=0;
@@ -104,9 +142,9 @@ std::vector<lccCells> fillHarvestNeighborhood(std::vector<lccCells> vecobj, int 
 
 	int distanceLag=distlag;
 	std::vector<int>harvLaggrid; // Container to store status of cell already existed in neighbourhood vector or not
+	harvLaggrid.clear();
 	harvLaggrid.resize(size);		//Resize vetor to landscape size
 	std::fill(harvLaggrid.begin(),harvLaggrid.end(),0); // Filling vector with 0s
-
 	if((demand>0) && (veclen>0))
 	{	
 		int ilcccol2;
@@ -115,13 +153,17 @@ std::vector<lccCells> fillHarvestNeighborhood(std::vector<lccCells> vecobj, int 
 		int index2;
 
 		lccCells tempCells;
+		
+
+
 		for (int dlag=0;dlag<distanceLag;dlag++)
 		{
-			for(int j=-1-dlag;j<=1+dlag;j++)
+			for (int k=-1-dlag;k<=1+dlag;k++)
+			
 			{
-				for (int k=-1-dlag;k<=1+dlag;k++)
+				for(int j=-1-dlag;j<=1+dlag;j++)
 				{
-					if(j!=0||k!=0)
+					if(((j!=0)||(k!=0)))
 					{
 						irow=irow+j;
 						icol=icol+k;
@@ -141,31 +183,50 @@ std::vector<lccCells> fillHarvestNeighborhood(std::vector<lccCells> vecobj, int 
 							{
 								if((demand>0) && (patch_size<mpatchsize))
 								{
-										if((index1==index2) && (harvtempgridFlag[index1]==0) && (harvLaggrid[index1]==0) &&(harvestgrid[index1]==0))  
+										if((index1==index2) && (harvtempgridFlag[index2]==0) && (harvLaggrid[index2]==0) &&(harvestgrid[index2]==0))  
 										{ 
 											tempCells.lccCol=ilcccol2;
 											tempCells.lccRow=ilccrow2;
-											neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
+											tempneighVecObj.push_back(tempCells);	// Store the changed neighbour cells											
 											harvLaggrid[index1]=1;
-
+											
 										}
 									
 								}
 							}
 
-						}							
-					}						
+						}	
+						
+					}
+					
+					
 				}
+			
 			}
+
+						
 		}
+
+		while(tempneighVecObj.size()!=0)
+		{
+			int tempval=rand_int(tempneighVecObj.size());
+			tempval=tempval-1;
+			neighborVecObj.push_back(tempneighVecObj[tempval]);	
+			tempneighVecObj.erase(tempneighVecObj.begin()+tempval);
+			tempneighVecObj.begin();
+		}
+
+		
+		
 	}
 	harvLaggrid.clear();
 	// shuffle the list	
 	/*
 	std::random_device rd;
     std::mt19937 g(rd());
-	shuffle(neighborVecObj.begin(),neighborVecObj.end(),g);	
+	shuffle(neighborVecObj.begin(),neighborVecObj.end(),g);
 	*/
+	
 	return(neighborVecObj);
 }
 
@@ -175,7 +236,7 @@ void allocateHarvest(std::vector<lccCells> harvCells,  int harvDemand, int mharv
 	int rand_harvrow,rand_harvcol,rand_index,harv_index,neighcell_index;
 	bool harvNeigh=false;
 	int harv_patch;
-	int harv_lag=3;		// harvesting  adjacent neighbours
+	int harv_lag=1;		// harvesting  adjacent neighbours
 	int harvneighDemand;
 	int counter1=0; //Counts the demand allocaiton while loop (1st loop)
 	int counter2=0;	//Counts the neighbour demand allocation while loop (2nd loop)
@@ -217,8 +278,9 @@ void allocateHarvest(std::vector<lccCells> harvCells,  int harvDemand, int mharv
 				}
 				cout <<"Remaining to harvest 1: "<< harvDemand<<endl;
 				harvNeigh=true;
+				harvneighbourVecCells.clear();
 				harvneighbourVecCells=fillHarvestNeighborhood(harvCells,rand_harvrow,rand_harvcol,harvDemand,harv_patch,harv_lag,mharvpatchSize);
-				
+				harvneighbourVecCells.begin();
 				
 
 			}			

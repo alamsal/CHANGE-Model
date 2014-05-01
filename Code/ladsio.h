@@ -8,6 +8,9 @@
 
 #ifndef ladsioH
 #define ladsioH
+#include <string>
+
+using namespace std;
 
 // POINTERS TO MAIN LANDSCAPE ARRAYS
 extern short int *age;	        //patch age grid
@@ -63,15 +66,16 @@ struct image_header gen_grid( int nrows, int ncols, int cellval, char *gridname 
 void gen_strucsum( char *runname, int nclass, int nsum, struct image_header out_head );
 void gen_firesum( char *filename, int nsum, struct image_header out_head, int timestep );
 void gen_sevsum(char *filename, int nsum, struct image_header out_head);
-void gen_snapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum );
-void gen_lccsnapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum );
-void gen_forescesnapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum );
-void gen_hnisnapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum );
-void gen_severitysnapshot( char *runname, int year, struct image_header out_head,int snapsum, int transsum );
-void get_harvestsnapshot(char *runname, int year, struct image_header out_head,int snapsum, int transsum );
+void gen_snapshot( char *runname, string year, struct image_header out_head,int snapsum, int transsum );
+void gen_lccsnapshot( char *runname, string year, struct image_header out_head,int snapsum, int transsum );
+void gen_forescesnapshot( char *runname, string year, struct image_header out_head,int snapsum, int transsum );
+void gen_hnisnapshot( char *runname, string year, struct image_header out_head,int snapsum, int transsum );
+void gen_severitysnapshot( char *runname, string year, struct image_header out_head,int snapsum, int transsum );
+void get_harvestsnapshot(char *runname, string year, struct image_header out_head,int snapsum, int transsum );
 void gen_agesum( char *runname, int year, struct image_header out_head, int timestep );
 void gen_biosum( char *runname, int year, struct image_header out_head );
 void write_grid( char *outfilename, unsigned char *gridname, struct image_header imagehd );
 void landscape_sum( int *classnum, int zonesum);
 short int get_struc( int index );
+std::string ZeroPadNumber(int num);// 000 padding 
 #endif
