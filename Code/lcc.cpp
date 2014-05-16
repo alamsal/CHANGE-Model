@@ -484,17 +484,18 @@ std::vector<lccCells> fillEightNeighborhood(std::vector<lccCells> vecobj, int ir
 	return(neighborVecObj);
 }
 //Find neighbourhood based on lag distance
-std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int lcccode,int prob_index,int &demand, int &patch_size, int distlag,bool hni_trasition)
+std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int inrow, int incol,int lcccode,int prob_index,int &demand, int &patch_size, int distlag,bool hni_trasition)
 {
-	std::vector<lccCells> neighborVecObj; // vector to hold 8 neighborhing cells temporaily
+	std::vector<lccCells> neighborVecObj,tempneighVecObj; // vector to hold 8 neighborhing cells temporaily
 	int initdem=demand;
 	int veclen=vecobj.size();
 	unsigned int iteration_count1=0;
 	unsigned int iteration_count2=0;
 	unsigned int iteration_count3=0;
 	bool iterationflag= true;
-
-	int distanceLag=distlag;
+	unsigned int irow,icol;
+	neighborVecObj.clear();
+	tempneighVecObj.clear();
 	std::vector<int>tempLaggrid; // Container to store status of cell already existed in neighbourhood vector or not
 	tempLaggrid.resize(size);		//Resize vetor to landscape size
 	std::fill(tempLaggrid.begin(),tempLaggrid.end(),0); // Filling vector with 0s
@@ -507,16 +508,15 @@ std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, i
 		int index2;
 
 		lccCells tempCells;
-		for (int dlag=0;dlag<distanceLag;dlag++)
-		{
-			for(int j=-1-dlag;j<=1+dlag;j++)
+
+			for(int j=inrow-distlag;j<=inrow+distlag;j++)
 			{
-				for (int k=-1-dlag;k<=1+dlag;k++)
+				for (int k=incol-distlag;k<=incol+distlag;k++)
 				{
-					if(j!=0||k!=0)
+					if(j!=inrow||k!=incol)
 					{
-						irow=irow+j;
-						icol=icol+k;
+						irow=j;
+						icol=k;
 
 						index1=irow*maxcol+icol;
 
@@ -540,7 +540,8 @@ std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, i
 										{ 
 											tempCells.lccCol=ilcccol2;
 											tempCells.lccRow=ilccrow2;
-											neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
+											tempneighVecObj.push_back(tempCells);	// Store the changed neighbour cells
+											//neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
 											tempLaggrid[index1]=1;
 										
 										}
@@ -552,57 +553,10 @@ std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, i
 										{ 
 											tempCells.lccCol=ilcccol2;
 											tempCells.lccRow=ilccrow2;
-											neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
+											tempneighVecObj.push_back(tempCells);	// Store the changed neighbour cells
+											//neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
 											tempLaggrid[index1]=1;
-											/*
-											if(lccgrid[index1]!=lcccode)
-											{
-											while((iterationflag) && (iteration_count3<NO_OF_ITERATION))
-											{
-											//Get the transitional probability value;
-											trans_probaility=(double)(probability_surfaces[prob_index][ilccrow2][ilcccol2]);
-											//Generate a uniform random variable;
-											irand=u0_1();
-											if(irand<trans_probaility)
-											{
 
-											//			int index_value= (int)(lccgrid[index1]);
-											//			//If FORSCE change the cell transition form non-veg to vegetated; we must assign succesational stage [index]==1 to start future successional stages.
-											//			if(((index_value==11)||(index_value==12)||(index_value==20)||(index_value==30)||(index_value==81)||(index_value==82)||(index_value==41)||(index_value==42)||(index_value==43)||(index_value==52)||(index_value==71))&&((lcccode==41)||(lcccode==42)||(lcccode==52)||(lcccode==71)))	
-											//			{												//Put the smallest value from state,initage,and tsfire grids
-											//				stategrid[index1]=1; // When forsce simulate veg to veg/ non-veg to veg the successional stage= 1;timeinstage =0; age=0; time since fire=0. 
-											//										// When forsce simulate non-veg to non-veg * veg to non-veg the buffer is  set to 0, which will handle by "merg_lccBuffer()" after the completion this demand allocation look at lads.cpp.
-											//				timeinstage[index1]=1;	// time in current successional stage grid
-											//				age[index1]=5;		    // patch age grid
-											//				lccgrid[index1]=lcccode;
-											//				tsfire[index1]=1;      // time since last fire grid
-											//				buffer[index1]=1;		//Active simulation
-											//				tempgridFlag[index1]=1;		// To prevent from further trasition of the same cell
-											//
-											//			}
-											//			else
-											//			{
-											//				lccgrid[index1]=lcccode; 
-											//				buffer[index1]=0;			//Prevent from simulation human dominated cell
-											//				tempgridFlag[index1]=1;		// To prevent from further trasition of the same cell
-											//			}
-
-
-											bool transFlag=cellTrasition(index1,lcccode);
-
-											if(transFlag)
-											{
-											demand--;
-											patch_size++;
-											iterationflag=false;
-											iteration_count3++;
-											writelog<< "Rem. to accomp demand::"<<demand <<"\t Lcc Code::"<<lcccode<<"\t Rem. trans. prob pixel #::" <<vecobj.size() <<endl; 
-											}
-
-											}
-											}
-
-											} */
 										}
 									}
 								}
@@ -612,9 +566,25 @@ std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, i
 					}						
 				}
 			}
-		}
+			//Randomize the order of neighbouring cells
+			if(tempneighVecObj.size()!=0)
+			{
+				vector<int> randValue=RandFillArr(tempneighVecObj.size());
+			
+				int tempval;
+				for(unsigned int i=0;i<tempneighVecObj.size();i++)
+				{
+					tempval=randValue[i]; 
+					tempval=tempval-1;
+					neighborVecObj.push_back(tempneighVecObj[tempval]);	
+
+				}
+
+			}
+		
 	}
 	tempLaggrid.clear();
+	tempneighVecObj.clear();
 	return(neighborVecObj);
 }
 

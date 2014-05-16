@@ -45,4 +45,8 @@ void checkLogExists( const char *name);
 //Get eligible cells to harvest
 void getEligibleHarvestCells( short int treatmentunit, int treatmentclass, std::vector<lccCells> & harvestEligibleCells );
 
+
+//Get Random arraylist
+vector<int> RandFillArr(int arrsize);
+
 #endif

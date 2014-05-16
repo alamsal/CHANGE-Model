@@ -10,6 +10,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <random>
+#include <chrono>
 
 using namespace std;
 
@@ -119,5 +121,26 @@ void getEligibleHarvestCells( short int treatmentunit, int treatmentclass, std::
 }
 
 
+//Get Random arraylist
+vector<int> RandFillArr(int arrsize)
+{
+	int randomNumber;
+	vector <int> x;
+	int i=0;
+	while (i<arrsize)
+	{
+		        
+			randomNumber = rand_int(arrsize);
+			bool exists = std::find(x.begin(), x.end(), randomNumber) != x.end();
+			if(!exists)
+			{
+				x.push_back(randomNumber);
+				i++;
+			}
+		
+	}
+	
 
+	return x;
+}
 

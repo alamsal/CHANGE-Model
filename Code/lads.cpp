@@ -218,7 +218,7 @@ double hiburnarea[40];		// stand-replacement area burned summary array
 double totburncount[40];	// total number of fires summary array
 
 // Number of iteraiton 
-int NO_OF_ITERATION=3;
+int NO_OF_ITERATION=5;
 
 // Probabilty surfaces container
 std::vector< std::vector<std::vector< float > > > probability_surfaces; //Holds the probability surfaces rasters as 3D vector
@@ -1096,15 +1096,22 @@ int main( int argc, char *argv[] ) {
 	cout<<"Reading demand files (csvs)..."<<endl;
 	read_demandCsv(demand_matrix,numDemand,rowDemand,colDemand);
 	demand_matrix;	
+	
 
+
+	//Loop through the demand years
 	for(demperiod=0;demperiod<numDemand;demperiod++)
 	{
 		harvtempgridFlag.clear();
 		harvtempgridFlag.resize(size,0);
+
+
 		writelog<<"START DEMAND PERIOD #"<<demperiod<<" ****************************************************************************************************************************"<<endl;
 		
 		
 		
+		
+		//HUMAN DOMINATED LCLU CHANGE- FORESCE REGION
 
 		tempgridFlag.clear();
 		tempgridFlag.resize(size,0);
@@ -1194,7 +1201,7 @@ int main( int argc, char *argv[] ) {
 			nsdisturb_veg(distnum);
 
 			// Forest management disturbances
-			/*
+			
 			if( simharv_flag == 1 ) 
 			{
 				for(harvperiod=0;harvperiod<numDemand; harvperiod++)
@@ -1207,16 +1214,17 @@ int main( int argc, char *argv[] ) {
 								{
 
 										cout<< "Dem: "<<harvperiod <<"\t"<<"Hzone: "<<harvzone <<"\t"<<"Htype: "<<harvtype <<"\t"<<harvDemand[harvperiod][harvzone][harvtype]<<endl;
-							
-										// Determine the total area treated within the unit
-										treatunit= ownershipCode[harvzone];   //treatment zone
-										getEligibleHarvestCells(treatunit, harvtype,harvestCells);
-										printf("runname=%s year=%d unit=%d treatsize=%d\n", runname, harvperiod, treatunit, harvestCells.size());
-							
+										
 										//Allocate harvest with demand	
-										
-										allocateHarvest(harvestCells, harvDemand[harvperiod][harvzone][harvtype], harvmeanSize[harvperiod][harvzone][harvtype],treatunit,harvtype);
-										
+										if(harvDemand[harvperiod][harvzone][harvtype]>0)
+										{
+
+											// Determine the total area treated within the unit
+											treatunit= ownershipCode[harvzone];   //treatment zone
+											getEligibleHarvestCells(treatunit, harvtype,harvestCells);
+											printf("Harvestsize=%d harvtype=%d period=%d unit=%d \n",harvestCells.size(),harvtype,harvperiod,treatunit);
+											allocateHarvest(harvestCells, harvDemand[harvperiod][harvzone][harvtype], harvmeanSize[harvperiod][harvzone][harvtype],treatunit,harvtype);
+										}
 										
 										
 									}
@@ -1227,11 +1235,11 @@ int main( int argc, char *argv[] ) {
 			       }
 				//Output the harvest grid
 				
-				get_harvestsnapshot("harvest",demperiod, buffer_head,snapsum,0 );
+				get_harvestsnapshot("harvest",ZeroPadNumber(demperiod), buffer_head,snapsum,0 );
 				std::fill(harvestgrid,harvestgrid+size,0);
 
 			}
-			*/
+			
 			// Fire disturbances
 			if( simfire_flag == 1) 
 			{

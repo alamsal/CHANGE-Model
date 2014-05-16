@@ -161,13 +161,15 @@ bool getHnilag(int row,int col,int hcode,int lagdistance,int hni_patchSize, bool
 }
 
 //Find hni neighbourhood distance
-std::vector<lccCells> hni_fillNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int prob_index,int &demand, int &patch_size, int dlag)
+std::vector<lccCells> hni_fillNeighborhood(std::vector<lccCells> vecobj, int inrow, int incol,int prob_index,int &demand, int &patch_size, int dlag)
 {
-	std::vector<lccCells> neighborVecObj; // vector to hold 8 neighborhing cells temporaily
+	std::vector<lccCells> neighborVecObj,tempneighVecObj; // vector to hold 8 neighborhing cells temporaily
+	neighborVecObj.clear();
+	tempneighVecObj.clear();
 	int initdem=demand;
 	int veclen=vecobj.size();
 	bool iterationflag= true;
-
+	unsigned int irow,icol;
 	int distanceLag=dlag;
 	std::vector<int>tempLaggrid; // Container to store status of cell already existed in neighbourhood vector or not
 	tempLaggrid.resize(size);		//Resize vetor to landscape size
@@ -181,16 +183,15 @@ std::vector<lccCells> hni_fillNeighborhood(std::vector<lccCells> vecobj, int iro
 		int index2;
 
 		lccCells tempCells;
-		for (int dlag=0;dlag<distanceLag;dlag++)
-		{
-			for(int j=-1-dlag;j<=1+dlag;j++)
+		
+			for(int j=inrow-dlag;j<=inrow+dlag;j++)
 			{
-				for (int k=-1-dlag;k<=1+dlag;k++)
+				for (int k=incol-dlag;k<=incol+dlag;k++)
 				{
-					if(j!=0||k!=0)
+					if(j!=inrow||k!=incol)
 					{
-						irow=irow+j;
-						icol=icol+k;
+						irow=j;
+						icol=k;
 
 						index1=irow*maxcol+icol;
 
@@ -209,7 +210,10 @@ std::vector<lccCells> hni_fillNeighborhood(std::vector<lccCells> vecobj, int iro
 										{ 
 											tempCells.lccCol=ilcccol2;
 											tempCells.lccRow=ilccrow2;
-											neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
+											tempneighVecObj.push_back(tempCells);	// Store the changed neighbour cells
+
+											//neighborVecObj.push_back(tempCells);	// Store the changed neighbour cells
+											
 											tempLaggrid[index1]=1;
 										
 										}
@@ -220,9 +224,29 @@ std::vector<lccCells> hni_fillNeighborhood(std::vector<lccCells> vecobj, int iro
 					}						
 				}
 			}
-		}
+			//Randomize the order of neighbouring cells
+			if(tempneighVecObj.size()!=0)
+			{
+				vector<int> randValue=RandFillArr(tempneighVecObj.size());
+			
+				int tempval;
+				for(unsigned int i=0;i<tempneighVecObj.size();i++)
+				{
+					tempval=randValue[i]; 
+					tempval=tempval-1;
+					neighborVecObj.push_back(tempneighVecObj[tempval]);	
+
+				}
+
+			}
+
+
+
+
+		
 	}
 	tempLaggrid.clear();
+	tempneighVecObj.clear();
 	return(neighborVecObj);
 }
 
