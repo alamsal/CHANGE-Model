@@ -16,7 +16,7 @@ using namespace std;
 
 
 // Hold filtered raster cells
-extern struct lccCells;
+
 extern char *harvestgrid;		// Harvest grid
 extern std::vector<int> harvtempgridFlag; //Harvest temp grid
 extern int NO_OF_ITERATION;

@@ -1132,9 +1132,8 @@ int main( int argc, char *argv[] ) {
 		//gen_forescesnapshot(runname, 50+demperiod, buffer_head, snapsum, 0);
 		merg_lccBuffer(); //This function will make buffer=0 for Veg to non-veg & non-veg to non-veg trasnision to prevent the cells from simulation.
 		//gen_forescesnapshot(runname, 60+demperiod, buffer_head, snapsum, 0); //Temporary intermediate snapshot  from forsce only- just to make sure program is working.
-		
-			
-			
+
+
 		//BEYOND THIS POINT THE CONTROL HANDOVER TO LADS FOR FURTHER SIMULATION
 
 		// process the simulation step by step
@@ -1199,9 +1198,8 @@ int main( int argc, char *argv[] ) {
 
 			// Non-spatial disturbances 
 			nsdisturb_veg(distnum);
-
-			// Forest management disturbances
 			
+			// Forest management disturbances
 			if( simharv_flag == 1 ) 
 			{
 				for(harvperiod=0;harvperiod<numDemand; harvperiod++)
@@ -1230,15 +1228,16 @@ int main( int argc, char *argv[] ) {
 									}
 							
 								}
-				    	 }
+							}
 	 			
-			       }
+					}
 				//Output the harvest grid
 				
 				get_harvestsnapshot("harvest",ZeroPadNumber(demperiod), buffer_head,snapsum,0 );
 				std::fill(harvestgrid,harvestgrid+size,0);
 
-			}
+			}	
+			//End forest harvesting
 			
 			// Fire disturbances
 			if( simfire_flag == 1) 
@@ -1310,6 +1309,7 @@ int main( int argc, char *argv[] ) {
 
 
 			} // end if fireflag == 1
+			
 
 			// If landscape structure summary is selected, increment structure
 			// summary grids
@@ -1417,6 +1417,9 @@ int main( int argc, char *argv[] ) {
 
 
 		}  // end year loop
+		
+		
+
 
 		// Do I need to worry about explicitly closing any other files?
 		outfire.close();

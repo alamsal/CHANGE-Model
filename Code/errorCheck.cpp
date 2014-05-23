@@ -125,12 +125,12 @@ void ErrorCheck::check_communityType_param(int &_numcom,int _comcode[],int _comn
 
 	if(_numcom>=1)
 	{
-		for(unsigned int comcnt=0;comcnt<_numcom;comcnt++)
+		for( int comcnt=0;comcnt<_numcom;comcnt++)
 		{
 			community_param_flag.push_back((_comcode[comcnt]>=0)?0:1);
 			community_param_flag.push_back((_comnumstate[comcnt]>=0)?0:1);
 			community_param_flag.push_back((_init_state[comcnt]>=0)?0:1);
-			for(unsigned int statecnt=0; statecnt<_comnumstate[comcnt];statecnt++)
+			for( int statecnt=0; statecnt<_comnumstate[comcnt];statecnt++)
 			{
 				community_param_flag.push_back((_statecode[comcnt][statecnt]>=1)?0:1);
 				community_param_flag.push_back((_stateout[comcnt][statecnt]>=0)?0:1);
@@ -150,13 +150,13 @@ void ErrorCheck::check_communityType_param(int &_numcom,int _comcode[],int _comn
 				community_param_flag.push_back((_msfirereset[comcnt][statecnt]>=0)?0:1);
 				community_param_flag.push_back((_lsfiretrans[comcnt][statecnt]>=0)?0:1);
 				community_param_flag.push_back((_lsfirereset[comcnt][statecnt]>=0)?0:1);
-				for(unsigned int classcnt=0; classcnt<_mgmtnum;classcnt++)
+				for( int classcnt=0; classcnt<_mgmtnum;classcnt++)
 				{
 					community_param_flag.push_back((_treatelig[comcnt][statecnt][classcnt]>=0)?0:1);
 					community_param_flag.push_back((_treattrans[comcnt][statecnt][classcnt]>=0)?0:1);
 					community_param_flag.push_back((_treatreset[comcnt][statecnt][classcnt]>=0)?0:1);		
 				}
-				for( unsigned int classcnt=0; classcnt<_distnum;classcnt++)
+				for(  int classcnt=0; classcnt<_distnum;classcnt++)
 				{
 					community_param_flag.push_back((_distprob[comcnt][statecnt][classcnt]>=0)?0:1);	
 					community_param_flag.push_back((_disttrans[comcnt][statecnt][classcnt]>=0)?0:1);	
@@ -195,7 +195,7 @@ void ErrorCheck::check_landType_param(int &_numland, int _landcode[],double _lan
 
 	if(_numland>0)
 	{
-		for(unsigned int landcnt=0; landcnt<_numland;landcnt++)
+		for( int landcnt=0; landcnt<_numland;landcnt++)
 		{
 			landtype_param_flag.push_back((_landcode[landcnt]>0)?0:1);
 			landtype_param_flag.push_back((_landfiremod[landcnt]>0)?0:1);

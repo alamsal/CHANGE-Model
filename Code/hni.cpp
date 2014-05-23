@@ -158,6 +158,10 @@ bool getHnilag(int row,int col,int hcode,int lagdistance,int hni_patchSize, bool
 			cin.get();
 		}
 	}
+	else
+	{
+		false;
+	}
 }
 
 //Find hni neighbourhood distance
@@ -418,7 +422,7 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 						if(irand<hni_tras_probability)
 						{
 							hni_index=neighrow*maxcol + neighcol;
-							//if(((getNeighbour(neighrow,neighcol,lcccode)) &&(lcccode != lccgrid[cell_index]) && (tempgridFlag[cell_index]==0) )) //Enforce adjaceny while cell transition
+
 							if((getHnilag(neighrow,neighcol,hcode,hni_plag,hni_patch,true)) && (hnitempgridFlag[hni_index]==0))  //Enforce patch lag while cell transtion
 							{
 
@@ -462,11 +466,6 @@ void allocate_lcc2hni(std::vector <lccCells>lcc2hni_vec,int prob_index, int &dem
 			if(olddemand==demand && counter1>NO_OF_ITERATION*(lcc2hni_vec.size()))
 			{
 
-				//vecobj.erase(vecobj.begin()+rand_index-1);
-				//if(vecobj.size()!=0)
-				//{
-				//	vecobj.begin(); 
-				//}
 				afterIteraiton=true;
 				counter1=0;
 			}

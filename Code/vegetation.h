@@ -82,7 +82,7 @@ extern int treatelig[40][40][5];
 
 
 // Hold filtered raster cells
-extern struct lccCells;//hold raster cells
+
 extern unsigned int harvDemand[200][500][10];    // Harvest demand in each mgmt zone
 
 

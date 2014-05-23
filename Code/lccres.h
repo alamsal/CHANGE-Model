@@ -18,7 +18,7 @@ using namespace std;
 
 
 // Hold filtered raster cells
-extern struct lccCells;
+
 
 extern ofstream writelog;
 

@@ -71,7 +71,7 @@ extern std::vector<int>hnitempgridFlag;     //temp grid to hold hni trasition fl
 void merg_lccBuffer();	
 
 //LCC neighbour lag  iscompactNeighbour for compacting the neighbourhood cells
-bool getNeighbour(int row,int col,int lcccode);
+
 bool getNeighbourLag(int row,int col,int lcccode,int lagdistance, int patch_size, bool iscompactNeighbour);
 
 //Allow broad LCLU classes & HNI transitions
@@ -79,7 +79,6 @@ bool cellTrasition(int cellindex, int lcccode, bool hni_trasition);
 
 //Find neighbourhood based on lag distance
 std::vector<lccCells> fillNeighborhood(std::vector<lccCells> vecobj, int irow, int icol,int lcccode,int prob_index,int &demand, int &patch_size, int dlag,bool hni_trasition);
-std::vector<lccCells> fillEightNeighborhood(std::vector<lccCells> vecobj, int row, int col,int lcccode,int prob_index,int &demand, int &patch_size,bool ishni); // Recursive function to change the landscape's transition
 
 // Extract LCC cells based upon lcccode
 std::map <int,std::vector <lccCells> > extract_LandCoverCells(int lccCode); 
