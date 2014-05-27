@@ -1,0 +1,21 @@
+90 Cell size
+2 Input map flag
+1000 Maxrow
+1500 Maxcol
+1 Simulate Fire
+1 Simulate Harvest
+0 Burn-in Period
+5 Simulation Length
+5 Run Step
+5 Summary Step
+1 Vegetation summary flag
+1 Fire summary flag
+0 Harvest summary flag
+1 Landscape snapshot flag
+0 fire map summary flag(should be 0 if Simulation Length is >300)
+0 Vegetation map summary flag(should be 0 if Simulation Length is >300)
+0 Biomass flag
+2 Number of non-spatial disturbances
+2 Number of treatments
+1 Simulate HNI
+10 Fire repeat/demand year

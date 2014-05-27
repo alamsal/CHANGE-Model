@@ -1,16 +1,14 @@
 13 	No of probability surfaces
-3228    Rows
-2540	Columns
-0.50 	Water trasition prob threshold
-0.50	Ice,Snow trasition prob threshold
-0.50	Developed trasition prob threshold
-0.50	Barren Land (Rock/Sand/Clay) trasition prob threshold
-0.50	Deciduous Forest trasition prob threshold
-0.50	Evergreen Forest trasition prob threshold
-0.50	Shrub/Scrub trasition prob threshold
-0.50	Grassland/Herbaceous trasition prob threshold
-0.50	Pasture/Hay trasition prob threshold
-0.50	Cultivated Crops trasition prob threshold
-0.50	heberous wetland trasition prob threshold
-0.50	woody wetland trasition prob threshold
-0.50	HNI trasition prob threshold
+0.95 	Water trasition prob threshold
+0.95	Ice,Snow trasition prob threshold
+0.90	Developed trasition prob threshold
+0.85	Barren Land (Rock/Sand/Clay) trasition prob threshold
+0.85	Deciduous Forest trasition prob threshold
+0.85	Evergreen Forest trasition prob threshold
+0.90	Shrub/Scrub trasition prob threshold
+0.90	Grassland/Herbaceous trasition prob threshold
+0.85	Pasture/Hay trasition prob threshold
+0.85	Cultivated Crops trasition prob threshold
+0.95	heberous wetland trasition prob threshold
+0.95	woody wetland trasition prob threshold
+0.70	HNI trasition prob threshold

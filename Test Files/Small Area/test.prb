@@ -1,0 +1,14 @@
+13 		No of probability surfaces
+0.95 	Water transition prob threshold
+0.95	Ice,Snow transition prob threshold
+0.85	Developed transition prob threshold
+0.85	Barren Land (Rock/Sand/Clay) transition prob threshold
+0.85	Deciduous Forest transition prob threshold
+0.85	Evergreen Forest transition prob threshold
+0.85	Shrub/Scrub transition prob threshold
+0.85	Grassland/Herbaceous transition prob threshold
+0.90	Pasture/Hay transition prob threshold
+0.85	Cultivated Crops transition prob threshold
+0.95	herbaceous wetland transition prob threshold
+0.95	woody wetland transition prob threshold
+0.93	WUI transition prob threshold

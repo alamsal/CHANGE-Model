@@ -1,4 +1,3 @@
-Patch lag, Dist_Lag (Pixel), Mean_Pt_Size (Pixel), STD_dev Size(Pixel), Transition 
 1	1 	4  11	Water trasition  
 1	1	1	1	Ice,Snow trasition  
 1	1	5 	8	Developed trasition  
@@ -11,4 +10,4 @@ Patch lag, Dist_Lag (Pixel), Mean_Pt_Size (Pixel), STD_dev Size(Pixel), Transiti
 1	-9	41 85	Cultivated Crops trasition  
 1	1	2  2	heberous wetland trasition  
 1	1	2  2	woody wetland trasition
-1	1	10 8	HNI trasition   
+2	1	10 8	HNI trasition   

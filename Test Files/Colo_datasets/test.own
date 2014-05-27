@@ -1,8 +1,14 @@
-6 Number of ownership layers
-Code  Restriction    Layer type
-1 	1	fed
-2 	1 	local land
-3 	1	native 
-4 	1 	pri. conservation land
-5 	0	private land
-6 	1	state land
+12 Number of ownership layers
+Code  Restriction  Not Allowed                  Type
+1 	1	20,999,81,82       BLM [can have clear cut, thinning, and Rx fire]
+2 	1 	20,999,81,82       Federal land other
+3 	1	20,999,81,82       NPS [no clear cut, have thinning and rx fires]
+4 	0	20,999,81,82       Native American land [can have development clear cut, thinning, and Rx fire]
+5 	1	20,999,81,82       private conservation land  [NO development, no management]
+6 	0	81                 private land [development and management]
+7 	1	20,999,81,82       State land and local land, non protect [no development, have management]
+8 	1 	20,999,81,82       USFS-national forest [no development, have management]
+9 	1	20,999,81,82       USFWS [no development, have thinning]
+10 	1 	20,999,81,82       Wilderness area [NO]
+11 	1 	20,999,81,82       other restrictive areas non-national forest or others [NO]
+12 	1	20,999,81,82       state land and local land, protect [no]

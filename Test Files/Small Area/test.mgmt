@@ -1,0 +1,310 @@
+0 **** demand period ****
+1 ---- zone TH CC PB ----
+10 20  
+100 80 
+2 ---- zone TH CC PB ----
+40 80
+0 0 
+3 ---- zone TH CC PB ----
+30 20
+0 0
+4 ---- zone TH CC PB ----
+50 60
+0 0 
+5 ---- zone TH CC PB ----
+1 2
+0 0 
+6 ---- zone TH CC PB ----
+5 3
+0 0
+7 ---- zone TH CC PB ----
+40 50
+0 0
+8 ---- zone TH CC PB ----
+40 50
+0  0
+9 ---- zone TH CC PB ----
+15 10
+50 50
+10 ---- zone TH CC PB ----
+50 60
+0 0
+1 **** demand period ****
+1 ---- zone TH CC PB ----
+50 60  
+0 0 
+2 ---- zone TH CC PB ----
+40 80
+0 0 
+3 ---- zone TH CC PB ----
+30 20
+0 0
+4 ---- zone TH CC PB ----
+50 60
+0 0 
+5 ---- zone TH CC PB ----
+1 2
+0 0 
+6 ---- zone TH CC PB ----
+5 3
+0 0
+7 ---- zone TH CC PB ----
+40 50
+0 0
+8 ---- zone TH CC PB ----
+40 50
+0  0
+9 ---- zone TH CC PB ----
+20 20
+100 100
+10 ---- zone TH CC PB ----
+50 60
+0 0
+2 **** demand period ****
+1 ---- zone TH CC PB ----
+50 60  
+0 0 
+2 ---- zone TH CC PB ----
+40 80
+0 0 
+3 ---- zone TH CC PB ----
+30 20
+0 0
+4 ---- zone TH CC PB ----
+50 60
+0 0 
+5 ---- zone TH CC PB ----
+1 2
+0 0 
+6 ---- zone TH CC PB ----
+5 3
+0 0
+7 ---- zone TH CC PB ----
+40 50
+0 0
+8 ---- zone TH CC PB ----
+40 50
+0  0
+9 ---- zone TH CC PB ----
+40 50
+300 300
+10 ---- zone TH CC PB ----
+50 60
+0 0
+3 **** demand period ****
+1 ---- zone TH CC PB ----
+50 60  
+0 0 
+2 ---- zone TH CC PB ----
+40 80
+0 0 
+3 ---- zone TH CC PB ----
+30 20
+0 0
+4 ---- zone TH CC PB ----
+50 60
+0 0 
+5 ---- zone TH CC PB ----
+1 2
+0 0 
+6 ---- zone TH CC PB ----
+5 3
+0 0
+7 ---- zone TH CC PB ----
+40 50
+0 0
+8 ---- zone TH CC PB ----
+40 50
+0  0
+9 ---- zone TH CC PB ----
+40 50
+500 700
+10 ---- zone TH CC PB ----
+50 60
+0 0
+4 **** demand period ****
+1 ---- zone TH CC PB ----
+50 60  
+0 0 
+2 ---- zone TH CC PB ----
+40 80
+0 0 
+3 ---- zone TH CC PB ----
+30 20
+0 0
+4 ---- zone TH CC PB ----
+50 60
+0 0 
+5 ---- zone TH CC PB ----
+1 2
+0 0 
+6 ---- zone TH CC PB ----
+5 3
+0 0
+7 ---- zone TH CC PB ----
+40 50
+0 0
+8 ---- zone TH CC PB ----
+40 50
+0  0
+9 ---- zone TH CC PB ----
+40 50
+500 700
+10 ---- zone TH CC PB ----
+50 60
+0 0
+5 **** demand period ****
+1 ---- zone TH CC PB ----
+50 60  
+0 0 
+2 ---- zone TH CC PB ----
+40 80
+0 0 
+3 ---- zone TH CC PB ----
+30 20
+0 0
+4 ---- zone TH CC PB ----
+50 60
+0 0 
+5 ---- zone TH CC PB ----
+1 2
+0 0 
+6 ---- zone TH CC PB ----
+5 3
+0 0
+7 ---- zone TH CC PB ----
+40 50
+0 0
+8 ---- zone TH CC PB ----
+40 50
+0  0
+9 ---- zone TH CC PB ----
+40 50
+500 700
+10 ---- zone TH CC PB ----
+50 60
+0 0
+6 **** demand period ****
+1 ---- zone TH CC PB ----
+50 60  
+0 0 
+2 ---- zone TH CC PB ----
+40 80
+0 0 
+3 ---- zone TH CC PB ----
+30 20
+0 0
+4 ---- zone TH CC PB ----
+50 60
+0 0 
+5 ---- zone TH CC PB ----
+1 2
+0 0 
+6 ---- zone TH CC PB ----
+5 3
+0 0
+7 ---- zone TH CC PB ----
+40 50
+0 0
+8 ---- zone TH CC PB ----
+40 50
+0  0
+9 ---- zone TH CC PB ----
+40 50
+500 700
+10 ---- zone TH CC PB ----
+50 60
+0 0
+7 **** demand period ****
+1 ---- zone TH CC PB ----
+50 60  
+0 0 
+2 ---- zone TH CC PB ----
+40 80
+0 0 
+3 ---- zone TH CC PB ----
+30 20
+0 0
+4 ---- zone TH CC PB ----
+50 60
+0 0 
+5 ---- zone TH CC PB ----
+1 2
+0 0 
+6 ---- zone TH CC PB ----
+5 3
+0 0
+7 ---- zone TH CC PB ----
+40 50
+0 0
+8 ---- zone TH CC PB ----
+40 50
+0  0
+9 ---- zone TH CC PB ----
+40 50
+500 700
+10 ---- zone TH CC PB ----
+50 60
+0 0
+8 **** demand period ****
+1 ---- zone TH CC PB ----
+50 60  
+0 0 
+2 ---- zone TH CC PB ----
+40 80
+0 0 
+3 ---- zone TH CC PB ----
+30 20
+0 0
+4 ---- zone TH CC PB ----
+50 60
+0 0 
+5 ---- zone TH CC PB ----
+1 2
+0 0 
+6 ---- zone TH CC PB ----
+5 3
+0 0
+7 ---- zone TH CC PB ----
+40 50
+0 0
+8 ---- zone TH CC PB ----
+40 50
+0  0
+9 ---- zone TH CC PB ----
+40 50
+500 700
+10 ---- zone TH CC PB ----
+50 60
+0 0
+9 **** demand period ****
+1 ---- zone TH CC PB ----
+50 60  
+0 0 
+2 ---- zone TH CC PB ----
+40 80
+0 0 
+3 ---- zone TH CC PB ----
+30 20
+0 0
+4 ---- zone TH CC PB ----
+50 60
+0 0 
+5 ---- zone TH CC PB ----
+1 2
+0 0 
+6 ---- zone TH CC PB ----
+5 3
+0 0
+7 ---- zone TH CC PB ----
+40 50
+0 0
+8 ---- zone TH CC PB ----
+40 50
+0  0
+9 ---- zone TH CC PB ----
+40 50
+500 700
+10 ---- zone TH CC PB ----
+50 60
+0 0

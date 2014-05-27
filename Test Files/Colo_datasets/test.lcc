@@ -1,6 +1,4 @@
-****************NLCD LCC classification 2006 legends**********
 12	Total number of LCC classes
-********Input lcc code, output lcc code, simulation flag, and lcc type *******
 11	201 0 Water
 12	202 0 Ice,Snow
 20	203 0 Developed
@@ -11,5 +9,5 @@
 71	209 1 Grassland/Herbaceous
 81	210 0 Pasture/Hay
 82	211 0 Cultivated Crops 
-90  212 1 herbaceous wetland
+90  212 1 heberous wetland
 95  213 1 woody wetland

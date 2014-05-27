@@ -1,0 +1,21 @@
+6 Number of fire regime zones
+2 Fire size distribution
+90 Prevailing wind direction
+360 Variability in wind direction
+1 Wind intensity parameter
+0 Wind shift parameter
+0.2 FSPREAD parameter (lower values are more complex shapes zero one)
+0.1 FEXT parameter (point one five is most like landsum effect)
+1 Fire severity pattern
+0 Torus (0 for real landscapes; 1 for test rectangular landscapes)
+0           Years before burn
+3			Number of slope classes
+-99999 -0.20 0.8	Slope class definitions
+-0.2 0.1 1.0
+0.1 99999 1.2
+50001 30 10000 10000 1 1 0 0 0 0 0
+50001 50 1500 15000 1 1 0 0 0 0 0
+50001 100 2000 20000 1 1 0 0 0 0 0
+50001 200 4000 20000 1 1 0 0 0 0 0
+50001 500 1000 10000 1 1 0 0 0 0 0
+50001 1000 2500 10000 1 1 0 0 0 0 0
