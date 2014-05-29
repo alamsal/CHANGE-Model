@@ -1463,7 +1463,7 @@ int main( int argc, char *argv[] ) {
 	writelog.clear();
 	writelog.close();
 	printf("Simulation is finished !!!");
-	cin.get();
+	//cin.get();
 
 	return 0;
 }
