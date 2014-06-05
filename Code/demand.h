@@ -1,3 +1,9 @@
+// File:		demandH.h
+// Author: 		Ashis Lamsal
+// Last Update:	11/44/2013
+// Decription:	Contains external variable declarations and function prototypes
+//              for demand.cpp
+//----------------------------------------------------------------------------
 #ifndef demandH
 #define demandH
 

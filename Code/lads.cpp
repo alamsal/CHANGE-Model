@@ -4,7 +4,7 @@
 //----------------------------------------------------------------------------
 // File:		lads.cpp  (CHANGE)
 // Author: 		Aashis Lamsal & Mike Wimberly
-// Last Update:	4/3/2014
+// Last Update:	6/4/2014
 //----------------------------------------------------------------------------
 #include "lads.h"
 #include "ladsio.h"
@@ -921,7 +921,7 @@ int main( int argc, char *argv[] ) {
 
 		}
 		//Read grid lcc.gis
-		lcc_head= read_grid("lcc",lccgrid);			 
+		lcc_head= read_grid("initlclu",lccgrid);			 
 		//Compare # of class in lcc grid with runname.lcc file
 		if(input_error_flag==1)
 		{
