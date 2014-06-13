@@ -1330,7 +1330,7 @@ int main( int argc, char *argv[] ) {
 				if(snapsum >= 1) {
 					gen_snapshot("state", ZeroPadNumber(demperiod), buffer_head, snapsum, 0);
 					reclassify_lclu(com_stateout,com_lclustate,com_counter-1);
-					gen_lccsnapshot("broader", ZeroPadNumber(demperiod), buffer_head, snapsum, 0); //Temporary intermediate snapshot  of lclugrid- just to make sure program is working.
+					gen_lccsnapshot("lclu", ZeroPadNumber(demperiod), buffer_head, snapsum, 0); //Temporary intermediate snapshot  of lclugrid- just to make sure program is working.
 					writelog<<"END DEMAND PERIOD #"<<ZeroPadNumber(demperiod)<<" ****************************************************************************************************************************"<<endl;
 				}
 				// or output age summaries

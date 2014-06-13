@@ -4,11 +4,11 @@
 1 Default initial state   
 1 ----------------woody wetland-------------------    
 1 Output Code    
-90			LCLU Code (Classified as wetlands changed to water)
+95			LCLU Code (Classified as wetlands changed to water)
 1 Fire spread modifier (VFACT)  
 1 Fire initiation modifier   
-0.8       	High severity probability (stand replacement) 
-0.2     	Moderate severity probability (mixed/non-lethal)  
+0.5       	High severity probability (stand replacement) 
+0.5     	Moderate severity probability (mixed/non-lethal)  
 0 Initial age    
 500 Overstory succession lag   
 1 Overstory succession transition   
@@ -19,7 +19,8 @@
 1 1 Mixed severity fire disturbance 
 1 0 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire 
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance
 2 ********Grass**
@@ -30,8 +31,8 @@
 71			LCLU Code (Classified as grassland) 
 1 Fire spread modifier (VFACT)  
 1 Fire initiation modifier   
-0.8       	High severity probability (stand replacement) 
-0.2     	Moderate severity probability (mixed/non-lethal)  
+0.9       	High severity probability (stand replacement) 
+0.1     	Moderate severity probability (mixed/non-lethal)  
 0 Initial age    
 60 Overstory succession lag   
 2 Overstory succession transition   
@@ -42,12 +43,13 @@
 1 1 Mixed severity fire disturbance 
 1 0 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance
 2 ----------------woody encoachment-------------------    
 3 Output Code    
-52			LCLU Code (Classified as shrubland) 
+71			LCLU Code (Classified as shrubland) 
 1 Fire spread modifier (VFACT)  
 1 Fire initiation modifier   
 0.5 Fire severity modifier (stand replacement) 
@@ -62,7 +64,8 @@
 1 1 Mixed severity fire disturbance 
 1 2 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance
 3 ************************herbaceous_wetland********
@@ -70,11 +73,11 @@
 1 Default initial state   
 1 ----------------herbaceous_wetland-------------------    
 4 Output Code    
-95			LCLU Code (Classified as wetlands changed to water)
+90			LCLU Code (Classified as wetlands changed to water)
 1 Fire spread modifier (VFACT)  
 1 Fire initiation modifier   
-0.8       	High severity probability (stand replacement) 
-0.2     	Moderate severity probability (mixed/non-lethal)  
+0.6       	High severity probability (stand replacement) 
+0.4     	Moderate severity probability (mixed/non-lethal)  
 0 Initial age    
 500 Overstory succession lag   
 1 Overstory succession transition   
@@ -85,7 +88,8 @@
 1 1 Mixed severity fire disturbance 
 1 0 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance
 4 ********** subalpine *****   
@@ -108,7 +112,8 @@
 1 0 Mixed severity fire disturbance 
 1 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 2 --------------Subalpine - Sapling_Open-------------------   
@@ -128,7 +133,8 @@
 2 0 Mixed severity fire disturbance 
 2 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 3 ----------------Subalpine  - Pole_tree_open-------------------   
@@ -148,7 +154,8 @@
 3 0 Mixed severity fire disturbance 
 3 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 4 ----------------Subalpine  - Pole_tree_medium-------------------   
@@ -168,7 +175,8 @@
 3 0 Mixed severity fire disturbance 
 4 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 5 ----------------Subalpine  - Pole_tree_closed-------------------   
@@ -188,7 +196,8 @@
 4 0 Mixed severity fire disturbance 
 5 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 6 ----------------Subalpine  - Small_tree_open-------------------   
@@ -208,7 +217,8 @@
 6 0 Mixed severity fire disturbance 
 6 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 7 ----------------Subalpine  - Small_tree_medium-------------------   
@@ -228,7 +238,8 @@
 6 0 Mixed severity fire disturbance 
 7 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 8 ----------------Subalpine  - Small_tree_closed-------------------   
@@ -248,7 +259,8 @@
 7 0 Mixed severity fire disturbance 
 8 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 9 ----------------Subalpine  - Med_tree_open-------------------   
@@ -268,7 +280,8 @@
 9 0 Mixed severity fire disturbance 
 9 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 10 ----------------Subalpine  - Med_tree_medium-------------------   
@@ -288,7 +301,8 @@
 9 0 Mixed severity fire disturbance 
 10 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+1 1 1 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 11 ----------------Subalpine  - Med_tree_closed-------------------   
@@ -307,8 +321,9 @@
 1 1 Stand replacement fire disturbance 
 10 0 Mixed severity fire disturbance 
 11 0 Non-lethal fire disturbance  
-1 10 0 Light Treatment  
-1 1 1 Clearcut   
+0 0 0 Light Treatment  
+1 1 1 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 12 ----------------Subalpine  - Large_tree_open-------------------   
@@ -328,7 +343,8 @@
 12 0 Mixed severity fire disturbance 
 12 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 13 ----------------Subalpine  - Large_tree_medium-------------------   
@@ -348,7 +364,8 @@
 12 0 Mixed severity fire disturbance 
 13 0 Non-lethal fire disturbance  
 1 12 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+1 12 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 14 ----------------Subalpine  - Large_tree_closed-------------------   
@@ -368,7 +385,8 @@
 13 0 Mixed severity fire disturbance 
 14 0 Non-lethal fire disturbance  
 1 12 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+1 13 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 15 ----------------Subalpine  - Very_large_tree_open-------------------   
@@ -388,7 +406,8 @@
 15 0 Mixed severity fire disturbance 
 15 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 16 ----------------Subalpine  - Very_large_tree_medium-------------------   
@@ -408,7 +427,8 @@
 15 0 Mixed severity fire disturbance 
 16 0 Non-lethal fire disturbance  
 1 15 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+1 15 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 17 ----------------Subalpine - Very_large_tree_closed-------------------   
@@ -428,7 +448,8 @@
 16 0 Mixed severity fire disturbance 
 17 0 Non-lethal fire disturbance  
 1 15 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+1 16 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance
 5 ****Mixed Conifer Forest*******
@@ -451,7 +472,8 @@
 1 0 Mixed severity fire disturbance 
 1 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 2 --------------Mixed Conifer - Sapling_Open-------------------   
@@ -471,7 +493,8 @@
 2 0 Mixed severity fire disturbance 
 2 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 3 ----------------Mixed Conifer - Pole_tree_open-------------------   
@@ -491,7 +514,8 @@
 3 0 Mixed severity fire disturbance 
 3 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 4 ----------------Mixed Conifer- Pole_tree_medium------------------
@@ -511,7 +535,8 @@
 3 0 Mixed severity fire disturbance 
 4 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 5 ----------------Mixed Conifer - Pole_tree_closed-------------------   
@@ -531,7 +556,8 @@
 4 0 Mixed severity fire disturbance 
 5 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 6 ---------------Mixed Conifer - Small_tree_open-------------------   
@@ -551,7 +577,8 @@
 6 0 Mixed severity fire disturbance 
 6 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 7 ----------------Mixed Conifer - Small_tree_medium--------------- 
@@ -570,8 +597,9 @@
 1 1 Stand replacement fire disturbance 
 6 0 Mixed severity fire disturbance 
 7 0 Non-lethal fire disturbance  
-0 0 0 Light Treatment  
-0 0 0 Clearcut   
+1 6 0 Light Treatment  
+0 0 0 Clearcut
+1 6 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 8 ----------------Mixed Conifer - Small_tree_closed-------------  
@@ -590,8 +618,9 @@
 1 1 Stand replacement fire disturbance 
 7 0 Mixed severity fire disturbance 
 8 0 Non-lethal fire disturbance  
-0 0 0 Light Treatment  
-0 0 0 Clearcut   
+1 6 0 Light Treatment  
+0 0 0 Clearcut
+1 7 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 9 ----------------Mixed Conifer - Med_tree_open-------------------   
@@ -611,7 +640,8 @@
 9 0 Mixed severity fire disturbance 
 9 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 10 ----------------Mixed Conifer - Med_tree_medium-------------------   
@@ -631,7 +661,8 @@
 9 0 Mixed severity fire disturbance 
 10 0 Non-lethal fire disturbance  
 1 9 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+1 9 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 11 ----------------Mixed Conifer - Med_tree_closed-------------------   
@@ -651,7 +682,8 @@
 10 0 Mixed severity fire disturbance 
 11 0 Non-lethal fire disturbance  
 1 9 0 Light Treatment  
-1 1 1 Clearcut     
+1 1 1 Clearcut
+1 10 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 12 ----------------Mixed Conifer - Large_tree_open-------------------   
@@ -671,7 +703,8 @@
 12 0 Mixed severity fire disturbance 
 12 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 13 ----------------Mixed Conifer - Large_tree_medium-------------------   
@@ -691,7 +724,8 @@
 12 0 Mixed severity fire disturbance 
 13 0 Non-lethal fire disturbance  
 1 12 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+1 12 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 14 ----------------Mixed Conifer - Large_tree_closed-------------------   
@@ -710,8 +744,9 @@
 1 1 Stand replacement fire disturbance 
 13 0 Mixed severity fire disturbance 
 14 0 Non-lethal fire disturbance  
-1 9 0 Light Treatment  
-1 1 1 Clearcut    
+1 12 0 Light Treatment  
+1 1 1 Clearcut
+1 113 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 15 ----------------Mixed Conifer - Very_large_tree_open-------------------   
@@ -731,7 +766,8 @@
 15 0 Mixed severity fire disturbance 
 15 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+0 0 0 Rx fire  
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 16 ----------------Mixed Conifer - Very_large_tree_medium-------------------   
@@ -751,7 +787,8 @@
 15 0 Mixed severity fire disturbance 
 16 0 Non-lethal fire disturbance  
 1 15 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+1 15 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 17 ----------------Mixed Conifer - Very_large_tree_closed-------------------   
@@ -771,7 +808,8 @@
 16 0 Mixed severity fire disturbance 
 17 0 Non-lethal fire disturbance  
 1 15 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+1 16 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance
 6 **********hardwood*****   
@@ -794,7 +832,8 @@
 1 0 Mixed severity fire disturbance 
 1 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 2 --------------Lodgepole Pine - Sapling_Open-------------------   
@@ -814,7 +853,8 @@
 2 0 Mixed severity fire disturbance 
 2 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 3 ----------------hardwood - Pole_tree_open-------------------   
@@ -834,7 +874,8 @@
 3 0 Mixed severity fire disturbance 
 3 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 4 ----------------hardwood - Pole_tree_medium-------------------   
@@ -854,7 +895,8 @@
 3 0 Mixed severity fire disturbance 
 4 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 5 ----------------hardwood - Pole_tree_closed-------------------   
@@ -874,7 +916,8 @@
 4 0 Mixed severity fire disturbance 
 5 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 6 ----------------hardwood - Small_tree_open-------------------   
@@ -894,7 +937,8 @@
 6 0 Mixed severity fire disturbance 
 6 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 7 ----------------hardwood - Small_tree_medium-------------------   
@@ -914,7 +958,8 @@
 6 0 Mixed severity fire disturbance 
 7 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 8 ----------------hardwood - Small_tree_closed-------------------   
@@ -934,7 +979,8 @@
 7 0 Mixed severity fire disturbance 
 8 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 9 ----------------hardwood - Med_tree_open-------------------   
@@ -954,7 +1000,8 @@
 9 0 Mixed severity fire disturbance 
 9 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+1 1 1 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 10 ----------------hardwood - Med_tree_medium-------------------   
@@ -974,7 +1021,8 @@
 9 0 Mixed severity fire disturbance 
 10 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+1 1 1 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 11 ----------------hardwood - Med_tree_closed-------------------   
@@ -994,7 +1042,8 @@
 10 0 Mixed severity fire disturbance 
 11 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+1 1 1 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 12 ----------------hardwood - Large_tree_open-------------------   
@@ -1014,7 +1063,8 @@
 12 0 Mixed severity fire disturbance 
 12 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 13 ----------------hardwood - Large_tree_medium-------------------   
@@ -1034,7 +1084,8 @@
 12 0 Mixed severity fire disturbance 
 13 0 Non-lethal fire disturbance  
 1 12 0 Light Treatment  
-1 1 1 Clearcut  
+1 1 1 Clearcut
+1 12 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 14 ----------------hardwood - Large_tree_closed-------------------   
@@ -1054,7 +1105,8 @@
 13 0 Mixed severity fire disturbance 
 14 0 Non-lethal fire disturbance  
 1 12 0 Light Treatment  
-1 1 1 Clearcut  
+1 1 1 Clearcut
+1 13 0 Rx fire  
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 15 ----------------hardwood - Very_large_tree_open-------------------   
@@ -1074,7 +1126,8 @@
 15 0 Mixed severity fire disturbance 
 15 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 16 ----------------hardwood - Very_large_tree_medium-------------------   
@@ -1094,7 +1147,8 @@
 15 0 Mixed severity fire disturbance 
 16 0 Non-lethal fire disturbance  
 1 15 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+1 15 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 17 ----------------hardwood - Very_large_tree_closed-------------------   
@@ -1114,7 +1168,8 @@
 16 0 Mixed severity fire disturbance 
 17 0 Non-lethal fire disturbance  
 1 15 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+1 16 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance
 7 ***hardwood_conifer_mixed forest***
@@ -1137,7 +1192,8 @@
 1 1 Mixed severity fire disturbance 
 1 0 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire      
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 2 --------------hardwood_conifer_mixed forest - Sapling_Open-------------------   
@@ -1157,7 +1213,8 @@
 2 1 Mixed severity fire disturbance 
 2 0 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 3 ----------------hardwood_conifer_mixed forest(aspen dominate) - Pole_tree_open ----------
@@ -1177,7 +1234,8 @@
 3 0 Mixed severity fire disturbance 
 3 0 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 4 ----------------hardwood_conifer_mixed forest(aspen dominate) - Pole_tree_medium---------
@@ -1197,7 +1255,8 @@
 3 0 Mixed severity fire disturbance 
 4 0 Non-lethal fire disturbance  
 1 18 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 5 ----------------hardwood_conifer_mixed forest(aspen dominate) - Pole_tree_closed--------
@@ -1217,7 +1276,8 @@
 4 0 Mixed severity fire disturbance 
 5 0 Non-lethal fire disturbance  
 1 19 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 6 ----------------hardwood_conifer_mixed forest(Co-dominate) - Small_tree_open---------
@@ -1237,7 +1297,8 @@
 6 0 Mixed severity fire disturbance 
 6 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 7 ----------------hardwood_conifer_mixed forest(Co-dominate) - Small_tree_medium-------
@@ -1257,7 +1318,8 @@
 6 0 Mixed severity fire disturbance 
 7 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 8 ----------------hardwood_conifer_mixed forest(Co-dominate) - Small_tree_closed---------
@@ -1277,7 +1339,8 @@
 7 0 Mixed severity fire disturbance 
 8 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment    
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 9 ----------------hardwood_conifer_mixed forest(Conifer-dominate) - Med_tree_open--------
@@ -1297,7 +1360,8 @@
 9 0 Mixed severity fire disturbance 
 9 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+1 1 1 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 10 ----------------hardwood_conifer_mixed forest(Conifer-dominate) - Med_tree_medium------
@@ -1316,8 +1380,9 @@
 1 1 Stand replacement fire disturbance 
 9 0 Mixed severity fire disturbance 
 10 0 Non-lethal fire disturbance  
-0 0 0 Light Treatment    
-0 0 0 Clearcut   
+0 0 0 Light Treatment  
+1 1 1 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 11 ----------------hardwood_conifer_mixed forest(Conifer-dominate) - Med_tree_closed------
@@ -1336,8 +1401,9 @@
 1 1 Stand replacement fire disturbance 
 10 0 Mixed severity fire disturbance 
 11 0 Non-lethal fire disturbance  
-0 0 0 Light Treatment   
-0 0 0 Clearcut   
+0 0 0 Light Treatment  
+1 1 1 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 12 ----------------hardwood_conifer_mixed forest(Conifer) - Large_tree_open-------------------   
@@ -1357,7 +1423,8 @@
 12 0 Mixed severity fire disturbance 
 12 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 13 ----------------hardwood_conifer_mixed forest(Conifer) - Large_tree_medium-------------
@@ -1377,7 +1444,8 @@
 12 0 Mixed severity fire disturbance 
 13 0 Non-lethal fire disturbance  
 1 12 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+1 12 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 14 ----------------hardwood_conifer_mixed forest(Conifer) - Large_tree_closed-------
@@ -1397,7 +1465,8 @@
 13 0 Mixed severity fire disturbance 
 14 0 Non-lethal fire disturbance  
 1 12 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+1 13 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 15 ----------------hardwood_conifer_mixed forest(Conifer) - Very_large_tree_open-----
@@ -1417,7 +1486,8 @@
 15 0 Mixed severity fire disturbance 
 15 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 16 ----------------hardwood_conifer_mixed forest(Conifer) - Very_large_tree_medium----
@@ -1437,7 +1507,8 @@
 15 0 Mixed severity fire disturbance 
 16 0 Non-lethal fire disturbance  
 1 15 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+1 15 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 17 ----------------hardwood_conifer_mixed forest(Conifer) - Very_large_tree_closed------
@@ -1457,7 +1528,8 @@
 16 0 Mixed severity fire disturbance 
 17 0 Non-lethal fire disturbance  
 1 15 0 Light Treatment  
-1 1 1 Clearcut  
+1 1 1 Clearcut
+1 16 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance
 8 *****************Ponderosa Pine*****************   
@@ -1480,7 +1552,8 @@
 1 1 Mixed severity fire disturbance 
 1 0 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 2 --------------Ponderosa Pine - Sapling_Open-------------------   
@@ -1500,7 +1573,8 @@
 2 1 Mixed severity fire disturbance 
 2 0 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 3 ----------------Ponderosa Pine - Pole_tree_open-------------------   
@@ -1520,7 +1594,8 @@
 3 0 Mixed severity fire disturbance 
 3 0 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 4 ----------------Ponderosa Pine - Pole_tree_medium-------------------   
@@ -1540,7 +1615,8 @@
 3 0 Mixed severity fire disturbance 
 4 0 Non-lethal fire disturbance  
 1 18 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 5 ----------------Ponderosa Pine - Pole_tree_closed-------------------   
@@ -1560,7 +1636,8 @@
 4 0 Mixed severity fire disturbance 
 5 0 Non-lethal fire disturbance  
 1 19 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 6 ----------------Ponderosa Pine - Small_tree_open-------------------   
@@ -1580,7 +1657,8 @@
 6 0 Mixed severity fire disturbance 
 6 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 7 ----------------Ponderosa Pine - Small_tree_medium-------------------   
@@ -1599,8 +1677,9 @@
 1 1 Stand replacement fire disturbance 
 6 0 Mixed severity fire disturbance 
 7 0 Non-lethal fire disturbance  
-1 20 0 Light Treatment  
-0 0 0 Clearcut   
+1 6 0 Light Treatment  
+0 0 0 Clearcut
+1 6 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 8 ----------------Ponderosa Pine - Small_tree_closed-------------------   
@@ -1619,8 +1698,9 @@
 1 1 Stand replacement fire disturbance 
 7 0 Mixed severity fire disturbance 
 8 0 Non-lethal fire disturbance  
-0 0 0 Light Treatment  
-0 0 0 Clearcut   
+1 6 0 Light Treatment  
+0 0 0 Clearcut
+1 7 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 9 ----------------Ponderosa Pine - Med_tree_open-------------------   
@@ -1640,7 +1720,8 @@
 9 0 Mixed severity fire disturbance 
 9 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-0 0 0 Clearcut   
+1 1 1 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 10 ----------------Ponderosa Pine - Med_tree_medium-------------------   
@@ -1659,8 +1740,9 @@
 1 1 Stand replacement fire disturbance 
 9 0 Mixed severity fire disturbance 
 10 0 Non-lethal fire disturbance  
-0 0 0 Light Treatment  
-0 0 0 Clearcut   
+1 9 0 Light Treatment  
+1 1 1 Clearcut
+1 9 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 11 ----------------Ponderosa Pine - Med_tree_closed-------------------   
@@ -1679,8 +1761,9 @@
 1 1 Stand replacement fire disturbance 
 10 0 Mixed severity fire disturbance 
 11 0 Non-lethal fire disturbance  
-0 0 0 Light Treatment  
-0 0 0 Clearcut   
+1 9 0 Light Treatment  
+1 1 1 Clearcut
+1 10 0 Rx fire  
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 12 ----------------Ponderosa Pine - Large_tree_open-------------------   
@@ -1700,7 +1783,8 @@
 12 0 Mixed severity fire disturbance 
 12 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 13 ----------------Pondersoa Pine - Large_tree_medium-------------------   
@@ -1720,7 +1804,8 @@
 12 0 Mixed severity fire disturbance 
 13 0 Non-lethal fire disturbance  
 1 12 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+1 12 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 14 ----------------Ponderosa Pine - Large_tree_closed-------------------   
@@ -1740,7 +1825,8 @@
 13 0 Mixed severity fire disturbance 
 14 0 Non-lethal fire disturbance  
 1 12 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+1 13 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 15 ----------------Ponderosa Pine - Very_large_tree_open-------------------   
@@ -1760,7 +1846,8 @@
 15 0 Mixed severity fire disturbance 
 15 0 Non-lethal fire disturbance  
 0 0 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 16 ----------------Ponderosa Pine - Very_large_tree_medium-------------------   
@@ -1780,7 +1867,8 @@
 15 0 Mixed severity fire disturbance 
 16 0 Non-lethal fire disturbance  
 1 15 0 Light Treatment  
-1 1 1 Clearcut   
+1 1 1 Clearcut
+1 15 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance  
 17 ----------------Ponderosa Pine - Very_large_tree_closed-------------------   
@@ -1800,7 +1888,8 @@
 16 0 Mixed severity fire disturbance 
 17 0 Non-lethal fire disturbance  
 1 15 0 Light Treatment  
-1 1 1 Clearcut    
+1 1 1 Clearcut
+1 16 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance 
 9 ************************shrub, Sagebrush**********      
@@ -1808,7 +1897,7 @@
 1 Default initial state   
 1 ----------------shrub-------------------    
 90 Output Code
-71			LCLU Code (Classified as Grassland)    
+52			LCLU Code (Classified as Grassland)    
 1 Fire spread modifier (VFACT)  
 1 Fire initiation modifier   
 0.6       	High severity probability (stand replacement) 
@@ -1823,7 +1912,8 @@
 1 1 Mixed severity fire disturbance 
 1 1 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire    
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance 
 2 ----------------Tree-woody (savanna)-------------------    
@@ -1843,7 +1933,8 @@
 1 1 Mixed severity fire disturbance 
 1 2 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance
 10 ***************deciduous/other shrub*********      
@@ -1851,7 +1942,7 @@
 1 Default initial state   
 1 ----------------shrub-------------------    
 92 Output Code
-71			LCLU Code (Classified as Grassland)    
+52			LCLU Code (Classified as Grassland)    
 1 Fire spread modifier (VFACT)  
 1 Fire initiation modifier   
 0.6       	High severity probability (stand replacement) 
@@ -1866,7 +1957,8 @@
 1 1 Mixed severity fire disturbance 
 1 1 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance 
 2 ----------------Tree-woody (savanna)-------------------    
@@ -1886,7 +1978,8 @@
 1 1 Mixed severity fire disturbance 
 1 2 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance
 11 *********Pinyon-Juniper Woodland(PJW)******
@@ -1910,6 +2003,7 @@
 1 0		Low-severity fire disturbance
 0 0 0		Thinning
 0 0 0		Clearcut
+0 0 0 		Rx fire
 0 0 0		Non-spatial disturbance 1
 0 0 0		Non-spatial disturbance 2
 2 --------------PJW - Sapling_Open-------------------   
@@ -1929,7 +2023,8 @@
 2 1 Mixed severity fire disturbance 
 2 0 Non-lethal fire disturbance  
 0 0 0 Thinning   
-0 0 0 Clearcut   
+0 0 0 Clearcut
+0 0 0 Rx fire   
 0 0 0 Non-spatial disturbance  
 0 0 0 Non-spatial disturbance 
 3 ----------------PJW - Pole_tree_open-------------------
@@ -1950,6 +2045,7 @@
 3 0		Non-lethal fire disturbance
 0 0 0		Thinning
 0 0 0		Clearcut
+0 0 0      Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 4 ----------------PJW - Pole_tree_medium-------------------
@@ -1970,6 +2066,7 @@
 4 0		Non-lethal fire disturbance
 0 0 0		Thinning
 0 0 0		Clearcut
+0 0 0       Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 5 ----------------PJW - Pole_tree_closed-------------------
@@ -1990,6 +2087,7 @@
 5 0		Non-lethal fire disturbance
 0 0 0		Thinning
 0 0 0		Clearcut
+0 0 0       Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 6 ----------------Juniper - Small_tree_open-------------------
@@ -2010,6 +2108,7 @@
 6 0		Non-lethal fire disturbance
 0 0 0		Thinning
 0 0 0		Clearcut
+0 0 0       Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 7 ----------------Juniper - Small_tree_medium-------------------
@@ -2030,6 +2129,7 @@
 7 0		Non-lethal fire disturbance
 0 0 0		Thinning
 0 0 0		Clearcut
+0 0 0       Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 8 ----------------Juniper - Small_tree_closed-------------------
@@ -2050,6 +2150,7 @@
 10 0		Non-lethal fire disturbance
 0 0 0		Thinning
 0 0 0		Clearcut
+0 0 0       Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 9 ----------------Juniper - Med_tree_open-------------------
@@ -2070,6 +2171,7 @@
 9 0		Non-lethal fire disturbance
 0 0 0		Thinning
 0 0 0		Clearcut
+0 0 0       Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 10 ----------------Juniper - Med_tree_medium-------------------
@@ -2088,8 +2190,9 @@
 1 1		Stand replacement fire disturbance
 9 0		Mixed severity fire disturbance
 10 0		Non-lethal fire disturbance
-1 5 95		Thinning
-1 1 0		Clearcut
+0 0 0		Thinning
+0 0 0		Clearcut
+0 0 0      Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 11 ----------------Juniper - Med_tree_closed-------------------
@@ -2110,6 +2213,7 @@
 11 0		Non-lethal fire disturbance
 0 0 0		Thinning
 0 0 0		Clearcut
+0 0 0      Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 12 ----------------Juniper - Large_tree_open-------------------
@@ -2130,6 +2234,7 @@
 12 0		Non-lethal fire disturbance
 0 0 0		Thinning
 0 0 0		Clearcut
+0 0 0      Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 13 ----------------Juniper - Large_tree_medium-------------------
@@ -2148,8 +2253,9 @@
 1 1		Stand replacement fire disturbance
 12 0		Mixed severity fire disturbance
 13 0		Non-lethal fire disturbance
-0 0 0		Thinning
+1 12 0		Thinning
 0 0 0		Clearcut
+1 12 0      Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 14 ----------------Juniper - Large_tree_closed-------------------
@@ -2168,8 +2274,9 @@
 1 1		Stand replacement fire disturbance
 13 0		Mixed severity fire disturbance
 14 0		Non-lethal fire disturbance
-0 0 0		Thinning
+1 12 0		Thinning
 0 0 0		Clearcut
+1 13 0      Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 15 ----------------Juniper - Very_large_tree_open-------------------
@@ -2188,8 +2295,9 @@
 1 1		Stand replacement fire disturbance
 15 0		Mixed severity fire disturbance
 15 0		Non-lethal fire disturbance
-0 0 0		Thinning
+0 12 0		Thinning
 0 0 0		Clearcut
+0 12 0      Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 16 ----------------Juniper - Very_large_tree_medium-------------------
@@ -2208,8 +2316,9 @@
 1 1		Stand replacement fire disturbance
 15 0		Mixed severity fire disturbance
 16 0		Non-lethal fire disturbance
-0 0 0		Thinning
+1 15 0		Thinning
 0 0 0		Clearcut
+1 15 0      Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
 17 ----------------Juniper - Very_large_tree_closed-------------------
@@ -2228,7 +2337,8 @@
 1 1		Stand replacement fire disturbance
 16 0		Mixed severity fire disturbance
 17 0		Non-lethal fire disturbance
-0 0 0		Thinning
+1 15 0		Thinning
 0 0 0		Clearcut
+1 16 0      Rx fire
 0 0 0		Non-spatial disturbance
 0 0 0		Non-spatial disturbance
