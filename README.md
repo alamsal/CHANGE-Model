@@ -11,3 +11,23 @@ CHANGE combines the capabilities of FORE-SCE and LADS in an integrated modeling 
 Model output is in the form of raster GIS layers that characterize the spatial patterns of LCLU classes and successional stages at the end of each time step. These files can be processed using standard GIS, image processing and statistical software (e.g., ArcView, ArcGIS, Imagine, R) to analyze spatial patterns of forest vegetation. Various tabular summaries of landscape composition and land cover change transitions are also provided.
 
 The model is a stand-alone program written in Visual C++ environment for use in Microsoft Windows Operating System environment, and in continuous development.
+
+Publications:
+
+1. Michael C. Wimberly, Zhihua Liu, Aashis Lamsal, and Terry L. Sohl. 2014. Simulating forest landscape disturbances as coupled human and natural systems. Chapter 11 In: Modeling Forest Landscape Disturbances. A. H. Perera, B.Sturtevant, and L. J. Buse(Eds.)(Springer, New York, USA, submitted)
+
+2. Zhihua Liu, Michael C. Wimberly, Aashis Lamsal, Terry L. Sohl, Todd J. Hawbaker. 2015. Interactive effects of climate change and wildland-urban interface growth on wildfire risk in the Colorado Front Range Corridor (Landscape Ecology, submitted)
+
+Presentations and proceedings
+
+1. Michael C. Wimberly, Terry L. Sohl, Aashis Lamsal, Zhihua Liu, Todd J.Hawbaker.2013. An Integrated Land Change Model for Projecting Future Climate and Land Change Scenarios. (Oral presentation in Landscape Dynamics Along Environmental Gradients, 2013 Annual Symposium Austin, TX, April 14-18)
+
+2. Aashis Lamsal, Zhihua Liu, Michael C. Wimberly. 2013. Coupling Simulations of Human Driven Land Use Change with Natural Vegetation Dynamics. (Poster presentation in 4thInternational Conference on Computing for Geospatial Research & Application 2013, San Jose, CA, July 22-24)
+
+3. Zhihua Liu, Michael C. Wimberly, Aashis Lamsal, Terry L. Sohl, Todd J. Hawbaker. 2014. Coupled simulation of human-driven and natural land cover change in the Front Range Corridor, CO. International Environmental Modelling and Software Society (iEMSs) 7th International Congress on Environmental Modelling and Software San Diego, California, USA, D.P. Ames, N. Quinn (Eds.)  http://www.iemss.org/society/index.php/iemss-2014-proceedings
+
+4. Aashis Lamsal, Michael C. Wimberly, Zhihua Liu, Terry L. Sohl. 2014. A simulation model of human-natural interactions in dynamic landscapes. International  Environmental Modelling and Software Society (iEMSs) 7th International Congress on Environmental Modelling and Software San Diego, California, USA, D.P. Ames, N. Quinn (Eds.) http://www.iemss.org/society/index.php/iemss-2014-proceedings
+
+5. Zhihua Liu, Michael C. Wimberly, Aashis Lamsal, Terry L. Sohl, Todd J. Hawbaker. 2014. Coupled simulation of land cover change and natural dynamics in Front Range Corridor, Colorado. (Poster 2014 ESA Annual Meeting, Sacramento, CA, August 10-15.)
+
+
