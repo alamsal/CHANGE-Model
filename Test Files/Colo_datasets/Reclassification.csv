@@ -1,0 +1,117 @@
+Communityname,CommunityID,SuccID,OutputID,stages,stagesID,stagesID2
+woodywetland,1,1,1,woody wetland,1,15
+grass,2,1,2,Grass,2,12
+grass,2,2,3,Grass,2,12
+herbwetland,3,1,4,heberous wetland,3,16
+subapline,4,1,5,Evergreen_Early_successional ,4,8
+subapline,4,2,6,Evergreen_Early_successional ,4,8
+subapline,4,3,7,Evergreen_Early_successional ,4,8
+subapline,4,4,8,Evergreen_Early_successional ,4,8
+subapline,4,5,9,Evergreen_Early_successional ,4,8
+subapline,4,6,10,Evergreen_Mid_successional ,5,9
+subapline,4,7,11,Evergreen_Mid_successional ,5,9
+subapline,4,8,12,Evergreen_Mid_successional ,5,9
+subapline,4,9,13,Evergreen_Mid_successional ,5,9
+subapline,4,10,14,Evergreen_Mid_successional ,5,9
+subapline,4,11,15,Evergreen_Mid_successional ,5,9
+subapline,4,12,16,Evergreen_Late_Successional,6,10
+subapline,4,13,17,Evergreen_Late_Successional,6,10
+subapline,4,14,18,Evergreen_Late_Successional,6,10
+subapline,4,15,19,Evergreen_Late_Successional,6,10
+subapline,4,16,20,Evergreen_Late_Successional,6,10
+subapline,4,17,21,Evergreen_Late_Successional,6,10
+mixedconifer,5,1,22,Evergreen_Early_successional ,4,8
+mixedconifer,5,2,23,Evergreen_Early_successional ,4,8
+mixedconifer,5,3,24,Evergreen_Early_successional ,4,8
+mixedconifer,5,4,25,Evergreen_Early_successional ,4,8
+mixedconifer,5,5,26,Evergreen_Early_successional ,4,8
+mixedconifer,5,6,27,Evergreen_Mid_successional ,5,9
+mixedconifer,5,7,28,Evergreen_Mid_successional ,5,9
+mixedconifer,5,8,29,Evergreen_Mid_successional ,5,9
+mixedconifer,5,9,30,Evergreen_Mid_successional ,5,9
+mixedconifer,5,10,31,Evergreen_Mid_successional ,5,9
+mixedconifer,5,11,32,Evergreen_Mid_successional ,5,9
+mixedconifer,5,12,33,Evergreen_Late_Successional,6,10
+mixedconifer,5,13,34,Evergreen_Late_Successional,6,10
+mixedconifer,5,14,35,Evergreen_Late_Successional,6,10
+mixedconifer,5,15,36,Evergreen_Late_Successional,6,10
+mixedconifer,5,16,37,Evergreen_Late_Successional,6,10
+mixedconifer,5,17,38,Evergreen_Late_Successional,6,10
+hardwood,6,1,39,Deciduous_Early_successional ,7,5
+hardwood,6,2,40,Deciduous_Early_successional ,7,5
+hardwood,6,3,41,Deciduous_Early_successional ,7,5
+hardwood,6,4,42,Deciduous_Early_successional ,7,5
+hardwood,6,5,43,Deciduous_Early_successional ,7,5
+hardwood,6,6,44,Deciduous_Mid_successional ,7,5
+hardwood,6,7,45,Deciduous_Mid_successional ,8,6
+hardwood,6,8,46,Deciduous_Mid_successional ,8,6
+hardwood,6,9,47,Deciduous_Mid_successional ,8,6
+hardwood,6,10,48,Deciduous_Mid_successional ,8,6
+hardwood,6,11,49,Deciduous_Mid_successional ,8,6
+hardwood,6,12,50,Deciduous_Late_Successional,9,7
+hardwood,6,13,51,Deciduous_Late_Successional,9,7
+hardwood,6,14,52,Deciduous_Late_Successional,9,7
+hardwood,6,15,53,Deciduous_Late_Successional,9,7
+hardwood,6,16,54,Deciduous_Late_Successional,9,7
+hardwood,6,17,55,Deciduous_Late_Successional,9,7
+hardwoodconifer,7,1,56,Deciduous_Early_successional ,7,5
+hardwoodconifer,7,2,57,Deciduous_Early_successional ,7,5
+hardwoodconifer,7,3,58,Deciduous_Early_successional ,7,5
+hardwoodconifer,7,4,59,Deciduous_Early_successional ,7,5
+hardwoodconifer,7,5,60,Deciduous_Early_successional ,7,5
+hardwoodconifer,7,6,61,Evergreen_Mid_successional ,5,9
+hardwoodconifer,7,7,62,Evergreen_Mid_successional ,5,9
+hardwoodconifer,7,8,63,Evergreen_Mid_successional ,5,9
+hardwoodconifer,7,9,64,Evergreen_Mid_successional ,5,9
+hardwoodconifer,7,10,65,Evergreen_Mid_successional ,5,9
+hardwoodconifer,7,11,66,Evergreen_Mid_successional ,5,9
+hardwoodconifer,7,12,67,Evergreen_Late_Successional,6,10
+hardwoodconifer,7,13,68,Evergreen_Late_Successional,6,10
+hardwoodconifer,7,14,69,Evergreen_Late_Successional,6,10
+hardwoodconifer,7,15,70,Evergreen_Late_Successional,6,10
+hardwoodconifer,7,16,71,Evergreen_Late_Successional,6,10
+hardwoodconifer,7,17,72,Evergreen_Late_Successional,6,10
+PIPO,8,1,73,Evergreen_Early_successional ,4,8
+PIPO,8,2,74,Evergreen_Early_successional ,4,8
+PIPO,8,3,75,Evergreen_Early_successional ,4,8
+PIPO,8,4,76,Evergreen_Early_successional ,4,8
+PIPO,8,5,77,Evergreen_Early_successional ,4,8
+PIPO,8,6,78,Evergreen_Mid_successional ,5,9
+PIPO,8,7,79,Evergreen_Mid_successional ,5,9
+PIPO,8,8,80,Evergreen_Mid_successional ,5,9
+PIPO,8,9,81,Evergreen_Mid_successional ,5,9
+PIPO,8,10,82,Evergreen_Mid_successional ,5,9
+PIPO,8,11,83,Evergreen_Mid_successional ,5,9
+PIPO,8,12,84,Evergreen_Late_Successional,6,10
+PIPO,8,13,85,Evergreen_Late_Successional,6,10
+PIPO,8,14,86,Evergreen_Late_Successional,6,10
+PIPO,8,15,87,Evergreen_Late_Successional,6,10
+PIPO,8,16,88,Evergreen_Late_Successional,6,10
+PIPO,8,17,89,Evergreen_Late_Successional,6,10
+shrub/sagebrush,9,1,90,Shrub,10,11
+shrub/sagebrush,9,2,91,Shrub,10,11
+deciduous/othershrub,10,1,92,Shrub,10,11
+deciduous/othershrub,10,2,93,Shrub,10,11
+PJW,11,1,94,Evergreen_Early_successional ,4,8
+PJW,11,2,95,Evergreen_Early_successional ,4,8
+PJW,11,3,96,Evergreen_Early_successional ,4,8
+PJW,11,4,97,Evergreen_Early_successional ,4,8
+PJW,11,5,98,Evergreen_Early_successional ,4,8
+PJW,11,6,99,Evergreen_Mid_successional ,5,9
+PJW,11,7,100,Evergreen_Mid_successional ,5,9
+PJW,11,8,101,Evergreen_Mid_successional ,5,9
+PJW,11,9,102,Evergreen_Mid_successional ,5,9
+PJW,11,10,103,Evergreen_Mid_successional ,5,9
+PJW,11,11,104,Evergreen_Mid_successional ,5,9
+PJW,11,12,105,Evergreen_Late_Successional,6,10
+PJW,11,13,106,Evergreen_Late_Successional,6,10
+PJW,11,14,107,Evergreen_Late_Successional,6,10
+PJW,11,15,108,Evergreen_Late_Successional,6,10
+PJW,11,16,109,Evergreen_Late_Successional,6,10
+PJW,11,17,110,Evergreen_Late_Successional,6,10
+Water,,,201,Water,11,1
+Ice/Snow,,,202,Ice/Snow,12,2
+Developed,,,203,Developed,13,3
+Barren,,,204,Barren,14,4
+Pasture/Hay,,,210,Pasture/Hay,15,13
+Cultivated Crops ,,,211,Cultivated Crops ,16,14

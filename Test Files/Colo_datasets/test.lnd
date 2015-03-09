@@ -1,0 +1,18 @@
+3 Number of landtypes
+1 ************************Landtype nothslope***************
+0.8 Fire spread modifier
+1 Fire ignition modifier
+1.1 Fire severity modifier
+1 Fire severity modifier
+2 ************************Landtype semi-northslope**********
+1 Fire spread modifier
+1 Fire ignition modifier
+1 Fire severity modifier
+1 Fire severity modifier
+3 ************************Landtype south slope***********
+1.2 Fire spread modifier
+1 Fire ignition modifier
+0.9 Fire severity modifier
+1 Fire severity modifier
+
+

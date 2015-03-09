@@ -1,0 +1,13 @@
+1 1     20 	10	Water   
+1 1	20	10	Ice,Snow   
+1 3	200	20	Developed   
+1 2	200	50	Barren Land (Rock/Sand/Clay)   
+1 5	500	90	Deciduous Forest   
+1 5	500	90	Evergreen Forest   
+1 5	500	90	Shrub/Scrub   
+1 5	500	90	Grassland/Herbaceous   
+1 5	500	90	Pasture/Hay   
+1 -9	100     20	Cultivated Crops   
+1 2	200	50	herbaceous wetland   
+1 2	200	50	woody wetland  
+1 -9    70       3       hni  

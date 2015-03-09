@@ -9,16 +9,22 @@
 #ifndef vegetationH
 #define vegetationH
 
+// Define header files
+#include <vector>
+#include <map>
+#include <string>
+
 // POINTERS TO MAIN LANDSCAPE ARRAYS
 extern short int *age;	        //  patch age grid
 extern short int *tsfire;       //  time since last fire grid
 extern char *fgrid2;            //  fire pattern grid
 extern char *regime;            //  fire regime grid
 extern char *buffer;            //  fire buffer zone grid
-extern short int *management;
+extern char *ownergrid;		    //ownership type grid
 extern unsigned long int *fsum1;       // summary grid for tallying fire occurence
 extern unsigned long int *fsum2;
 extern unsigned long int *fsum3;
+extern char *severitygrid;     // fire severity grid
 extern short int *bioagegrid;
 extern double *deadgrid;
 extern short int *timeinstage;
@@ -73,11 +79,18 @@ extern int treattrans[40][40][5];
 extern int treatreset[40][40][5];
 extern int treatelig[40][40][5];
 
+
+
+// Hold filtered raster cells
+
+extern unsigned int harvDemand[200][500][10];    // Harvest demand in each mgmt zone
+
+
 // FUNCTION PROTOTYPES
 short int get_struc( int index );
 void grow_veg( void );
-void disturb_veg( int landfiresum, int sevcnt, int firereg );
+void disturb_veg( int landfiresum, int sevcnt, int firereg,bool lastFire);
 void nsdisturb_veg( int distnum );
-int gentreatment( short int treatmentunit, int treatmentclass );
+bool gentreatment( int index, short int treatmentunit, int treatmentclass );
 
 #endif

@@ -8,11 +8,11 @@
 //				based on odds ratios instead of the previous approach.
 //----------------------------------------------------------------------------
 
-#pragma hdrstop
 #include "lads.h"
 #include "fires.h"
 #include "randnum.h"
 #include "celllist.h"
+
 
 int fminrow;
 int fmaxrow;
@@ -57,9 +57,12 @@ int firespread( int firereg, int fsize ) {
 	fire_cal_odds = fire_cal / (1 - fire_cal);
 	
 	// Initialize the fire grids
-    for(index=0;index<size;index++) {
-        if(regime[index] > 0) {
+    for(index=0;index<size;index++)
+	{
+        if((buffer[index]==1) && (regime[index]>0))  // Edited: Ashis/2/19/2014, Original: if(regime[index] > 0), Final: if((buffer[index] ==1) && (regime[index]>0))
+		{		
 			fsusc[index] = statefireinit[comgrid[index] - 1][stategrid[index] - 1] * landfireinit[landgrid[index] - 1];
+			//printf("%d \t %d \n",statefireinit[comgrid[index] - 1][stategrid[index] - 1],landfireinit[landgrid[index] - 1]);
         }
         fgrid1[index] = 0;
         fgrid2[index] = 0;
@@ -70,12 +73,20 @@ int firespread( int firereg, int fsize ) {
 	    row = rand_int(maxrow) - 1;
 		col = rand_int(maxcol) - 1;
 		index = row * maxcol + col;
-        if( (int)regime[index] == firereg + 1 ) {
-		    f_susc = fsusc[index];
-			//printf("%d\t%d\n",u0_1(),f_susc);
-		    if( u0_1() < f_susc )
-                break;
-        }
+		if(buffer[index]==1)			// Edited: Ashis/2/19/2014, Original: No buffer checking, Final: if(buffer[index] ==1)  
+		{
+			if((int)regime[index] == (firereg + 1) ) {  
+		    
+				f_susc = fsusc[index];
+			
+				//printf("Fire suc...%f\t\t%f\n",f_susc,u0_1());
+		    
+				if(u0_1() < f_susc )
+				{
+					break;
+				}
+			}
+		}
     }
 
     // Burn the initial cell 
@@ -119,7 +130,7 @@ int firespread( int firereg, int fsize ) {
 
             totprob = 0;
             cellcnt = 0;
-
+			//printf("Go once through the list of burning cells\n");
             // Loop through neighboring cells
             row = nextrow;
             col = nextcol;
@@ -154,7 +165,7 @@ int firespread( int firereg, int fsize ) {
 			                index2 = row2 * maxcol + col2;
 							if(fgrid2[index2] != 0 )
 								goodcell = 0;
-							if(regime[index2] <= 0)
+							if((regime[index2] <= 0)|| (buffer[index2]<=0)) // Comment Need special care for Buffer and Regime to create good cell.- if(regime[index2] <= 0)
 								goodcell = 0;
 							if(tsfire[index2] < mintsfire)
 								goodcell = 0;
@@ -279,10 +290,10 @@ int fill_islands( void ) {
             if(processed[index] == 1)
                 continue;
             // nodata cells are output as nodata
-            if(regime[index] == 0) {
+            if(regime[index] == 0 || buffer[index]==0) {                // Edited: Ashis/2/19/2014,Original:(regime[index] == 0), Final:(regime[index] == 0 || buffer[index]==0)
                 fgrid1[index] = 0;
             // burned cells are all output as burned
-            } else if(fgrid2[index] >= 1) {
+            } else if(fgrid2[index] >= 1 && buffer[index]==1) {         // Edited: Ashis/2/19/2014, Original: else if(fgrid2[index] >= 1) , Final: else if(fgrid2[index] >= 1 && buffer[index]==1)
                 fgrid1[index] = 1;
             // otherwise, we have an unburned cell
             } else {
@@ -315,8 +326,8 @@ int fill_islands( void ) {
                                     } else if(regime[index2] == 0) {
                                         extborder = 1;
                                     // if not, add the cell the the patch
-                                    } else if(fgrid2[index2] == 0 &&
-                                      processed[index2] == 0) {
+                                    } else if((fgrid2[index2] == 0 ) && (processed[index2] == 0) && (buffer[index]==1)) // Edited: Ashis/2/19/2014, Original: else if((fgrid2[index2] == 0 ) && (processed[index2] == 0)) , Final: else if((fgrid2[index2] == 0 ) && (processed[index2] == 0) && (buffer[index]==1))
+									{
                                         newitem ++;
                                         patchy[newitem] = (unsigned short int)row3;
                                         patchx[newitem] = (unsigned short int)col3;

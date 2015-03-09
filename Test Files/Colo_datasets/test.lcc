@@ -1,0 +1,13 @@
+12	Total number of LCC classes
+11	201 0 Water
+12	202 0 Ice,Snow
+20	203 0 Developed
+30	204 0 Barren Land (Rock/Sand/Clay)
+41	205 1 Deciduous Forest
+42	206 1 Evergreen Forest
+52	208 1 Shrub/Scrub 
+71	209 1 Grassland/Herbaceous
+81	210 0 Pasture/Hay
+82	211 0 Cultivated Crops 
+90  212 1 heberous wetland
+95  213 1 woody wetland

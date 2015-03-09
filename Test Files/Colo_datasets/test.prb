@@ -1,0 +1,14 @@
+13 	No of probability surfaces
+0.95 	Water trasition prob threshold
+0.95	Ice,Snow trasition prob threshold
+0.90	Developed trasition prob threshold
+0.85	Barren Land (Rock/Sand/Clay) trasition prob threshold
+0.85	Deciduous Forest trasition prob threshold
+0.85	Evergreen Forest trasition prob threshold
+0.90	Shrub/Scrub trasition prob threshold
+0.90	Grassland/Herbaceous trasition prob threshold
+0.85	Pasture/Hay trasition prob threshold
+0.85	Cultivated Crops trasition prob threshold
+0.95	heberous wetland trasition prob threshold
+0.95	woody wetland trasition prob threshold
+0.70	HNI trasition prob threshold

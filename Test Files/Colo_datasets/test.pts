@@ -1,0 +1,13 @@
+1	1 	4  11	Water trasition  
+1	1	1	1	Ice,Snow trasition  
+1	1	5 	8	Developed trasition  
+1	2	1	1	Barren Land (Rock/Sand/Clay) trasition  
+1	7	4	6	Deciduous Forest trasition  
+1	7	4	6	Evergreen Forest trasition  
+1	5	66	186	Shrub/Scrub trasition  
+1	5	66	186	Grassland/Herbaceous trasition  
+1	-9	41 85	Pasture/Hay trasition  
+1	-9	41 85	Cultivated Crops trasition  
+1	1	2  2	heberous wetland trasition  
+1	1	2  2	woody wetland trasition
+2	1	10 8	HNI trasition   

@@ -13,7 +13,7 @@
 #include "lads.h"
 #include "randnum.h"
 #include "vegetation.h"
-#pragma package(smart_init)
+
 
 //----------------------------------------------------------------------------
 // Function:    live_biomass
@@ -65,9 +65,9 @@ int calc_bio_age( double biomass, int index, int lastfiresev ) {
     standage = log(1 - pow(biomass/cr_p1[curregime - 1], 1/cr_p3))/(-1 * cr_p2[curregime - 1]);
 
     if( fmod(standage, 1) < 0.5 ) {
-        standage2 = floor(standage);
+        standage2 =(int) floor(standage);
     } else {
-        standage2 = ceil(standage);
+        standage2 =(int) ceil(standage);
     }
 
     return standage2;
